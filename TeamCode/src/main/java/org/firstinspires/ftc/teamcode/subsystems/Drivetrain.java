@@ -94,13 +94,13 @@ public final class Drivetrain implements Subsystem {
                 RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
 
         // drive model parameters
-        public double inPerTick = 0.0019758748077;
-        public double lateralInPerTick = 0.0016497467248996012;
-        public double trackWidthTicks = 6839.452740668602;
+        public double inPerTick = 0.00197222585;
+        public double lateralInPerTick = 0.0016504424770049388;
+        public double trackWidthTicks = 6750.929119379205;
 
         // feedforward parameters (in tick units)
-        public double kS = 0.5835280789731487;
-        public double kV =  0.0002965484947801144;
+        public double kS = 0.5894557719505222;
+        public double kV =  0.0002976080726198164;
         public double kA = 0.00003;
 
         // path profile parameters (in inches)
