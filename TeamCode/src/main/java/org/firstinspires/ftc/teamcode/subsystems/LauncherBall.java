@@ -1,177 +1,208 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.Constants.dashboard;
+import static org.firstinspires.ftc.teamcode.Constants.tele;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+/**
+ * Subsystem representing a single-motor flywheel launcher.
+ * <p>
+ * This class uses a PID + feedforward loop to hold the flywheel
+ * at a desired RPM, with a configurable acceleration ramp to
+ * prevent brownouts. FTC Dashboard can be used to live-tune
+ * parameters via the {@link Params} inner class.
+ */
 @Config
-public class LauncherBall implements Subsystem {
+public final class LauncherBall implements Subsystem {
 
+    /**
+     * Holds all tunable parameters and control state for the launcher.
+     * Marked public so FTC Dashboard can reflect values in the Config tab.
+     */
     public static class Params {
-        // Target and readiness tunables
+        /** Desired target wheel speed in RPM. */
         public double targetRpm = 6000;
-        public  double readyToleranceRpm = 50;
+
+        /** Allowed RPM error margin to consider launcher "ready". */
+        public double readyToleranceRpm = 50;
+
+        /** How long (seconds) the RPM must stay in tolerance to be "ready". */
         public double readyHoldTimeSeconds = 0.10;
 
-        // Ready to launch state
+        // --- Runtime state ---
+        /** True if within tolerance for the required hold time. */
         public boolean isReadyToLaunch = false;
+        /** Timestamp when we first entered tolerance, in ns. */
         public long inTolStartNanos = 0L;
-
-        // Control state
-        public boolean enabled = false;
-        public double currentTargetRpm = 0.0;          // ramped setpoint
-        public double maxAccelRpmPerSec = 10000.0;     // ramp limit
+        /** Whether the PID control loop is enabled. */
+        public boolean enabledPid = false;
+        /** Ramped setpoint RPM used to avoid sudden current draw. */
+        public double currentTargetRpm = 0.0;
+        /** Max ramp rate in RPM/sec. */
+        public double maxAccelRpmPerSec = 10000.0;
+        /** Time of last loop iteration, in ns. */
         public long lastLoopNanos = 0L;
 
-        // PID (per-motor)
-        public final PIDController leftPid  = new PIDController(0.3, 0.0, 0.0);
-        public final PIDController rightPid = new PIDController(0.3, 0.0, 0.0);
+        // --- Control ---
+        /** Single PID controller for the shooter motor. */
+        public double PIDKs = 0.0;
+        public double PIDKi = 0.0;
+        public double PIDKd = 0.0;
 
-        // Simple feedforward (at wheel rpm)
-        public double kS = 0.05;
-        public double kV = 1.0 / 9000.0;  // ~full power near 9000 rpm wheel speed
+        /** Static feedforward to overcome friction. */
+        public double feedForwardKS = 0.05;
+        /** Velocity feedforward (power per RPM). */
+        public double feedForwardKV = 1.0 / 9000.0;  // ~full power near 9000 RPM
     }
 
-    // Instance of params holder
-    private final Params params = new Params();
+    /** Instance of params for this launcher. */
+    public static Params PARAMS = new Params();
 
-    private final MotorEx leftShooter;
-    private final MotorEx rightShooter;
+    public final PIDController shooterPid = new PIDController(PARAMS.PIDKs, PARAMS.PIDKi, PARAMS.PIDKd);
+
+    /** Motor driving the shooter flywheel. */
+    private final MotorEx shooter;
 
     // Encoder resolution calculations
     public static final double MOTOR_TPR   = 28;   // ticks per motor rev
     public static final double GEAR_RATIO  = 1.5;  // motor:wheel upgear
     public static final double TICKS_PER_REV = MOTOR_TPR / GEAR_RATIO;
 
+    /**
+     * Creates the launcher subsystem.
+     *
+     * @param hm Hardware map from OpMode
+     */
     public LauncherBall(HardwareMap hm) {
-        leftShooter  = new MotorEx(hm, "leftShooter");
-        rightShooter = new MotorEx(hm, "rightShooter");
+        shooter = new MotorEx(hm, "shooter"); // name must match configuration
 
-        leftShooter.setInverted(false);
-        rightShooter.setInverted(false);
+        shooter.setInverted(false);
+        shooter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
 
-        leftShooter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
-        rightShooter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
-
-        // We control power ourselves
-        leftShooter.setRunMode(Motor.RunMode.RawPower);
-        rightShooter.setRunMode(Motor.RunMode.RawPower);
-
-        // If you later use PIDController#setTolerance, use params.readyToleranceRpm
-        // params.leftPid.setTolerance(params.readyToleranceRpm);
-        // params.rightPid.setTolerance(params.readyToleranceRpm);
+        // We run our own PIDF, so use raw power mode.
+        shooter.setRunMode(Motor.RunMode.RawPower);
     }
 
     // ------------- Public API -------------
+
+    /** Enable closed-loop control and begin ramping toward the target RPM. */
     public void enable() {
-        params.enabled = true;
-        params.inTolStartNanos = 0L;
-        params.isReadyToLaunch = false;
-        params.leftPid.reset();
-        params.rightPid.reset();
-        // Start a gentle ramp from current speed
-        params.currentTargetRpm = getAverageRPM();
+        PARAMS.enabledPid = true;
+        PARAMS.inTolStartNanos = 0L;
+        PARAMS.isReadyToLaunch = false;
+        shooterPid.reset();
+        PARAMS.currentTargetRpm = getShooterRPM(); // ramp from current speed
     }
 
+    /** Disable closed-loop control and stop the motor. */
     public void disable() {
-        params.enabled = false;
+        PARAMS.enabledPid = false;
         stop();
     }
 
-    /** Open-loop power test (bypasses PID). */
-    public void setPower(double power) {
-        leftShooter.set(power);
-        rightShooter.set(power);
+    /** @return true if PID control is enabled. */
+    public boolean isEnabled() {
+        return PARAMS.enabledPid;
     }
 
+    /** Directly set motor power (bypasses PID). */
+    public void setPower(double power) {
+        shooter.set(power);
+    }
+
+    /** Immediately stop the motor and reset ready state. */
     public void stop() {
-        leftShooter.stopMotor();
-        rightShooter.stopMotor();
-        params.inTolStartNanos = 0L;
-        params.isReadyToLaunch = false;
+        shooter.stopMotor();
+        PARAMS.inTolStartNanos = 0L;
+        PARAMS.isReadyToLaunch = false;
     }
 
     // ----------------- Target & tuning -----------------
-    public void setTargetRpm(double rpm) { params.targetRpm = Math.max(0, rpm); }
-    public double getTargetRpm() { return params.targetRpm; }
 
-    public void setReadyToleranceRpm(double tol) { params.readyToleranceRpm = Math.max(0, tol); }
-    public double getReadyToleranceRpm() { return params.readyToleranceRpm; }
+    public void setTargetRpm(double rpm) { PARAMS.targetRpm = Math.max(0, rpm); }
+    public double getTargetRpm() { return PARAMS.targetRpm; }
 
-    public void setReadyHoldTimeSeconds(double sec) { params.readyHoldTimeSeconds = Math.max(0, sec); }
-    public double getReadyHoldTimeSeconds() { return params.readyHoldTimeSeconds; }
+    public void setReadyToleranceRpm(double tol) { PARAMS.readyToleranceRpm = Math.max(0, tol); }
+    public double getReadyToleranceRpm() { return PARAMS.readyToleranceRpm; }
+
+    public void setReadyHoldTimeSeconds(double sec) { PARAMS.readyHoldTimeSeconds = Math.max(0, sec); }
+    public double getReadyHoldTimeSeconds() { return PARAMS.readyHoldTimeSeconds; }
 
     // ----------------- Telemetry helpers -----------------
-    public double getLeftTicksPerSec()  { return leftShooter.getVelocity(); }
-    public double getRightTicksPerSec() { return rightShooter.getVelocity(); }
 
-    public double getLeftRPM()  { return (getLeftTicksPerSec()  * 60.0) / TICKS_PER_REV; }
-    public double getRightRPM() { return (getRightTicksPerSec() * 60.0) / TICKS_PER_REV; }
-    public double getAverageRPM() { return (getLeftRPM() + getRightRPM()) / 2.0; }
-
+    public double getLeftTicksPerSec()  { return shooter.getVelocity(); }
+    public double getShooterRPM()  { return (getLeftTicksPerSec() * 60.0) / TICKS_PER_REV; }
     public double rpmToTicksPerSec(double rpm) { return (rpm * TICKS_PER_REV) / 60.0; }
+    public boolean isReadyToLaunch() { return PARAMS.isReadyToLaunch; }
 
-    public boolean isReadyToLaunch() { return params.isReadyToLaunch; }
+    // ------------- Main control loop -------------
 
     @Override
     public void periodic() {
         final long now = System.nanoTime();
-        final double dt = (params.lastLoopNanos == 0L) ? 0.02 : (now - params.lastLoopNanos) / 1e9;
-        params.lastLoopNanos = now;
+        final double dt = (PARAMS.lastLoopNanos == 0L) ? 0.02 : (now - PARAMS.lastLoopNanos) / 1e9;
+        PARAMS.lastLoopNanos = now;
 
-        if (params.enabled) {
+        if (PARAMS.enabledPid) {
             // 1) Ramp target to avoid brownouts
-            final double maxStep = params.maxAccelRpmPerSec * dt;
-            final double delta = params.targetRpm - params.currentTargetRpm;
+            final double maxStep = PARAMS.maxAccelRpmPerSec * dt;
+            final double delta = PARAMS.targetRpm - PARAMS.currentTargetRpm;
             if (Math.abs(delta) > maxStep) {
-                params.currentTargetRpm += Math.copySign(maxStep, delta);
+                PARAMS.currentTargetRpm += Math.copySign(maxStep, delta);
             } else {
-                params.currentTargetRpm = params.targetRpm;
+                PARAMS.currentTargetRpm = PARAMS.targetRpm;
             }
 
             // 2) Measure
-            final double leftRpm  = getLeftRPM();
-            final double rightRpm = getRightRPM();
+            final double currentRpm = getShooterRPM();
 
-            // 3) PID (per motor) — calculate(measurement, setpoint) returns correction in "power" units
-            final double leftPidOut  = params.leftPid.calculate(leftRpm,  params.currentTargetRpm);
-            final double rightPidOut = params.rightPid.calculate(rightRpm, params.currentTargetRpm);
+            // 3) PID correction
+            final double pidOut = shooterPid.calculate(currentRpm, PARAMS.currentTargetRpm);
 
-            // 4) Feedforward at the ramped setpoint (same FF to both)
-            final double ff = params.kS + params.kV * params.currentTargetRpm;
+            // 4) Feedforward
+            final double ff = PARAMS.feedForwardKS + PARAMS.feedForwardKV * PARAMS.currentTargetRpm;
 
-            // 5) Sum and clamp
-            double lOut = clamp(ff + leftPidOut,  0.0, 1.0);
-            double rOut = clamp(ff + rightPidOut, 0.0, 1.0);
-
-            // 6) Apply
-            leftShooter.set(lOut);
-            rightShooter.set(rOut);
+            // 5) Apply
+            double output = clamp(ff + pidOut, 0.0, 1.0);
+            shooter.set(output);
         }
 
-        // Readiness logic (unchanged)
-        double leftErr  = Math.abs(getLeftRPM()  - params.targetRpm);
-        double rightErr = Math.abs(getRightRPM() - params.targetRpm);
-        boolean inTol   = leftErr <= params.readyToleranceRpm && rightErr <= params.readyToleranceRpm;
+        // --- Readiness logic ---
+        double shooterErr = Math.abs(getShooterRPM() - PARAMS.targetRpm);
+        boolean inTol = shooterErr <= PARAMS.readyToleranceRpm;
 
         if (inTol) {
-            if (params.inTolStartNanos == 0L) params.inTolStartNanos = now;
-            double heldSec = (now - params.inTolStartNanos) / 1e9;
-            params.isReadyToLaunch = heldSec >= params.readyHoldTimeSeconds;
+            if (PARAMS.inTolStartNanos == 0L) PARAMS.inTolStartNanos = now;
+            double heldSec = (now - PARAMS.inTolStartNanos) / 1e9;
+            PARAMS.isReadyToLaunch = heldSec >= PARAMS.readyHoldTimeSeconds;
         } else {
-            params.inTolStartNanos = 0L;
-            params.isReadyToLaunch = false;
+            PARAMS.inTolStartNanos = 0L;
+            PARAMS.isReadyToLaunch = false;
         }
 
-        // Optional telemetry for tuning (enable MultipleTelemetry in your OpMode):
-        // telemetry.addData("TgtRPM", params.targetRpm);
-        // telemetry.addData("CurTgt", params.currentTargetRpm);
-        // telemetry.addData("L/RPM", getLeftRPM());
-        // telemetry.addData("R/RPM", getRightRPM());
-        // telemetry.addData("Ready", params.isReadyToLaunch);
+        // Telemetry
+        tele.addData("TgtRPM", PARAMS.targetRpm);
+        tele.addData("CurTgt", PARAMS.currentTargetRpm);
+        tele.addData("RPM", getShooterRPM());
+        tele.addData("Ready", PARAMS.isReadyToLaunch);
+        tele.addData("Enabled", PARAMS.enabledPid);
+        tele.update();
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("TgtRPM", PARAMS.targetRpm);
+        packet.put("CurTgt", PARAMS.currentTargetRpm);
+        packet.put("RPM", getShooterRPM());
+        packet.put("Ready", PARAMS.isReadyToLaunch);
+        packet.put("Enabled", PARAMS.enabledPid);
+        dashboard.sendTelemetryPacket(packet);
+
     }
 
     private static double clamp(double v, double lo, double hi) {
