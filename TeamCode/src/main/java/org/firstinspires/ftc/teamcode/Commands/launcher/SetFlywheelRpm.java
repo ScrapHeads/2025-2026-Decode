@@ -42,15 +42,12 @@ public class SetFlywheelRpm extends CommandBase {
     }
 
     /**
-     * This command remains active until the subsystem is disabled elsewhere.
-     * For example, bind another button to call {@link LauncherBall#disable()}.
-     *
-     * @return true only when {@code launcher.disable()} has been called
+     * This command runs once.
+     * @return true once it is done with initialize
      */
     @Override
     public boolean isFinished() {
-        return false;
-//        return !launcher.isEnabled();
+        return true;
     }
 
     /**

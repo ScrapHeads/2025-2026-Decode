@@ -31,7 +31,7 @@ public final class LauncherBall implements Subsystem {
         public double targetRpm = 6000;
 
         /** Allowed RPM error margin to consider launcher "ready". */
-        public double readyToleranceRpm = 50;
+        public double readyToleranceRpm = 200;
 
         /** How long (seconds) the RPM must stay in tolerance to be "ready". */
         public double readyHoldTimeSeconds = 0.10;
@@ -52,7 +52,7 @@ public final class LauncherBall implements Subsystem {
 
         // --- Control ---
         /** Single PID controller for the shooter motor. */
-        public double PIDKs = 0.0;
+        public double PIDKs = 0.2;
         public double PIDKi = 0.0;
         public double PIDKd = 0.0;
 
@@ -140,7 +140,10 @@ public final class LauncherBall implements Subsystem {
     public double getLeftTicksPerSec()  { return shooter.getVelocity(); }
     public double getShooterRPM()  { return (getLeftTicksPerSec() * 60.0) / TICKS_PER_REV; }
     public double rpmToTicksPerSec(double rpm) { return (rpm * TICKS_PER_REV) / 60.0; }
-    public boolean isReadyToLaunch() { return PARAMS.isReadyToLaunch; }
+    public boolean isReadyToLaunch() {
+//        return true;
+        return PARAMS.isReadyToLaunch;
+    }
 
     // ------------- Main control loop -------------
 
