@@ -1,11 +1,17 @@
 package org.firstinspires.ftc.teamcode.Commands;
 
+import static org.firstinspires.ftc.teamcode.Constants.dashboard;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+
+import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 
 /**
  * A continuous drive command for TeleOp.
@@ -44,13 +50,31 @@ public class DriveContinous extends CommandBase {
      */
     @Override
     public void execute() {
+        Rotation2d rot = new Rotation2d(drivetrain.localizer.getPose().heading.toDouble());
+        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                driver.getLeftY() * speed,
+                -driver.getLeftX() * speed,
+                -driver.getRightX() * speed,
+                rot);
+
         PoseVelocity2d pose = new PoseVelocity2d(
                 new Vector2d(
-                        driver.getLeftY() * speed,   // forward/back
-                        -driver.getLeftX() * speed   // strafe (note the inversion)
+                        robotSpeeds.vxMetersPerSecond,  // forward/back
+                        robotSpeeds.vyMetersPerSecond   // strafe (note the inversion)
                 ),
-                -driver.getRightX() * speed         // rotation (inverted to match driver feel)
+                robotSpeeds.omegaRadiansPerSecond       // rotation (inverted to match driver feel)
         );
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Rotation: ", rot.toString());
+        packet.put("Desired x: ", robotSpeeds.vxMetersPerSecond);
+        packet.put("Actual x: ", pose.linearVel.x);
+        packet.put("Desired y: ", robotSpeeds.vyMetersPerSecond);
+        packet.put("Actual y: ", pose.linearVel.y);
+        packet.put("Desired rot: ", robotSpeeds.omegaRadiansPerSecond);
+        packet.put("Actual rot: ", pose.angVel);
+        dashboard.sendTelemetryPacket(packet);
+
         drivetrain.setDrivePowers(pose);
     }
 
