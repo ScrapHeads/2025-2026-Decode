@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.vision.AutoAlignConfig;
@@ -70,17 +71,14 @@ public class VisionAutoAlign extends CommandBase {
                 Math.abs(driverTurn) > 0.05;
 
         if (driverActive) {
-            drivetrain.setDrivePowers(new PoseVelocity2d(
-                    new Vector2d(driverForward, driverStrafe),
-                    driverTurn
-            ));
+            drivetrain.setDrivePowers(new ChassisSpeeds(driverForward, driverStrafe, driverTurn));
             sendTelemetry(false, false, false);
             return;
         }
 
         // If no tags, stop
         if (blocks.length == 0) {
-            drivetrain.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
+            drivetrain.setDrivePowers(new ChassisSpeeds());
             sendTelemetry(false, false, false);
             return;
         }
@@ -90,7 +88,7 @@ public class VisionAutoAlign extends CommandBase {
 
         // If tag not configured or too small, stop
         if (config == null || Math.min(block.width, block.height) < config.minWidth) {
-            drivetrain.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
+            drivetrain.setDrivePowers(new ChassisSpeeds());
             sendTelemetry(true, false, false);
             return;
         }
@@ -104,7 +102,7 @@ public class VisionAutoAlign extends CommandBase {
                 Math.abs(errorY) < config.toleranceY;
 
         if (aligned) {
-            drivetrain.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
+            drivetrain.setDrivePowers(new ChassisSpeeds());
             sendTelemetry(true, false, true);
             return;
         }
@@ -114,10 +112,7 @@ public class VisionAutoAlign extends CommandBase {
         double forwardCmd = (config.targetY - block.y) * config.kP_forward;
         double turnCmd    = errorX * config.kP_heading;
 
-        drivetrain.setDrivePowers(new PoseVelocity2d(
-                new Vector2d(forwardCmd, strafeCmd),
-                turnCmd
-        ));
+        drivetrain.setDrivePowers(new ChassisSpeeds(forwardCmd, strafeCmd, turnCmd));
 
         sendTelemetry(true, true, false);
     }
@@ -161,6 +156,6 @@ public class VisionAutoAlign extends CommandBase {
      */
     @Override
     public void end(boolean interrupted) {
-        drivetrain.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
+        drivetrain.setDrivePowers(new ChassisSpeeds());
     }
 }

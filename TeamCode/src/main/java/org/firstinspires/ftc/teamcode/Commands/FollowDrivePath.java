@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.arcrobotics.ftclib.command.CommandBase;
 
+import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 /**
@@ -59,7 +60,7 @@ public class FollowDrivePath extends CommandBase {
      */
     @Override
     public void end(boolean isInterrupted) {
-        drivetrain.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
+        drivetrain.setDrivePowers(new ChassisSpeeds());
     }
 
     /**

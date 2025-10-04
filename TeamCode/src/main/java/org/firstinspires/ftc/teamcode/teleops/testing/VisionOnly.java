@@ -11,13 +11,13 @@ import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.VisionDetection;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.vision.CameraParams;
@@ -30,7 +30,7 @@ public class VisionOnly extends CommandOpMode {
     private Drivetrain drivetrain;
     private VisionProcessor processor;
 
-    private final Pose2d startPose = new Pose2d(0, 0, 0);
+    private final Pose2d startPose = new Pose2d();
 
     @Override
     public void initialize() {

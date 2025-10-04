@@ -5,12 +5,12 @@ import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 @TeleOp(name = "DriveOnly", group = "ScrapHeads")
@@ -32,7 +32,7 @@ public class DriveOnly extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
 
         // Initialize the subsystems declared at the top of the code
-        drivetrain = new Drivetrain(hm, new Pose2d(0,0,0));
+        drivetrain = new Drivetrain(hm, new Pose2d());
         drivetrain.register();
 
         // Calling assignControls to set input commands

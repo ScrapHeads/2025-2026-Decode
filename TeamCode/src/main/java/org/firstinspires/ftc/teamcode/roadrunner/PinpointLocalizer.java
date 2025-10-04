@@ -1,16 +1,16 @@
 package org.firstinspires.ftc.teamcode.roadrunner;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Rotation2d;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.teamcode.Localizer;
+import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Transform2d;
 
 import java.util.Objects;
 
@@ -26,8 +26,8 @@ public final class PinpointLocalizer implements Localizer {
     public final GoBildaPinpointDriver driver;
     public final GoBildaPinpointDriver.EncoderDirection initialParDirection, initialPerpDirection;
 
-    private Pose2d txWorldPinpoint;
-    private Pose2d txPinpointRobot = new Pose2d(0, 0, 0);
+    private Transform2d txWorldPinpoint;
+    private Pose2d txPinpointRobot = new Pose2d(0, 0, new Rotation2d());
 
     public PinpointLocalizer(HardwareMap hardwareMap, double inPerTick, Pose2d initialPose) {
         // TODO: make sure your config has a Pinpoint device with this name
@@ -46,29 +46,37 @@ public final class PinpointLocalizer implements Localizer {
 
         driver.resetPosAndIMU();
 
-        txWorldPinpoint = initialPose;
+        txWorldPinpoint = new Transform2d(initialPose.getX(), initialPose.getY(), initialPose.getRotation());
     }
 
-    @Override
     public void setPose(Pose2d pose) {
-        txWorldPinpoint = pose.times(txPinpointRobot.inverse());
+        txWorldPinpoint = txPinpointRobot.minus(pose);
     }
 
     @Override
+    public void setPose(com.acmerobotics.roadrunner.Pose2d pose) {
+        Pose2d newPose = new Pose2d(pose.position.x, pose.position.y, new Rotation2d(pose.heading.toDouble()));
+        txWorldPinpoint = txPinpointRobot.minus(newPose);
+    }
+
     public Pose2d getPose() {
-        return txWorldPinpoint.times(txPinpointRobot);
+        return txPinpointRobot.plus(txWorldPinpoint);
     }
 
-    @Override
-    public PoseVelocity2d update() {
+    public ChassisSpeeds update() {
         driver.update();
         if (Objects.requireNonNull(driver.getDeviceStatus()) == GoBildaPinpointDriver.DeviceStatus.READY) {
-            txPinpointRobot = new Pose2d(driver.getPosX(DistanceUnit.INCH), driver.getPosY(DistanceUnit.INCH), driver.getHeading(UnnormalizedAngleUnit.RADIANS));
-            Vector2d worldVelocity = new Vector2d(driver.getVelX(DistanceUnit.INCH), driver.getVelY(DistanceUnit.INCH));
-            Vector2d robotVelocity = Rotation2d.fromDouble(-txPinpointRobot.heading.log()).times(worldVelocity);
+            txPinpointRobot = new Pose2d(
+                    driver.getPosX(DistanceUnit.METER),
+                    driver.getPosY(DistanceUnit.METER),
+                    new Rotation2d(driver.getHeading(UnnormalizedAngleUnit.RADIANS)));
 
-            return new PoseVelocity2d(robotVelocity, driver.getHeadingVelocity(UnnormalizedAngleUnit.RADIANS));
+            return ChassisSpeeds.fromFieldRelativeSpeeds(
+                    driver.getVelX(DistanceUnit.METER),
+                    driver.getVelY(DistanceUnit.METER),
+                    driver.getHeadingVelocity(UnnormalizedAngleUnit.RADIANS),
+                    txPinpointRobot.getRotation());
         }
-        return new PoseVelocity2d(new Vector2d(0, 0), 0);
+        return new ChassisSpeeds();
     }
 }

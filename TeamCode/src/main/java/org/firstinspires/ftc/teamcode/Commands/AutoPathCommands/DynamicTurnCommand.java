@@ -11,6 +11,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandBase;
 
+import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 import java.util.function.DoubleSupplier;
@@ -147,21 +148,21 @@ public class DynamicTurnCommand extends CommandBase {
      */
     @Override
     public void initialize() {
-        drivetrain.updatePoseEstimate();
-        Pose2d currentPose = drivetrain.localizer.getPose();
-
-        Pose2d targetPose = new Pose2d(
-                currentPose.position,
-                Rotation2d.exp(targetHeadingSupplier.getAsDouble())
-        );
-
-        trajectoryAction = drivetrain.actionBuilder(
-                        currentPose,
-                        turnConstraints, velConstraints, accelConstraint,
-                        posTol, headingTol, velTol
-                )
-                .turnTo(targetPose.heading)
-                .build();
+//        drivetrain.updatePoseEstimate();
+//        Pose2d currentPose = drivetrain.localizer.getPose();
+//
+//        Pose2d targetPose = new Pose2d(
+//                currentPose.position,
+//                Rotation2d.exp(targetHeadingSupplier.getAsDouble())
+//        );
+//
+//        trajectoryAction = drivetrain.actionBuilder(
+//                        currentPose,
+//                        turnConstraints, velConstraints, accelConstraint,
+//                        posTol, headingTol, velTol
+//                )
+//                .turnTo(targetPose.heading)
+//                .build();
     }
 
     /**
@@ -189,6 +190,6 @@ public class DynamicTurnCommand extends CommandBase {
      */
     @Override
     public void end(boolean interrupted) {
-        drivetrain.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
+        drivetrain.setDrivePowers(new ChassisSpeeds());
     }
 }

@@ -50,32 +50,14 @@ public class DriveContinous extends CommandBase {
      */
     @Override
     public void execute() {
-        Rotation2d rot = new Rotation2d(drivetrain.localizer.getPose().heading.toDouble());
+        Rotation2d rot = drivetrain.localizer.getPose().getRotation();
         ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 driver.getLeftY() * speed,
                 -driver.getLeftX() * speed,
                 -driver.getRightX() * speed,
                 rot);
 
-        PoseVelocity2d pose = new PoseVelocity2d(
-                new Vector2d(
-                        robotSpeeds.vxMetersPerSecond,  // forward/back
-                        robotSpeeds.vyMetersPerSecond   // strafe (note the inversion)
-                ),
-                robotSpeeds.omegaRadiansPerSecond       // rotation (inverted to match driver feel)
-        );
-
-        TelemetryPacket packet = new TelemetryPacket();
-        packet.put("Rotation: ", rot.toString());
-        packet.put("Desired x: ", robotSpeeds.vxMetersPerSecond);
-        packet.put("Actual x: ", pose.linearVel.x);
-        packet.put("Desired y: ", robotSpeeds.vyMetersPerSecond);
-        packet.put("Actual y: ", pose.linearVel.y);
-        packet.put("Desired rot: ", robotSpeeds.omegaRadiansPerSecond);
-        packet.put("Actual rot: ", pose.angVel);
-        dashboard.sendTelemetryPacket(packet);
-
-        drivetrain.setDrivePowers(pose);
+        drivetrain.setDrivePowers(robotSpeeds);
     }
 
     /**
@@ -85,10 +67,6 @@ public class DriveContinous extends CommandBase {
      */
     @Override
     public void end(boolean isInterrupted) {
-        PoseVelocity2d pose = new PoseVelocity2d(
-                new Vector2d(0, 0),
-                0
-        );
-        drivetrain.setDrivePowers(pose);
+        drivetrain.setDrivePowers(new ChassisSpeeds());
     }
 }

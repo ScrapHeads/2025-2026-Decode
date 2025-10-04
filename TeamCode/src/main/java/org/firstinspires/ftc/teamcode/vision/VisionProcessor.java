@@ -106,22 +106,23 @@ public class VisionProcessor {
      * @return a corrected Pose2d of the robot, or null if vision data is invalid
      */
     public Pose2d getCorrectedRobotPoseFromTag(Drivetrain drivetrain, HuskyLens.Block block) {
-        if (block == null) return null;
-
-        drivetrain.updatePoseEstimate();
-        Pose2d poseBefore = drivetrain.localizer.getPose();
-
-        Pose2d visionPose = blockToRobotPose(block);
-        if (visionPose == null) return null;
-
-        drivetrain.updatePoseEstimate();
-        Pose2d poseNow = drivetrain.localizer.getPose();
-
-        Pose2d motionOffset = poseNow.minusExp(poseBefore);
-
-        return new Pose2d(
-                visionPose.position.plus(motionOffset.position),
-                visionPose.heading.plus(motionOffset.heading.toDouble())
-        );
+//        if (block == null) return null;
+//
+//        drivetrain.updatePoseEstimate();
+//        Pose2d poseBefore = drivetrain.localizer.getPose();
+//
+//        Pose2d visionPose = blockToRobotPose(block);
+//        if (visionPose == null) return null;
+//
+//        drivetrain.updatePoseEstimate();
+//        Pose2d poseNow = drivetrain.localizer.getPose();
+//
+//        Pose2d motionOffset = poseNow.minusExp(poseBefore);
+//
+//        return new Pose2d(
+//                visionPose.position.plus(motionOffset.position),
+//                visionPose.heading.plus(motionOffset.heading.toDouble())
+//        );
+        return null;
     }
 }

@@ -16,32 +16,24 @@ import com.acmerobotics.roadrunner.HolonomicController;
 import com.acmerobotics.roadrunner.MecanumKinematics;
 import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.MotorFeedforward;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Pose2dDual;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.PoseVelocity2dDual;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.ProfileParams;
-import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.Time;
 import com.acmerobotics.roadrunner.TimeTrajectory;
 import com.acmerobotics.roadrunner.TimeTurn;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TrajectoryBuilderParams;
 import com.acmerobotics.roadrunner.TurnConstraints;
-import com.acmerobotics.roadrunner.Twist2d;
-import com.acmerobotics.roadrunner.Twist2dDual;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.DownsampledWriter;
-import com.acmerobotics.roadrunner.ftc.Encoder;
 import com.acmerobotics.roadrunner.ftc.FlightRecorder;
 import com.acmerobotics.roadrunner.ftc.LazyHardwareMapImu;
 import com.acmerobotics.roadrunner.ftc.LazyImu;
 import com.acmerobotics.roadrunner.ftc.LynxFirmware;
-import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
-import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
-import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -49,16 +41,16 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.Localizer;
+import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Transform2d;
 import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
-import org.firstinspires.ftc.teamcode.messages.MecanumLocalizerInputsMessage;
 import org.firstinspires.ftc.teamcode.messages.PoseMessage;
 import org.firstinspires.ftc.teamcode.roadrunner.PinpointLocalizer;
 
@@ -152,121 +144,11 @@ public final class Drivetrain implements Subsystem {
     // Localization
     public final Localizer localizer;
 
-    // Pose history for dashboard drawing
-    private final LinkedList<Pose2d> poseHistory = new LinkedList<>();
-
     // Log writers
     private final DownsampledWriter estimatedPoseWriter = new DownsampledWriter("ESTIMATED_POSE", 50_000_000);
     private final DownsampledWriter targetPoseWriter = new DownsampledWriter("TARGET_POSE", 50_000_000);
     private final DownsampledWriter driveCommandWriter = new DownsampledWriter("DRIVE_COMMAND", 50_000_000);
     private final DownsampledWriter mecanumCommandWriter = new DownsampledWriter("MECANUM_COMMAND", 50_000_000);
-
-    /**
-     * Localizer implementation using drive wheel encoders and IMU.
-     */
-    public class DriveLocalizer implements Localizer {
-        public final Encoder leftFront, leftBack, rightBack, rightFront;
-        public final IMU imu;
-
-        private int lastLeftFrontPos, lastLeftBackPos, lastRightBackPos, lastRightFrontPos;
-        private Rotation2d lastHeading;
-        private boolean initialized;
-        private Pose2d pose;
-
-        public DriveLocalizer(Pose2d pose) {
-            leftFront = new OverflowEncoder(new RawEncoder(Drivetrain.this.leftFront));
-            leftBack = new OverflowEncoder(new RawEncoder(Drivetrain.this.leftBack));
-            rightBack = new OverflowEncoder(new RawEncoder(Drivetrain.this.rightBack));
-            rightFront = new OverflowEncoder(new RawEncoder(Drivetrain.this.rightFront));
-
-            imu = lazyImu.get();
-
-            // TODO: reverse encoders if needed
-            //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-
-            this.pose = pose;
-        }
-
-        @Override
-        public void setPose(Pose2d pose) {
-            this.pose = pose;
-        }
-
-        @Override
-        public Pose2d getPose() {
-            return pose;
-        }
-
-        /**
-         * Updates localization from encoder deltas and IMU heading.
-         *
-         * @return robot velocity estimate
-         */
-        @Override
-        public PoseVelocity2d update() {
-            PositionVelocityPair leftFrontPosVel = leftFront.getPositionAndVelocity();
-            PositionVelocityPair leftBackPosVel = leftBack.getPositionAndVelocity();
-            PositionVelocityPair rightBackPosVel = rightBack.getPositionAndVelocity();
-            PositionVelocityPair rightFrontPosVel = rightFront.getPositionAndVelocity();
-
-            YawPitchRollAngles angles = imu.getRobotYawPitchRollAngles();
-
-            FlightRecorder.write("MECANUM_LOCALIZER_INPUTS", new MecanumLocalizerInputsMessage(
-                    leftFrontPosVel, leftBackPosVel, rightBackPosVel, rightFrontPosVel, angles));
-
-            Rotation2d heading = Rotation2d.exp(angles.getYaw(AngleUnit.RADIANS));
-
-            if (!initialized) {
-                initialized = true;
-
-                lastLeftFrontPos = leftFrontPosVel.position;
-                lastLeftBackPos = leftBackPosVel.position;
-                lastRightBackPos = rightBackPosVel.position;
-                lastRightFrontPos = rightFrontPosVel.position;
-
-                lastHeading = heading;
-
-                return new PoseVelocity2d(new Vector2d(0.0, 0.0), 0.0);
-            }
-
-            double headingDelta = heading.minus(lastHeading);
-
-            // Convert wheel encoder increments into robot twist
-            Twist2dDual<Time> twist = kinematics.forward(new MecanumKinematics.WheelIncrements<>(
-                    new DualNum<Time>(new double[]{
-                            (leftFrontPosVel.position - lastLeftFrontPos),
-                            leftFrontPosVel.velocity,
-                    }).times(PARAMS.inPerTick),
-                    new DualNum<Time>(new double[]{
-                            (leftBackPosVel.position - lastLeftBackPos),
-                            leftBackPosVel.velocity,
-                    }).times(PARAMS.inPerTick),
-                    new DualNum<Time>(new double[]{
-                            (rightBackPosVel.position - lastRightBackPos),
-                            rightBackPosVel.velocity,
-                    }).times(PARAMS.inPerTick),
-                    new DualNum<Time>(new double[]{
-                            (rightFrontPosVel.position - lastRightFrontPos),
-                            rightFrontPosVel.velocity,
-                    }).times(PARAMS.inPerTick)
-            ));
-
-            // Update last measurements
-            lastLeftFrontPos = leftFrontPosVel.position;
-            lastLeftBackPos = leftBackPosVel.position;
-            lastRightBackPos = rightBackPosVel.position;
-            lastRightFrontPos = rightFrontPosVel.position;
-
-            lastHeading = heading;
-
-            pose = pose.plus(new Twist2d(
-                    twist.line.value(),
-                    headingDelta
-            ));
-
-            return twist.velocity().value();
-        }
-    }
 
     /**
      * Creates a new drivetrain subsystem.
@@ -309,12 +191,26 @@ public final class Drivetrain implements Subsystem {
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
 
-    /**
-     * Applies normalized drive powers to motors.
-     *
-     * @param powers desired velocity in robot frame
-     */
-    public void setDrivePowers(PoseVelocity2d powers) {
+    public Pose2d convertPose2D(com.acmerobotics.roadrunner.Pose2d pose) {
+        return new Pose2d(pose.position.x, pose.position.y, new Rotation2d(pose.heading.toDouble()));
+    }
+
+    public com.acmerobotics.roadrunner.Pose2d convertPose2D(Pose2d pose) {
+        Vector2d vec = new Vector2d(pose.getX(), pose.getY());
+        return new com.acmerobotics.roadrunner.Pose2d(vec, pose.getRotation().getRadians());
+    }
+
+    public ChassisSpeeds convertChassisSpeeds(PoseVelocity2d speeds) {
+        return new ChassisSpeeds(speeds.linearVel.x, speeds.linearVel.y, speeds.angVel);
+    }
+
+    public PoseVelocity2d convertChassisSpeeds(ChassisSpeeds speeds) {
+        Vector2d vec = new Vector2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+        return new PoseVelocity2d(vec, speeds.omegaRadiansPerSecond);
+    }
+
+    public void setDrivePowers(ChassisSpeeds speeds) {
+        PoseVelocity2d powers = convertChassisSpeeds(speeds);
         MecanumKinematics.WheelVelocities<Time> wheelVels = new MecanumKinematics(1).inverse(
                 PoseVelocity2dDual.constant(powers, 1));
 
@@ -347,9 +243,9 @@ public final class Drivetrain implements Subsystem {
             xPoints = new double[disps.size()];
             yPoints = new double[disps.size()];
             for (int i = 0; i < disps.size(); i++) {
-                Pose2d p = t.path.get(disps.get(i), 1).value();
-                xPoints[i] = p.position.x;
-                yPoints[i] = p.position.y;
+                Pose2d p = convertPose2D(t.path.get(disps.get(i), 1).value());
+                xPoints[i] = p.getX();
+                yPoints[i] = p.getY();
             }
         }
 
@@ -375,13 +271,13 @@ public final class Drivetrain implements Subsystem {
             Pose2dDual<Time> txWorldTarget = timeTrajectory.get(t);
             targetPoseWriter.write(new PoseMessage(txWorldTarget.value()));
 
-            PoseVelocity2d robotVelRobot = updatePoseEstimate();
+            ChassisSpeeds robotVelRobot = updatePoseEstimate();
 
             PoseVelocity2dDual<Time> command = new HolonomicController(
                     PARAMS.axialGain, PARAMS.lateralGain, PARAMS.headingGain,
                     PARAMS.axialVelGain, PARAMS.lateralVelGain, PARAMS.headingVelGain
             )
-                    .compute(txWorldTarget, localizer.getPose(), robotVelRobot);
+                    .compute(txWorldTarget, convertPose2D(localizer.getPose()), convertChassisSpeeds(robotVelRobot));
             driveCommandWriter.write(new DriveCommandMessage(command));
 
             MecanumKinematics.WheelVelocities<Time> wheelVels = kinematics.inverse(command);
@@ -402,14 +298,14 @@ public final class Drivetrain implements Subsystem {
             rightBack.setPower(rightBackPower);
             rightFront.setPower(rightFrontPower);
 
-            p.put("x", localizer.getPose().position.x);
-            p.put("y", localizer.getPose().position.y);
-            p.put("heading (deg)", Math.toDegrees(localizer.getPose().heading.toDouble()));
+            p.put("x", localizer.getPose().getX());
+            p.put("y", localizer.getPose().getY());
+            p.put("heading (deg)", localizer.getPose().getRotation().toString());
 
-            Pose2d error = txWorldTarget.value().minusExp(localizer.getPose());
-            p.put("xError", error.position.x);
-            p.put("yError", error.position.y);
-            p.put("headingError (deg)", Math.toDegrees(error.heading.toDouble()));
+            Transform2d error = convertPose2D(txWorldTarget.value()).minus(localizer.getPose());
+            p.put("xError", error.getX());
+            p.put("yError", error.getY());
+            p.put("headingError (deg)", error.getRotation().toString());
 
             // only draw when active; only one drive action should be active at a time
             Canvas c = p.fieldOverlay();
@@ -419,7 +315,7 @@ public final class Drivetrain implements Subsystem {
             Drawing.drawRobot(c, txWorldTarget.value());
 
             c.setStroke("#3F51B5");
-            Drawing.drawRobot(c, localizer.getPose());
+            Drawing.drawRobot(c, convertPose2D(localizer.getPose()));
 
             c.setStroke("#4CAF50FF");
             c.setStrokeWidth(1);
@@ -470,13 +366,13 @@ public final class Drivetrain implements Subsystem {
             Pose2dDual<Time> txWorldTarget = turn.get(t);
             targetPoseWriter.write(new PoseMessage(txWorldTarget.value()));
 
-            PoseVelocity2d robotVelRobot = updatePoseEstimate();
+            ChassisSpeeds robotVelRobot = updatePoseEstimate();
 
             PoseVelocity2dDual<Time> command = new HolonomicController(
                     PARAMS.axialGain, PARAMS.lateralGain, PARAMS.headingGain,
                     PARAMS.axialVelGain, PARAMS.lateralVelGain, PARAMS.headingVelGain
             )
-                    .compute(txWorldTarget, localizer.getPose(), robotVelRobot);
+                    .compute(txWorldTarget, convertPose2D(localizer.getPose()), convertChassisSpeeds(robotVelRobot));
             driveCommandWriter.write(new DriveCommandMessage(command));
 
             MecanumKinematics.WheelVelocities<Time> wheelVels = kinematics.inverse(command);
@@ -503,7 +399,7 @@ public final class Drivetrain implements Subsystem {
             Drawing.drawRobot(c, txWorldTarget.value());
 
             c.setStroke("#3F51B5");
-            Drawing.drawRobot(c, localizer.getPose());
+            Drawing.drawRobot(c, convertPose2D(localizer.getPose()));
 
             c.setStroke("#7C4DFFFF");
             c.fillCircle(turn.beginPose.position.x, turn.beginPose.position.y, 2);
@@ -523,15 +419,10 @@ public final class Drivetrain implements Subsystem {
      *
      * @return current velocity estimate
      */
-    public PoseVelocity2d updatePoseEstimate() {
-        PoseVelocity2d vel = localizer.update();
-        poseHistory.add(localizer.getPose());
+    public ChassisSpeeds updatePoseEstimate() {
+        ChassisSpeeds vel = localizer.update();
 
-        while (poseHistory.size() > 100) {
-            poseHistory.removeFirst();
-        }
-
-        estimatedPoseWriter.write(new PoseMessage(localizer.getPose()));
+        estimatedPoseWriter.write(new PoseMessage(convertPose2D(localizer.getPose())));
 
         return vel;
     }
@@ -540,20 +431,20 @@ public final class Drivetrain implements Subsystem {
      * Draws the robot's pose history on the dashboard field overlay.
      */
     private void drawPoseHistory(Canvas c) {
-        double[] xPoints = new double[poseHistory.size()];
-        double[] yPoints = new double[poseHistory.size()];
-
-        int i = 0;
-        for (Pose2d t : poseHistory) {
-            xPoints[i] = t.position.x;
-            yPoints[i] = t.position.y;
-
-            i++;
-        }
-
-        c.setStrokeWidth(1);
-        c.setStroke("#3F51B5");
-        c.strokePolyline(xPoints, yPoints);
+//        double[] xPoints = new double[poseHistory.size()];
+//        double[] yPoints = new double[poseHistory.size()];
+//
+//        int i = 0;
+//        for (Pose2d t : poseHistory) {
+//            xPoints[i] = t.position.x;
+//            yPoints[i] = t.position.y;
+//
+//            i++;
+//        }
+//
+//        c.setStrokeWidth(1);
+//        c.setStroke("#3F51B5");
+//        c.strokePolyline(xPoints, yPoints);
     }
 
     /**
@@ -572,7 +463,7 @@ public final class Drivetrain implements Subsystem {
                                 PARAMS.defaultPosTolerance, PARAMS.defaultHeadingTolerance, PARAMS.defaultVelTolerance
                         )
                 ),
-                beginPose, 0.0,
+                convertPose2D(beginPose), 0.0,
                 defaultTurnConstraints,
                 defaultVelConstraint, defaultAccelConstraint
         );
@@ -599,7 +490,7 @@ public final class Drivetrain implements Subsystem {
                         1e-6,
                         new ProfileParams(posTol, headingTol, velTol)
                 ),
-                beginPose, 0.0,
+                convertPose2D(beginPose), 0.0,
                 defaultTurnConstraints,
                 defaultVelConstraint, defaultAccelConstraint
         );
@@ -625,7 +516,7 @@ public final class Drivetrain implements Subsystem {
                                 0.1, Math.toRadians(.5), .00005
                         )
                 ),
-                beginPose, 0.0,
+                convertPose2D(beginPose), 0.0,
                 turnConstraints,
                 velConstraints, accelConstraint
         );
@@ -657,7 +548,7 @@ public final class Drivetrain implements Subsystem {
                         1e-6,
                         new ProfileParams(posTol, headingTol, velTol)
                 ),
-                beginPose, 0.0,
+                convertPose2D(beginPose), 0.0,
                 turnConstraints,
                 velConstraints, accelConstraint
         );
@@ -668,18 +559,18 @@ public final class Drivetrain implements Subsystem {
      */
     @Override
     public void periodic() {
-        PoseVelocity2d vel = updatePoseEstimate();
+        ChassisSpeeds vel = updatePoseEstimate();
         Pose2d pose = localizer.getPose();
 
         TelemetryPacket packet = new TelemetryPacket();
-        packet.put("X", pose.position.x);
-        packet.put("Y", pose.position.y);
-        packet.put("rot", pose.heading.toDouble() * (180 / Math.PI));
-        packet.put("xVel", vel.linearVel.x);
-        packet.put("yVel", vel.linearVel.y);
-        packet.put("rotVel", vel.angVel);
+        packet.put("X", pose.getX());
+        packet.put("Y", pose.getY());
+        packet.put("rot", pose.getRotation().toString());
+        packet.put("xVel", vel.vxMetersPerSecond);
+        packet.put("yVel", vel.vyMetersPerSecond);
+        packet.put("rotVel", vel.omegaRadiansPerSecond);
 
-        Drawing.drawRobot(packet.fieldOverlay(), localizer.getPose());
+        Drawing.drawRobot(packet.fieldOverlay(), convertPose2D(localizer.getPose()));
 
         dashboard.sendTelemetryPacket(packet);
     }
