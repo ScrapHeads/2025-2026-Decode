@@ -27,6 +27,8 @@ import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.sorter.ShootOneBall;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
+import org.firstinspires.ftc.teamcode.commands.feeder.FeederRailCommand;
+import org.firstinspires.ftc.teamcode.subsystems.FeederRail;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 import org.firstinspires.ftc.teamcode.util.BallColor;
@@ -81,20 +83,15 @@ public class LauncherSorterTele extends CommandOpMode {
     }
 
     public static Command shootAllLoaded(LauncherBall launcher, Sorter sorter, long recoveryMs) {
-        int start = sorter.getCurrentIndex();
         TelemetryPacket packet = new TelemetryPacket();
-        SequentialCommandGroup burst = new SequentialCommandGroup();
+        SequentialCommandGroup command = new SequentialCommandGroup();
 
         for (int offset = 0; offset < Sorter.SLOT_COUNT; offset++) {
-            final int idx = (start + offset) % Sorter.SLOT_COUNT;
-            dashboard.sendTelemetryPacket(packet);
-            burst.addCommands(
-                    // move at most one step to the next index in the scan
-                    new TurnOneSlot(sorter, Sorter.CCW_POWER),
-                    new InstantCommand(() -> packet.addLine("Made it")),
-                    new InstantCommand(() -> dashboard.sendTelemetryPacket(packet)),
+            command.addCommands(
+//                    new FeederRailCommand(FeederRail, FeederRailCommand.Mode.DEPLOY),
 
                     // if there is a ball in the current slot, shoot it
+                    // if not turn to the next slot to run again
                     new ConditionalCommand(
                             new SequentialCommandGroup(
                                     new WaitUntilCommand(launcher::isReadyToLaunch),
@@ -102,12 +99,12 @@ public class LauncherSorterTele extends CommandOpMode {
                                     new WaitCommand(recoveryMs),
                                     new WaitUntilCommand(launcher::isReadyToLaunch)
                             ),
-                            new InstantCommand(),
+                            new TurnOneSlot(sorter, Sorter.CCW_POWER),
                             () -> sorter.getCurrentColor().isBall()        // evaluated at runtime
                     )
             );
         }
         dashboard.sendTelemetryPacket(packet);
-        return burst;
+        return command;
     }
 }
