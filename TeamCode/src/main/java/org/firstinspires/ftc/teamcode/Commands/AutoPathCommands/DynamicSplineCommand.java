@@ -3,14 +3,13 @@ package org.firstinspires.ftc.teamcode.Commands.AutoPathCommands;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.AccelConstraint;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 import java.util.function.Supplier;
@@ -155,17 +154,17 @@ public class DynamicSplineCommand extends CommandBase {
      */
     @Override
     public void initialize() {
-//        drivetrain.updatePoseEstimate();
-//        Pose2d currentPose = drivetrain.localizer.getPose();
-//        Vector2d targetPosition = targetPositionSupplier.get();
-//
-//        trajectoryAction = drivetrain.actionBuilder(
-//                        currentPose,
-//                        turnConstraints, velConstraints, accelConstraint,
-//                        posTol, headingTol, velTol
-//                )
-//                .splineTo(targetPosition, targetHeading)
-//                .build();
+        drivetrain.updatePoseEstimate();
+        Pose2d currentPose = drivetrain.localizer.getPose();
+        Vector2d targetPosition = targetPositionSupplier.get();
+
+        trajectoryAction = drivetrain.actionBuilder(
+                        currentPose,
+                        turnConstraints, velConstraints, accelConstraint,
+                        posTol, headingTol, velTol
+                )
+                .splineTo(targetPosition, targetHeading)
+                .build();
     }
 
     /**

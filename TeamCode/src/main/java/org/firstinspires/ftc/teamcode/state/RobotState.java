@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.state;
 
-import com.acmerobotics.roadrunner.Pose2d;
+
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 
 /**
  * Serializable snapshot of robot state to transfer from Auto to TeleOp.

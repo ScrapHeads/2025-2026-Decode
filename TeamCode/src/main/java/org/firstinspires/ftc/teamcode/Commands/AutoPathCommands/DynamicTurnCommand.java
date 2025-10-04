@@ -3,15 +3,14 @@ package org.firstinspires.ftc.teamcode.Commands.AutoPathCommands;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.AccelConstraint;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 import java.util.function.DoubleSupplier;
@@ -148,21 +147,21 @@ public class DynamicTurnCommand extends CommandBase {
      */
     @Override
     public void initialize() {
-//        drivetrain.updatePoseEstimate();
-//        Pose2d currentPose = drivetrain.localizer.getPose();
-//
-//        Pose2d targetPose = new Pose2d(
-//                currentPose.position,
-//                Rotation2d.exp(targetHeadingSupplier.getAsDouble())
-//        );
-//
-//        trajectoryAction = drivetrain.actionBuilder(
-//                        currentPose,
-//                        turnConstraints, velConstraints, accelConstraint,
-//                        posTol, headingTol, velTol
-//                )
-//                .turnTo(targetPose.heading)
-//                .build();
+        drivetrain.updatePoseEstimate();
+        Pose2d currentPose = drivetrain.localizer.getPose();
+
+        Pose2d targetPose = new Pose2d(
+                currentPose.getX(), currentPose.getY(),
+                new Rotation2d(targetHeadingSupplier.getAsDouble())
+        );
+
+        trajectoryAction = drivetrain.actionBuilder(
+                        currentPose,
+                        turnConstraints, velConstraints, accelConstraint,
+                        posTol, headingTol, velTol
+                )
+                .turnTo(targetPose.getRotation().getRadians())
+                .build();
     }
 
     /**
