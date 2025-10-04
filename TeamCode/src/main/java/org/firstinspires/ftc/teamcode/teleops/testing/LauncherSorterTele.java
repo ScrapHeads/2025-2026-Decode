@@ -90,32 +90,19 @@ public class LauncherSorterTele extends CommandOpMode {
             dashboard.sendTelemetryPacket(packet);
             burst.addCommands(
                     // move at most one step to the next index in the scan
-//                    new TurnOneSlot(sorter, Sorter.CCW_POWER),
+                    new TurnOneSlot(sorter, Sorter.CCW_POWER),
                     new InstantCommand(() -> packet.addLine("Made it")),
                     new InstantCommand(() -> dashboard.sendTelemetryPacket(packet)),
 
                     // if there is a ball in the current slot, shoot it
                     new ConditionalCommand(
                             new SequentialCommandGroup(
-                                    new InstantCommand(() -> packet.addLine("inside the conditional Command group")),
-                                    new InstantCommand(() -> dashboard.sendTelemetryPacket(packet)),
                                     new WaitUntilCommand(launcher::isReadyToLaunch),
-                                    new InstantCommand(() -> packet.addLine("Past isReadyToLaunch")),
-                                    new InstantCommand(() -> dashboard.sendTelemetryPacket(packet)),
                                     new TurnOneSlot(sorter, -1),
-                                    new InstantCommand(() -> packet.addLine("Past sprter")),
-                                    new InstantCommand(() -> dashboard.sendTelemetryPacket(packet)),
                                     new WaitCommand(recoveryMs),
-                                    new InstantCommand(() -> packet.addLine("Past recovery time")),
-                                    new InstantCommand(() -> dashboard.sendTelemetryPacket(packet)),
-                                    new WaitUntilCommand(launcher::isReadyToLaunch),
-                                    new InstantCommand(() -> packet.addLine("Finished the command")),
-                                    new InstantCommand(() -> dashboard.sendTelemetryPacket(packet))
+                                    new WaitUntilCommand(launcher::isReadyToLaunch)
                             ),
-                            new SequentialCommandGroup(
-                                    new InstantCommand(() -> packet.addLine("Didn't run the command")),                          // no-op if empty
-                                    new InstantCommand(() -> dashboard.sendTelemetryPacket(packet))
-                            ),
+                            new InstantCommand(),
                             () -> sorter.getCurrentColor().isBall()        // evaluated at runtime
                     )
             );

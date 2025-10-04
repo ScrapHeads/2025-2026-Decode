@@ -3,89 +3,118 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
 import com.arcrobotics.ftclib.command.Subsystem;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
+/**
+ * The Sorter subsystem handles the rotation of the sorting wheel that organizes balls
+ * into slots based on detected color using a REV Color Sensor V3.
+ *
+ * <p>It supports:
+ * <ul>
+ *     <li>Continuous rotation servo for sorting wheel</li>
+ *     <li>REV Color Sensor V3 for color classification</li>
+ *     <li>Swift Robotics magnetic sensor for rotation tracking</li>
+ * </ul>
+ *
+ * <p>Constants are adjustable and should be tuned on-robot.
+ */
 public class Sorter implements Subsystem {
 
     // === Tuning constants (adjust on-robot) ===
-    public static double CCW_POWER = -1;   // CCW is negative;
-    public static double CW_POWER = 1;   // CW is positive;
-    public static long STEP_MS = 200;    // time to advance exactly one slot in mills
-    public static long FEED_MS  = 500;    // time to push exactly one ball into flywheel in mills
-    public static int SLOT_COUNT   = 3;       // how many slots on the sorter
+    public static double CCW_POWER = -1;   // CCW is negative
+    public static double CW_POWER = 1;     // CW is positive
+    public static long STEP_MS = 200;      // time to advance exactly one slot (ms)
+    public static long FEED_MS = 500;      // time to push one ball into flywheel (ms)
+    public static int SLOT_COUNT = 3;      // number of slots on the sorter
 
     private final CRServo sorterRotate;
+    private final RevColorSensorV3 colorSensorV3;
+    private final DigitalChannel magneticSensor;
+
     private int currentIndex;
-    private BallColor[] slots = new BallColor[3];
+    private BallColor[] slots = new BallColor[SLOT_COUNT];
+    private boolean ledEnabled = false;
 
-//    private final RevColorSensorV3 colorSensorV3;
-
-    private boolean ledEnabled;
-
+    /**
+     * Constructor initializes servo, color sensor, and magnetic sensor.
+     *
+     * @param hm           The HardwareMap used for device lookup
+     * @param currentIndex The starting index position of the sorter
+     * @param slots        The initial color state of each slot
+     */
     public Sorter(HardwareMap hm, int currentIndex, BallColor[] slots) {
         this.sorterRotate = hm.get(CRServo.class, "sorter");
 
-        // Set the servo to to rotate
-
-        // Optional but recommended: ensure a sensible PWM range for CR servos.
+        // Configure the CR servo for proper PWM range
         if (sorterRotate instanceof CRServoImplEx) {
             ((CRServoImplEx) sorterRotate).setPwmRange(new PwmControl.PwmRange(500, 2500));
         }
-
         sorterRotate.setPower(0);
 
+        // === Initialize color sensor ===
+        colorSensorV3 = hm.get(RevColorSensorV3.class, "colorSensor");
+        colorSensorV3.setGain(2); // Gain range 1–60 depending on ambient light
+        setLed(true);
+
+        // === Initialize magnetic sensor ===
+        magneticSensor = hm.get(DigitalChannel.class, "magSensor");
+        magneticSensor.setMode(DigitalChannel.Mode.INPUT);
+
         setCurrentIndex(currentIndex);
-
         setSlots(slots);
-
-//        colorSensorV3 = hm.get(RevColorSensorV3.class, "colorSensor");
-//        colorSensorV3.setGain(1);
-//        setLed(true);
     }
 
     // === Inventory/Index helpers ===
+
+    /** @return the current slot index */
     public int getCurrentIndex() { return currentIndex; }
+
+    /** @return the BallColor currently under the color sensor */
     public BallColor getCurrentColor() { return slots[currentIndex]; }
+
+    /** @return a copy of the slot array */
     public BallColor[] getSlots() { return slots.clone(); }
 
-    /** Set the current slot to the color given */
+    /** Set the current slot color manually. */
     public void setSlotNow(BallColor color) { slots[currentIndex] = color; }
 
+    /** @return current power level applied to the sorting servo */
     public double getPower() { return sorterRotate.getPower(); }
 
+    /** Sets the servo rotation power. */
+    public void setPower(double power) { sorterRotate.setPower(power); }
 
-    public void setPower(double power) {
-        sorterRotate.setPower(power);
-    }
+    /** Updates the current index (wrapped automatically). */
+    public void setCurrentIndex(int index) { currentIndex = wrapIndex(index); }
 
-    public void setCurrentIndex (int index) {
-        currentIndex = wrapIndex(index);
-    }
-
-    public void setSlots (BallColor[] newSlots) {
-        slots = newSlots;
-    }
+    /** Sets the slot array. */
+    public void setSlots(BallColor[] newSlots) { slots = newSlots; }
 
     /**
      * Advances one slot in the direction given
      * @param direction 1 increase or -1 decrease
-     * */
-    public void advanceSlot (double direction) {
+     */
+    public void advanceSlot(double direction) {
         currentIndex = wrapIndex(currentIndex + (int) Math.rint(direction));
     }
 
     /**
-     * Takes the color you want and gives the closest slot index return -1 if none exist.
-     * Will prioritize CCW for launcher preference
+     * Takes the color you want and gives the closest slot index.
+     * Returns -1 if none exist.
+     * Prioritizes CCW for launcher preference.
+     *
      * @param target the color you want to find
-     * @return returns the index of the closest color -1 if none
-     * */
-    public int closestSlotToColor (BallColor target) {
+     * @return the index of the closest color (-1 if none)
+     */
+    public int closestSlotToColor(BallColor target) {
         if (target == null || !target.isBall()) return -1;
         int copyCurrentIndex = currentIndex;
         for (int steps = 0; steps < SLOT_COUNT; steps++) {
@@ -96,10 +125,11 @@ public class Sorter implements Subsystem {
     }
 
     /**
-     * Takes the given index and returns the power needed to go to that index
+     * Takes the given index and returns the power direction
+     * needed to go to that index.
      * @return -1 if index < currentIndex else 1
-     * */
-    public int getIndexOffset (int index) {
+     */
+    public int getIndexOffset(int index) {
         if (index < currentIndex) {
             return -1;
         } else {
@@ -107,22 +137,70 @@ public class Sorter implements Subsystem {
         }
     }
 
+    // === Color Sensor ===
 
-//    /**
-//     * Turns the ball to the index using the closest path
-//     * @param index the slot you want to turn to
-//     * */
-//    public void turnToIndex (int index) {
-//        if (index == currentIndex) {
-//            turnTo(0);
-//        } else if (index == wrapIndex(currentIndex - 1)) {
-//            turnToForTime(CCW_POWER, STEP_MS);
-//        } else if (index == wrapIndex(currentIndex + 1)) {
-//            turnToForTime(CW_POWER, STEP_MS);
-//        }
-//    }
-
+    /** @return true if the LED on the color sensor is enabled */
     public boolean isLedEnabled() { return ledEnabled; }
+
+    /** Enable or disable the onboard LED for the color sensor. */
+    public void setLed(boolean enable) {
+        if (colorSensorV3 instanceof SwitchableLight) {
+            ((SwitchableLight) colorSensorV3).enableLight(enable);
+        }
+        ledEnabled = enable;
+    }
+
+    /**
+     * Detects the color of the current ball using calibrated RGB thresholds
+     * for GREEN and PURPLE colors. Thresholds should be tuned on-robot
+     * for your lighting and sensor distance.
+     *
+     * @return the detected BallColor (GREEN, PURPLE, or EMPTY)
+     */
+    public BallColor detectBallColor() {
+        int r = colorSensorV3.red();
+        int g = colorSensorV3.green();
+        int b = colorSensorV3.blue();
+
+        // --- Normalize readings to minimize lighting variance ---
+        double total = r + g + b;
+        if (total == 0) return BallColor.EMPTY;
+
+        double rNorm = r / total;
+        double gNorm = g / total;
+        double bNorm = b / total;
+
+        // --- GREEN detection: strong green dominance ---
+        if (gNorm > rNorm * 1.3 && gNorm > bNorm * 1.3) {
+            return BallColor.GREEN;
+        }
+
+        // --- PURPLE detection: red + blue high, green low ---
+        double avgRB = (rNorm + bNorm) / 2.0;
+        if (avgRB > gNorm * 1.6) {
+            return BallColor.PURPLE;
+        }
+
+        // --- None detected ---
+        return BallColor.EMPTY;
+    }
+
+    // === Magnetic Sensor ===
+
+    /**
+     * Checks whether the Swift Robotics magnetic sensor has been triggered.
+     *
+     * <p>Typically, this sensor goes LOW (false) when it detects a magnet passing by.
+     * The logic may need to be inverted depending on your sensor wiring.
+     *
+     * @return true if the sorter has completed one rotation trigger event.
+     */
+    public boolean isMagnetTriggered() {
+        // Some sensors return LOW when triggered. Invert logic if needed.
+        return !magneticSensor.getState();
+    }
+
+    // === Utility ===
 
     /**
      * Wrap an integer index into the valid range [0, SLOT_COUNT - 1].
@@ -143,17 +221,15 @@ public class Sorter implements Subsystem {
         return m < 0 ? m + SLOT_COUNT : m;
     }
 
-
-//    public void setLed(boolean enable) {
-//        if (colorSensorV3 instanceof SwitchableLight) {
-//            ((SwitchableLight) colorSensorV3).enableLight(enable);
-//        }
-//        ledEnabled = enable;
-//    }
-
+    // === Periodic Telemetry ===
     @Override
     public void periodic() {
         tele.addData("ServoPower", getPower());
+        tele.addData("Sorter Index", currentIndex);
+        tele.addData("LED Enabled", ledEnabled);
+        tele.addData("Color Sensor (R,G,B)", "%d, %d, %d",
+                colorSensorV3.red(), colorSensorV3.green(), colorSensorV3.blue());
+        tele.addData("Detected Color", detectBallColor());
+        tele.addData("Mag Sensor Triggered", isMagnetTriggered());
     }
-
 }
