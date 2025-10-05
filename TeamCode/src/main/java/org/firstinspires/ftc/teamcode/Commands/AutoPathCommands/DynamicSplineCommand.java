@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 import java.util.function.Supplier;
@@ -154,8 +155,7 @@ public class DynamicSplineCommand extends CommandBase {
      */
     @Override
     public void initialize() {
-        drivetrain.updatePoseEstimate();
-        Pose2d currentPose = drivetrain.localizer.getPose();
+        Pose2d currentPose = RobotState.getInstance().getPose();
         Vector2d targetPosition = targetPositionSupplier.get();
 
         trajectoryAction = drivetrain.actionBuilder(

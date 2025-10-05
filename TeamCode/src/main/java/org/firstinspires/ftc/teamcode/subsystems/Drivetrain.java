@@ -145,8 +145,6 @@ public final class Drivetrain implements Subsystem {
     // Localization
     public final Localizer localizer;
 
-    public RobotState robotState;
-
     // Log writers
     private final DownsampledWriter estimatedPoseWriter = new DownsampledWriter("ESTIMATED_POSE", 50_000_000);
     private final DownsampledWriter targetPoseWriter = new DownsampledWriter("TARGET_POSE", 50_000_000);
@@ -159,10 +157,8 @@ public final class Drivetrain implements Subsystem {
      * @param hardwareMap FTC hardware map
      * @param pose        initial starting pose estimate
      */
-    public Drivetrain(HardwareMap hardwareMap, Pose2d pose, RobotState robotState) {
+    public Drivetrain(HardwareMap hardwareMap, Pose2d pose) {
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
-
-        this.robotState = robotState;
 
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
@@ -564,12 +560,11 @@ public final class Drivetrain implements Subsystem {
      */
     @Override
     public void periodic() {
-        if (robotState != null) {
-            robotState.setPose(localizer.getPose());
-        }
-
         ChassisSpeeds vel = updatePoseEstimate();
         Pose2d pose = localizer.getPose();
+
+        RobotState.getInstance().setChassisSpeeds(vel);
+        RobotState.getInstance().setPose(pose);
 
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("X", pose.getX());

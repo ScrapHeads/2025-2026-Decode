@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.state;
 
 
+import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
@@ -12,17 +13,21 @@ import org.firstinspires.ftc.teamcode.util.BallColor;
  * - Boolean for what alliance you are on sense there is only two
  */
 public class RobotState {
-    public int version = 1;
+    private int version = 1;
 
     // Pose on the field
-    public Pose2d pose;
-    public Pose2d estimatedPose;
+    private Pose2d pose;
+    private Pose2d estimatedPose;
+
+    private ChassisSpeeds chassisSpeeds;
 
     // get all the ball colors
-    public BallColor[] ballColors;
+    private BallColor[] ballColors;
 
     // If true on blue alliance if false on red alliance
-    public boolean isBlue;
+    private boolean isBlue;
+
+    private static RobotState instance;
 
     /**
      * Required no-argument constructor.
@@ -36,6 +41,13 @@ public class RobotState {
 
     }
 
+    public static RobotState getInstance() {
+        if (instance == null) {
+            instance = new RobotState();
+        }
+        return instance;
+    }
+
     /**
      * Creates a new RobotState with the given pose and alliance flag.
      * This is typically used at the end of an Autonomous routine to capture
@@ -45,10 +57,11 @@ public class RobotState {
      * @param pose   the robot's estimated field position and heading
      * @param isBlue true if on the blue alliance, false if on the red alliance
      */
-    public RobotState(Pose2d pose, boolean isBlue, BallColor[] ballColors) {
+    public RobotState(Pose2d pose, boolean isBlue, BallColor[] ballColors, ChassisSpeeds chassisSpeeds) {
         this.pose = pose;
         this.estimatedPose = pose;
         this.isBlue = isBlue;
+        this.chassisSpeeds = chassisSpeeds;
 
         this.ballColors = ballColors;
     }
@@ -59,6 +72,10 @@ public class RobotState {
         pose = newPose;
         estimatedPose = newPose;
     }
+
+    public void setChassisSpeeds (ChassisSpeeds chassisSpeeds) {this.chassisSpeeds = chassisSpeeds;}
+
+    public ChassisSpeeds getChassisSpeeds() {return chassisSpeeds;}
 
     public BallColor[] getBallColors() {return ballColors;}
 

@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
+import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 public class LocalizationTest extends LinearOpMode {
@@ -29,9 +30,7 @@ public class LocalizationTest extends LinearOpMode {
                         -gamepad1.right_stick_x
                 ));
 
-                drive.updatePoseEstimate();
-
-                Pose2d pose = drive.localizer.getPose();
+                Pose2d pose = RobotState.getInstance().getPose();
                 telemetry.addData("x", pose.getX());
                 telemetry.addData("y", pose.getY());
                 telemetry.addData("heading (deg)", pose.getRotation().toString());

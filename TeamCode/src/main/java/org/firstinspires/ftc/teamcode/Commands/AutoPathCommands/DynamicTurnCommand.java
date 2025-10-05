@@ -11,6 +11,7 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
+import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 import java.util.function.DoubleSupplier;
@@ -147,8 +148,7 @@ public class DynamicTurnCommand extends CommandBase {
      */
     @Override
     public void initialize() {
-        drivetrain.updatePoseEstimate();
-        Pose2d currentPose = drivetrain.localizer.getPose();
+        Pose2d currentPose = RobotState.getInstance().getPose();
 
         Pose2d targetPose = new Pose2d(
                 currentPose.getX(), currentPose.getY(),

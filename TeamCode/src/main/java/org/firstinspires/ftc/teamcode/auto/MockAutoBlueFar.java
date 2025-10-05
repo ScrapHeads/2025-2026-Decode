@@ -57,9 +57,9 @@ public class MockAutoBlueFar extends CommandOpMode {
         tele = telemetry;
         dashboard = FtcDashboard.getInstance();
 
-        robotState = new RobotState(path.get(0), isBlue, ballColors);
+//        robotState = new RobotState(path.get(0), isBlue, ballColors);
 
-        drivetrain = new Drivetrain(hm, path.get(0), robotState);
+        drivetrain = new Drivetrain(hm, path.get(0));
         drivetrain.register();
 
         // Wait to start the auto path till the play button is pressed
