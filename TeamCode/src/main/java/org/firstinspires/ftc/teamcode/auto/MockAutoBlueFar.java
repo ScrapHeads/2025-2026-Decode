@@ -25,6 +25,7 @@ import org.firstinspires.ftc.teamcode.auto.paths.mockAutoBlueFar;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.util.BallColor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +35,20 @@ public class MockAutoBlueFar extends CommandOpMode {
 
     Drivetrain drivetrain;
 
+    RobotState robotState;
+
+    public boolean isBlue = true;
+
     public static final List<Pose2d> path = mockAutoBlueFar.PATH;
+
+    public BallColor[] ballColors = new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN};
+
+    // Custom constraints for some moves
+    TurnConstraints turnConstraintsFast = new TurnConstraints(4, -4, 4);
+    VelConstraint velConstraintFast = new MinVelConstraint(Arrays.asList(
+            drivetrain.kinematics.new WheelVelConstraint(80),
+            new AngularVelConstraint(Math.PI)));
+    AccelConstraint accelConstraintFast = new ProfileAccelConstraint(-40, 80);
 
     @Override
     public void initialize() {
@@ -43,15 +57,10 @@ public class MockAutoBlueFar extends CommandOpMode {
         tele = telemetry;
         dashboard = FtcDashboard.getInstance();
 
-        drivetrain = new Drivetrain(hm, path.get(0));
-        drivetrain.register();
+        robotState = new RobotState(path.get(0), isBlue, ballColors);
 
-        // Custom constraints for some moves
-        TurnConstraints turnConstraintsFast = new TurnConstraints(4, -4, 4);
-        VelConstraint velConstraintFast = new MinVelConstraint(Arrays.asList(
-                drivetrain.kinematics.new WheelVelConstraint(80),
-                new AngularVelConstraint(Math.PI)));
-        AccelConstraint accelConstraintFast = new ProfileAccelConstraint(-40, 80);
+        drivetrain = new Drivetrain(hm, path.get(0), robotState);
+        drivetrain.register();
 
         // Wait to start the auto path till the play button is pressed
         waitForStart();
@@ -94,18 +103,8 @@ public class MockAutoBlueFar extends CommandOpMode {
 
     private void writeAutoHandoff() {
         try {
-            // Update the pose of the robot
-            drivetrain.updatePoseEstimate();
-
-            // Get the updated robot pose
-            Pose2d pose = drivetrain.localizer.getPose();
-            boolean isBlue = true;
-
-            // Create a new RobotState class
-            RobotState rs = new RobotState(pose, isBlue);
-
             // Save the RobotState class to the json file
-            StateIO.save(rs);
+            StateIO.save(robotState);
 
         } catch (Exception e) {
             // Keep Auto safe-avoid throwing out of end(); add a log

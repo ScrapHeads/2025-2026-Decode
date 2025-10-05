@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.state;
 
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.util.BallColor;
 
 /**
  * Serializable snapshot of robot state to transfer from Auto to TeleOp.
@@ -15,6 +16,10 @@ public class RobotState {
 
     // Pose on the field
     public Pose2d pose;
+    public Pose2d estimatedPose;
+
+    // get all the ball colors
+    public BallColor[] ballColors;
 
     // If true on blue alliance if false on red alliance
     public boolean isBlue;
@@ -40,10 +45,30 @@ public class RobotState {
      * @param pose   the robot's estimated field position and heading
      * @param isBlue true if on the blue alliance, false if on the red alliance
      */
-    public RobotState(Pose2d pose, boolean isBlue) {
+    public RobotState(Pose2d pose, boolean isBlue, BallColor[] ballColors) {
         this.pose = pose;
+        this.estimatedPose = pose;
         this.isBlue = isBlue;
+
+        this.ballColors = ballColors;
     }
+
+    public Pose2d getPose() {return pose;}
+
+    public void setPose(Pose2d newPose) {
+        pose = newPose;
+        estimatedPose = newPose;
+    }
+
+    public BallColor[] getBallColors() {return ballColors;}
+
+    public void setBallColorAtIndex(int index, BallColor ballColor) {
+        ballColors[index] = ballColor;
+    }
+
+    public void setBallColors (BallColor[] ballColors) {this.ballColors = ballColors;}
+
+
 
     /**
      * Returns a human-readable string representation of this RobotState.
@@ -57,6 +82,7 @@ public class RobotState {
         return "RobotState{" +
                 "version=" + version +
                 "pose=" +pose +
+                "estPose=" +estimatedPose+
                 "isBlue=" + isBlue +
                 "}";
     }

@@ -84,7 +84,7 @@ public class Sorter implements Subsystem {
     public BallColor[] getSlots() { return slots.clone(); }
 
     /** Set the current slot color manually. */
-    public void setSlotNow(BallColor color) { slots[currentIndex] = color; }
+    public void setSlotCurrent(BallColor color) { slots[currentIndex] = color; }
 
     /** @return current power level applied to the sorting servo */
     public double getPower() { return sorterRotate.getPower(); }
@@ -224,6 +224,10 @@ public class Sorter implements Subsystem {
     // === Periodic Telemetry ===
     @Override
     public void periodic() {
+        if (detectBallColor() != getCurrentColor() && isMagnetTriggered()) {
+            setSlotCurrent(detectBallColor());
+        }
+
         tele.addData("ServoPower", getPower());
         tele.addData("Sorter Index", currentIndex);
         tele.addData("LED Enabled", ledEnabled);

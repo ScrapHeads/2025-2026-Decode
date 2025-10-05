@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
+import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 @TeleOp(name = "DriveOnly", group = "ScrapHeads")
@@ -32,7 +34,7 @@ public class DriveOnly extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
 
         // Initialize the subsystems declared at the top of the code
-        drivetrain = new Drivetrain(hm, new Pose2d());
+        drivetrain = new Drivetrain(hm, new Pose2d(), null);
         drivetrain.register();
 
         // Calling assignControls to set input commands

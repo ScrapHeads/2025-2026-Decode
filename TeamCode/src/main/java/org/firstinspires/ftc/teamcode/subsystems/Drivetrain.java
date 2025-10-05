@@ -53,6 +53,7 @@ import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.PoseMessage;
 import org.firstinspires.ftc.teamcode.roadrunner.PinpointLocalizer;
+import org.firstinspires.ftc.teamcode.state.RobotState;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -144,6 +145,8 @@ public final class Drivetrain implements Subsystem {
     // Localization
     public final Localizer localizer;
 
+    public RobotState robotState;
+
     // Log writers
     private final DownsampledWriter estimatedPoseWriter = new DownsampledWriter("ESTIMATED_POSE", 50_000_000);
     private final DownsampledWriter targetPoseWriter = new DownsampledWriter("TARGET_POSE", 50_000_000);
@@ -156,8 +159,10 @@ public final class Drivetrain implements Subsystem {
      * @param hardwareMap FTC hardware map
      * @param pose        initial starting pose estimate
      */
-    public Drivetrain(HardwareMap hardwareMap, Pose2d pose) {
+    public Drivetrain(HardwareMap hardwareMap, Pose2d pose, RobotState robotState) {
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
+
+        this.robotState = robotState;
 
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
@@ -559,6 +564,10 @@ public final class Drivetrain implements Subsystem {
      */
     @Override
     public void periodic() {
+        if (robotState != null) {
+            robotState.setPose(localizer.getPose());
+        }
+
         ChassisSpeeds vel = updatePoseEstimate();
         Pose2d pose = localizer.getPose();
 
