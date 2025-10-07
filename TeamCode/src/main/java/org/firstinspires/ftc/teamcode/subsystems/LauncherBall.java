@@ -28,7 +28,7 @@ public final class LauncherBall implements Subsystem {
      */
     public static class Params {
         /** Desired target wheel speed in RPM. */
-        public double targetRpm = 6000;
+        public double targetRpm = 5000;
 
         /** Allowed RPM error margin to consider launcher "ready". */
         public double readyToleranceRpm = 200;
@@ -46,13 +46,13 @@ public final class LauncherBall implements Subsystem {
         /** Ramped setpoint RPM used to avoid sudden current draw. */
         public double currentTargetRpm = 0.0;
         /** Max ramp rate in RPM/sec. */
-        public double maxAccelRpmPerSec = 10000.0;
+        public double maxAccelRpmPerSec = 3000;
         /** Time of last loop iteration, in ns. */
         public long lastLoopNanos = 0L;
 
         // --- Control ---
         /** Single PID controller for the shooter motor. */
-        public double PIDKs = 0.2;
+        public double PIDKs = 0.3;
         public double PIDKi = 0.0;
         public double PIDKd = 0.0;
 
@@ -137,8 +137,8 @@ public final class LauncherBall implements Subsystem {
 
     // ----------------- Telemetry helpers -----------------
 
-    public double getLeftTicksPerSec()  { return shooter.getVelocity(); }
-    public double getShooterRPM()  { return (getLeftTicksPerSec() * 60.0) / TICKS_PER_REV; }
+    public double getTicksPerSec()  { return shooter.getVelocity(); }
+    public double getShooterRPM()  { return (getTicksPerSec() * 60.0) / TICKS_PER_REV; }
     public double rpmToTicksPerSec(double rpm) { return (rpm * TICKS_PER_REV) / 60.0; }
     public boolean isReadyToLaunch() {
 //        return true;
@@ -211,4 +211,9 @@ public final class LauncherBall implements Subsystem {
     private static double clamp(double v, double lo, double hi) {
         return Math.max(lo, Math.min(hi, v));
     }
+
+    public void end() {
+        disable();
+    }
+
 }

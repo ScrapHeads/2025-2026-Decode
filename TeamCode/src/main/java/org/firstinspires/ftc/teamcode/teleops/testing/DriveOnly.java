@@ -34,7 +34,7 @@ public class DriveOnly extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
 
         // Initialize the subsystems declared at the top of the code
-        drivetrain = new Drivetrain(hm, new Pose2d(), null);
+        drivetrain = new Drivetrain(hm, new Pose2d());
         drivetrain.register();
 
         // Calling assignControls to set input commands

@@ -8,6 +8,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.VisionAutoAlign;
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 
+@Disabled
 @TeleOp(name = "AutoAlignTeleOp", group = "ScrapHeads")
 public class VisionAutoAlignTeleOp extends CommandOpMode {
     private GamepadEx driver;

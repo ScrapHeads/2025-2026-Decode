@@ -18,8 +18,8 @@ public class Intake implements Subsystem {
     private final MotorEx intakeMotor;
 
     // Default power constants (adjust as needed)
-    public static final double INTAKE_POWER = 1.0;
-    public static final double OUTTAKE_POWER = -1.0;
+    public static final double INTAKE_POWER = -1.0;
+    public static final double OUTTAKE_POWER = 1.0;
 
     /**
      * Constructs the IntakeSubsystem.

@@ -9,6 +9,7 @@ import static org.firstinspires.ftc.teamcode.Constants.tele;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
@@ -22,6 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
  *   A = spin up to 6000 RPM (holds until disabled)
  *   B = disable launcher (stop motor)
  */
+@Disabled
 @TeleOp(name = "LauncherOnly", group = "ScrapHeads")
 public class LauncherOnly extends CommandOpMode {
     // Controller

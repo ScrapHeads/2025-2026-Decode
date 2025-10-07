@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode.teleops;
 
 import com.qualcomm.hardware.dfrobot.HuskyLens;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -59,7 +60,7 @@ import java.util.concurrent.TimeUnit;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 @TeleOp(name = "VisionTele", group = "Sensor")
-//@Disabled
+@Disabled
 public class VisionTele extends LinearOpMode {
 
     private final int READ_PERIOD = 1;

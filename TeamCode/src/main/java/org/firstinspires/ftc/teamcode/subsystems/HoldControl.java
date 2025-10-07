@@ -17,14 +17,14 @@ public class HoldControl implements Subsystem {
 
     private final ServoEx holdServo;
 
-    // === Servo angle presets (in degrees) ===
-    public static final double TRANSPORT_ANGLE = 40;
-    public static final double LOADING_ANGLE   = 0;
-    public static final double LAUNCHING_ANGLE = 85;
-
     // === Servo configuration ===
-    public static final double MIN_ANGLE = 0.0;
-    public static final double MAX_ANGLE = 270.0;
+    public static final double MIN_ANGLE = 500.0;
+    public static final double MAX_ANGLE = 2500.0;
+
+    // === Servo angle presets (in degrees) ===
+    public static final double TRANSPORT_ANGLE = 1375;
+    public static final double LOADING_ANGLE   = 1550;
+    public static final double LAUNCHING_ANGLE = 1050;
 
     private HoldPosition currentPosition = HoldPosition.TRANSPORT;
 
@@ -43,7 +43,7 @@ public class HoldControl implements Subsystem {
     public HoldControl(HardwareMap hm) {
         // Axon MAX M2 supports 270° travel – specify full range
         holdServo = new SimpleServo(hm, "holdControl", MIN_ANGLE, MAX_ANGLE);
-        holdServo.turnToAngle(TRANSPORT_ANGLE);
+//        holdServo.turnToAngle(LOADING_ANGLE);
     }
 
     /** Turns servo to the specified preset angle based on mode. */

@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.Constants.tele;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
+@Disabled
 @TeleOp(name = "DriveWithAutoWrite", group = "ScrapHeads")
 public class DriveWithAutoWrite extends CommandOpMode {
     // Create all subsystems references
