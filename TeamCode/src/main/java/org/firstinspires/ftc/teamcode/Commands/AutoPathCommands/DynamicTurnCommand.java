@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.AccelConstraint;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.TurnConstraints;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandBase;
 
@@ -148,7 +147,7 @@ public class DynamicTurnCommand extends CommandBase {
      */
     @Override
     public void initialize() {
-        Pose2d currentPose = RobotState.getInstance().getPose();
+        Pose2d currentPose = RobotState.getInstance().getEstimatedPose();
 
         Pose2d targetPose = new Pose2d(
                 currentPose.getX(), currentPose.getY(),

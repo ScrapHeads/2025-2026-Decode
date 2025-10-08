@@ -6,8 +6,10 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 
+import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
@@ -50,7 +52,7 @@ public class DriveContinous extends CommandBase {
      */
     @Override
     public void execute() {
-        Rotation2d rot = drivetrain.localizer.getPose().getRotation();
+        Rotation2d rot = RobotState.getInstance().getOdometryPose().getRotation();
         ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 driver.getLeftY() * speed,
                 -driver.getLeftX() * speed,

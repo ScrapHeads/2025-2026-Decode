@@ -16,7 +16,7 @@ public class RobotState {
     private int version = 1;
 
     // Pose on the field
-    private Pose2d pose;
+    private Pose2d odometryPose;
     private Pose2d estimatedPose;
 
     private ChassisSpeeds chassisSpeeds;
@@ -58,7 +58,7 @@ public class RobotState {
      * @param isBlue true if on the blue alliance, false if on the red alliance
      */
     public RobotState(Pose2d pose, boolean isBlue, BallColor[] ballColors, ChassisSpeeds chassisSpeeds) {
-        this.pose = pose;
+        this.odometryPose = pose;
         this.estimatedPose = pose;
         this.isBlue = isBlue;
         this.chassisSpeeds = chassisSpeeds;
@@ -66,10 +66,12 @@ public class RobotState {
         this.ballColors = ballColors;
     }
 
-    public Pose2d getPose() {return pose;}
+    public Pose2d getOdometryPose() {return odometryPose;}
 
-    public void setPose(Pose2d newPose) {
-        pose = newPose;
+    public Pose2d getEstimatedPose() {return estimatedPose;}
+
+    public void setOdometryPose(Pose2d newPose) {
+        odometryPose = newPose;
         estimatedPose = newPose;
     }
 
@@ -98,7 +100,7 @@ public class RobotState {
     public String toString() {
         return "RobotState{" +
                 "version=" + version +
-                "pose=" +pose +
+                "pose=" + odometryPose +
                 "estPose=" +estimatedPose+
                 "isBlue=" + isBlue +
                 "}";

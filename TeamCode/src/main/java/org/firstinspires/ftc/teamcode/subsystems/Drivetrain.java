@@ -34,6 +34,7 @@ import com.acmerobotics.roadrunner.ftc.FlightRecorder;
 import com.acmerobotics.roadrunner.ftc.LazyHardwareMapImu;
 import com.acmerobotics.roadrunner.ftc.LazyImu;
 import com.acmerobotics.roadrunner.ftc.LynxFirmware;
+import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -56,7 +57,6 @@ import org.firstinspires.ftc.teamcode.roadrunner.PinpointLocalizer;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -274,11 +274,14 @@ public final class Drivetrain implements Subsystem {
 
             ChassisSpeeds robotVelRobot = updatePoseEstimate();
 
+            // NOTE: if you don't want vision to impact movement, use odometry pose instead
+            Pose2d estimatedPose = RobotState.getInstance().getEstimatedPose();
+
             PoseVelocity2dDual<Time> command = new HolonomicController(
                     PARAMS.axialGain, PARAMS.lateralGain, PARAMS.headingGain,
                     PARAMS.axialVelGain, PARAMS.lateralVelGain, PARAMS.headingVelGain
             )
-                    .compute(txWorldTarget, convertPose2D(localizer.getPose()), convertChassisSpeeds(robotVelRobot));
+                    .compute(txWorldTarget, convertPose2D(estimatedPose), convertChassisSpeeds(robotVelRobot));
             driveCommandWriter.write(new DriveCommandMessage(command));
 
             MecanumKinematics.WheelVelocities<Time> wheelVels = kinematics.inverse(command);
@@ -299,11 +302,11 @@ public final class Drivetrain implements Subsystem {
             rightBack.setPower(rightBackPower);
             rightFront.setPower(rightFrontPower);
 
-            p.put("x", localizer.getPose().getX());
-            p.put("y", localizer.getPose().getY());
-            p.put("heading (deg)", localizer.getPose().getRotation().toString());
+            p.put("x", estimatedPose.getX());
+            p.put("y", estimatedPose.getY());
+            p.put("heading (deg)", estimatedPose.getRotation().toString());
 
-            Transform2d error = convertPose2D(txWorldTarget.value()).minus(localizer.getPose());
+            Transform2d error = convertPose2D(txWorldTarget.value()).minus(estimatedPose);
             p.put("xError", error.getX());
             p.put("yError", error.getY());
             p.put("headingError (deg)", error.getRotation().toString());
@@ -316,7 +319,7 @@ public final class Drivetrain implements Subsystem {
             Drawing.drawRobot(c, txWorldTarget.value());
 
             c.setStroke("#3F51B5");
-            Drawing.drawRobot(c, convertPose2D(localizer.getPose()));
+            Drawing.drawRobot(c, convertPose2D(estimatedPose));
 
             c.setStroke("#4CAF50FF");
             c.setStrokeWidth(1);
@@ -369,11 +372,14 @@ public final class Drivetrain implements Subsystem {
 
             ChassisSpeeds robotVelRobot = updatePoseEstimate();
 
+            // NOTE: if you don't want vision to impact movement, use odometry pose instead
+            Pose2d estimatedPose = RobotState.getInstance().getEstimatedPose();
+
             PoseVelocity2dDual<Time> command = new HolonomicController(
                     PARAMS.axialGain, PARAMS.lateralGain, PARAMS.headingGain,
                     PARAMS.axialVelGain, PARAMS.lateralVelGain, PARAMS.headingVelGain
             )
-                    .compute(txWorldTarget, convertPose2D(localizer.getPose()), convertChassisSpeeds(robotVelRobot));
+                    .compute(txWorldTarget, convertPose2D(estimatedPose), convertChassisSpeeds(robotVelRobot));
             driveCommandWriter.write(new DriveCommandMessage(command));
 
             MecanumKinematics.WheelVelocities<Time> wheelVels = kinematics.inverse(command);
@@ -400,7 +406,7 @@ public final class Drivetrain implements Subsystem {
             Drawing.drawRobot(c, txWorldTarget.value());
 
             c.setStroke("#3F51B5");
-            Drawing.drawRobot(c, convertPose2D(localizer.getPose()));
+            Drawing.drawRobot(c, convertPose2D(estimatedPose));
 
             c.setStroke("#7C4DFFFF");
             c.fillCircle(turn.beginPose.position.x, turn.beginPose.position.y, 2);
@@ -423,7 +429,10 @@ public final class Drivetrain implements Subsystem {
     public ChassisSpeeds updatePoseEstimate() {
         ChassisSpeeds vel = localizer.update();
 
-        estimatedPoseWriter.write(new PoseMessage(convertPose2D(localizer.getPose())));
+        RobotState.getInstance().setOdometryPose(localizer.getPose());
+        RobotState.getInstance().setChassisSpeeds(vel);
+
+        estimatedPoseWriter.write(new PoseMessage(convertPose2D(RobotState.getInstance().getOdometryPose())));
 
         return vel;
     }
@@ -561,10 +570,7 @@ public final class Drivetrain implements Subsystem {
     @Override
     public void periodic() {
         ChassisSpeeds vel = updatePoseEstimate();
-        Pose2d pose = localizer.getPose();
-
-        RobotState.getInstance().setChassisSpeeds(vel);
-        RobotState.getInstance().setPose(pose);
+        Pose2d pose = RobotState.getInstance().getEstimatedPose();
 
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("X", pose.getX());
@@ -574,7 +580,7 @@ public final class Drivetrain implements Subsystem {
         packet.put("yVel", vel.vyMetersPerSecond);
         packet.put("rotVel", vel.omegaRadiansPerSecond);
 
-        Drawing.drawRobot(packet.fieldOverlay(), convertPose2D(localizer.getPose()));
+        Drawing.drawRobot(packet.fieldOverlay(), convertPose2D(pose));
 
         dashboard.sendTelemetryPacket(packet);
     }
