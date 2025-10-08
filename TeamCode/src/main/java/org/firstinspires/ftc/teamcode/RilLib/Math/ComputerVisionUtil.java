@@ -32,8 +32,8 @@ public final class ComputerVisionUtil {
      */
     public static Pose3d objectToRobotPose(
             Pose3d objectInField, Transform3d cameraToObject, Transform3d robotToCamera) {
-        final var objectToCamera = cameraToObject.inverse();
-        final var cameraToRobot = robotToCamera.inverse();
+        final Transform3d objectToCamera = cameraToObject.inverse();
+        final Transform3d cameraToRobot = robotToCamera.inverse();
         return objectInField.plus(objectToCamera).plus(cameraToRobot);
     }
 }

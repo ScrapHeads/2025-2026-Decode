@@ -131,16 +131,16 @@ public class Rotation2d
      *                                  orthogonal.
      */
     public Rotation2d(Matrix<N2, N2> rotationMatrix) {
-        final var R = rotationMatrix;
+        final Matrix<N2, N2> R = rotationMatrix;
 
         // Require that the rotation matrix is special orthogonal. This is true if
         // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
         if (R.times(R.transpose()).minus(Matrix.eye((Nat<N2>) N2.instance)).normF() > 1e-9) {
-            var msg = "Rotation matrix isn't orthogonal\n\nR =\n" + R.getStorage().toString() + '\n';
+            String msg = "Rotation matrix isn't orthogonal\n\nR =\n" + R.getStorage().toString() + '\n';
             throw new IllegalArgumentException(msg);
         }
         if (Math.abs(R.det() - 1.0) > 1e-9) {
-            var msg = "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n"
+            String msg = "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n"
                     + R.getStorage().toString()
                     + '\n';
             throw new IllegalArgumentException(msg);

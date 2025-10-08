@@ -105,7 +105,7 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
         }
 
         // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
-        var v = axis.times(1.0 / norm).times(Math.sin(angleRadians / 2.0));
+        Vector<N3> v = axis.times(1.0 / norm).times(Math.sin(angleRadians / 2.0));
         m_q = new Quaternion(Math.cos(angleRadians / 2.0), v.get(0, 0), v.get(1, 0), v.get(2, 0));
     }
 
@@ -117,16 +117,16 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
      *                                  orthogonal.
      */
     public Rotation3d(Matrix<N3, N3> rotationMatrix) {
-        final var R = rotationMatrix;
+        final Matrix<N3, N3> R = rotationMatrix;
 
         // Require that the rotation matrix is special orthogonal. This is true if
         // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
         if (R.times(R.transpose()).minus(Matrix.eye((Nat<N3>) N3.instance)).normF() > 1e-9) {
-            var msg = "Rotation matrix isn't orthogonal\n\nR =\n" + R.getStorage().toString() + '\n';
+            String msg = "Rotation matrix isn't orthogonal\n\nR =\n" + R.getStorage().toString() + '\n';
             throw new IllegalArgumentException(msg);
         }
         if (Math.abs(R.det() - 1.0) > 1e-9) {
-            var msg = "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n"
+            String msg = "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n"
                     + R.getStorage().toString()
                     + '\n';
             throw new IllegalArgumentException(msg);
@@ -221,13 +221,13 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
                 }
             }
 
-            var axis = Vector.cross(initial, other);
+            Vector<N3> axis = Vector.cross(initial, other);
 
             double axisNorm = axis.norm();
             m_q = new Quaternion(
                     0.0, axis.get(0, 0) / axisNorm, axis.get(1, 0) / axisNorm, axis.get(2, 0) / axisNorm);
         } else {
-            var axis = Vector.cross(initial, last);
+            Vector<N3> axis = Vector.cross(initial, last);
 
             // https://stackoverflow.com/a/11741520
             m_q = new Quaternion(normProduct + dot, axis.get(0, 0), axis.get(1, 0), axis.get(2, 0))
@@ -339,15 +339,15 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
      *         radians.
      */
     public double getX() {
-        final var w = m_q.getW();
-        final var x = m_q.getX();
-        final var y = m_q.getY();
-        final var z = m_q.getZ();
+        final double w = m_q.getW();
+        final double x = m_q.getX();
+        final double y = m_q.getY();
+        final double z = m_q.getZ();
 
         // wpimath/algorithms.md
-        final var cxcy = 1.0 - 2.0 * (x * x + y * y);
-        final var sxcy = 2.0 * (w * x + y * z);
-        final var cy_sq = cxcy * cxcy + sxcy * sxcy;
+        final double cxcy = 1.0 - 2.0 * (x * x + y * y);
+        final double sxcy = 2.0 * (w * x + y * z);
+        final double cy_sq = cxcy * cxcy + sxcy * sxcy;
         if (cy_sq > 1e-20) {
             return Math.atan2(sxcy, cxcy);
         } else {
@@ -363,10 +363,10 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
      *         radians.
      */
     public double getY() {
-        final var w = m_q.getW();
-        final var x = m_q.getX();
-        final var y = m_q.getY();
-        final var z = m_q.getZ();
+        final double w = m_q.getW();
+        final double x = m_q.getX();
+        final double y = m_q.getY();
+        final double z = m_q.getZ();
 
         // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
         double ratio = 2.0 * (w * y - z * x);
@@ -385,15 +385,15 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
      *         radians.
      */
     public double getZ() {
-        final var w = m_q.getW();
-        final var x = m_q.getX();
-        final var y = m_q.getY();
-        final var z = m_q.getZ();
+        final double w = m_q.getW();
+        final double x = m_q.getX();
+        final double y = m_q.getY();
+        final double z = m_q.getZ();
 
         // wpimath/algorithms.md
-        final var cycz = 1.0 - 2.0 * (y * y + z * z);
-        final var cysz = 2.0 * (w * z + x * y);
-        final var cy_sq = cycz * cycz + cysz * cysz;
+        final double cycz = 1.0 - 2.0 * (y * y + z * z);
+        final double cysz = 2.0 * (w * z + x * y);
+        final double cy_sq = cycz * cycz + cysz * cysz;
         if (cy_sq > 1e-20) {
             return Math.atan2(cysz, cycz);
         } else {
@@ -486,8 +486,11 @@ public class Rotation3d implements Interpolatable<Rotation3d> {
      */
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Rotation3d other
-                && Math.abs(Math.abs(m_q.dot(other.m_q)) - m_q.norm() * other.m_q.norm()) < 1e-9;
+        if (obj instanceof Rotation3d) {
+            Rotation3d other = (Rotation3d) obj;
+            return Math.abs(Math.abs(m_q.dot(other.m_q)) - m_q.norm() * other.m_q.norm()) < 1e-9;
+        }
+        return false;
     }
 
     @Override

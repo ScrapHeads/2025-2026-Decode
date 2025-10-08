@@ -115,7 +115,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
      * @return The transform that maps the other pose to the current pose.
      */
     public Transform3d minus(Pose3d other) {
-        final var pose = this.relativeTo(other);
+        final Pose3d pose = this.relativeTo(other);
         return new Transform3d(pose.getTranslation(), pose.getRotation());
     }
 
@@ -228,7 +228,7 @@ public class Pose3d implements Interpolatable<Pose3d> {
      * @return The current pose relative to the new origin pose.
      */
     public Pose3d relativeTo(Pose3d other) {
-        var transform = new Transform3d(other, this);
+        Transform3d transform = new Transform3d(other, this);
         return new Pose3d(transform.getTranslation(), transform.getRotation());
     }
 
@@ -396,8 +396,8 @@ public class Pose3d implements Interpolatable<Pose3d> {
      * @return An affine transformation matrix representation of this pose.
      */
     public Matrix<N4, N4> toMatrix() {
-        var vec = m_translation.toVector();
-        var mat = m_rotation.toMatrix();
+        Vector<N3> vec = m_translation.toVector();
+        Matrix<N3, N3> mat = m_rotation.toMatrix();
         return MatBuilder.fill(
                 N4.instance,
                 N4.instance,
@@ -459,9 +459,12 @@ public class Pose3d implements Interpolatable<Pose3d> {
      */
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Pose3d pose
-                && m_translation.equals(pose.m_translation)
-                && m_rotation.equals(pose.m_rotation);
+        if (obj instanceof Pose3d) {
+            Pose3d pose = (Pose3d) obj;
+            return m_translation.equals(pose.m_translation)
+                    && m_rotation.equals(pose.m_rotation);
+        }
+        return false;
     }
 
     @Override
@@ -476,8 +479,8 @@ public class Pose3d implements Interpolatable<Pose3d> {
         } else if (t >= 1) {
             return endValue;
         } else {
-            var twist = this.log(endValue);
-            var scaledTwist = new Twist3d(
+            Twist3d twist = this.log(endValue);
+            Twist3d scaledTwist = new Twist3d(
                     twist.dx * t, twist.dy * t, twist.dz * t, twist.rx * t, twist.ry * t, twist.rz * t);
             return this.exp(scaledTwist);
         }

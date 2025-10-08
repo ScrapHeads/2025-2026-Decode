@@ -67,7 +67,7 @@ public class Translation3d implements Interpolatable<Translation3d> {
      * @param angle    The angle between the x-axis and the translation vector.
      */
     public Translation3d(double distance, Rotation3d angle) {
-        final var rectangular = new Translation3d(distance, 0.0, 0.0).rotateBy(angle);
+        final Translation3d rectangular = new Translation3d(distance, 0.0, 0.0).rotateBy(angle);
         m_x = rectangular.getX();
         m_y = rectangular.getY();
         m_z = rectangular.getZ();
@@ -201,8 +201,8 @@ public class Translation3d implements Interpolatable<Translation3d> {
      * @return The new rotated translation.
      */
     public Translation3d rotateBy(Rotation3d other) {
-        final var p = new Quaternion(0.0, m_x, m_y, m_z);
-        final var qprime = other.getQuaternion().times(p).times(other.getQuaternion().inverse());
+        final Quaternion p = new Quaternion(0.0, m_x, m_y, m_z);
+        final Quaternion qprime = other.getQuaternion().times(p).times(other.getQuaternion().inverse());
         return new Translation3d(qprime.getX(), qprime.getY(), qprime.getZ());
     }
 
@@ -351,10 +351,13 @@ public class Translation3d implements Interpolatable<Translation3d> {
      */
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Translation3d other
-                && Math.abs(other.m_x - m_x) < 1E-9
-                && Math.abs(other.m_y - m_y) < 1E-9
-                && Math.abs(other.m_z - m_z) < 1E-9;
+        if (obj instanceof Translation3d) {
+            Translation3d other = (Translation3d) obj;
+            return Math.abs(other.m_x - m_x) < 1E-9
+                    && Math.abs(other.m_y - m_y) < 1E-9
+                    && Math.abs(other.m_z - m_z) < 1E-9;
+        }
+        return false;
     }
 
     @Override

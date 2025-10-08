@@ -6,7 +6,9 @@ package org.firstinspires.ftc.teamcode.RilLib.Math.Geometry;
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.MatBuilder;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Matrix;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N3;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N4;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Vector;
 
 import java.util.Objects;
 
@@ -180,8 +182,8 @@ public class Transform3d {
      *         transformation.
      */
     public Matrix<N4, N4> toMatrix() {
-        var vec = m_translation.toVector();
-        var mat = m_rotation.toMatrix();
+        Vector<N3> vec = m_translation.toVector();
+        Matrix<N3, N3> mat = m_rotation.toMatrix();
         return MatBuilder.fill(
                 N4.instance,
                 N4.instance,
@@ -239,9 +241,12 @@ public class Transform3d {
      */
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Transform3d other
-                && other.m_translation.equals(m_translation)
-                && other.m_rotation.equals(m_rotation);
+        if (obj instanceof Transform3d) {
+            Transform3d other = (Transform3d) obj;
+            return other.m_translation.equals(m_translation)
+                    && other.m_rotation.equals(m_rotation);
+        }
+        return false;
     }
 
     @Override

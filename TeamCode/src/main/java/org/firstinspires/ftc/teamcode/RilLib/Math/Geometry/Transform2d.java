@@ -6,7 +6,9 @@ package org.firstinspires.ftc.teamcode.RilLib.Math.Geometry;
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.MatBuilder;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Matrix;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N2;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N3;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Vector;
 
 import java.util.Objects;
 
@@ -154,8 +156,8 @@ public class Transform2d {
      *         transformation.
      */
     public Matrix<N3, N3> toMatrix() {
-        var vec = m_translation.toVector();
-        var mat = m_rotation.toMatrix();
+        Vector<N2> vec = m_translation.toVector();
+        Matrix<N2, N2> mat = m_rotation.toMatrix();
         return MatBuilder.fill(
                 N3.instance,
                 N3.instance,

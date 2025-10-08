@@ -72,13 +72,16 @@ public class Twist3d {
      */
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Twist3d other
-                && Math.abs(other.dx - dx) < 1E-9
-                && Math.abs(other.dy - dy) < 1E-9
-                && Math.abs(other.dz - dz) < 1E-9
-                && Math.abs(other.rx - rx) < 1E-9
-                && Math.abs(other.ry - ry) < 1E-9
-                && Math.abs(other.rz - rz) < 1E-9;
+        if (obj instanceof Twist3d) {
+            Twist3d other = (Twist3d) obj;
+            return Math.abs(other.dx - dx) < 1E-9
+                    && Math.abs(other.dy - dy) < 1E-9
+                    && Math.abs(other.dz - dz) < 1E-9
+                    && Math.abs(other.rx - rx) < 1E-9
+                    && Math.abs(other.ry - ry) < 1E-9
+                    && Math.abs(other.rz - rz) < 1E-9;
+        }
+        return false;
     }
 
     @Override

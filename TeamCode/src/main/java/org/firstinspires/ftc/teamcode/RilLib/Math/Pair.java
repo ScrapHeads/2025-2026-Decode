@@ -71,10 +71,14 @@ public class Pair<A, B> {
      */
     @Override
     public boolean equals(Object obj) {
-        return obj == this
-                || obj instanceof Pair<?, ?> other
-                && Objects.equals(m_first, other.getFirst())
-                && Objects.equals(m_second, other.getSecond());
+        if (obj == this) {
+            return true;
+        } else if (obj instanceof Pair<?, ?>) {
+            Pair<?, ?> other = (Pair<?, ?>) obj;
+            return Objects.equals(m_first, other.getFirst())
+                    && Objects.equals(m_second, other.getSecond());
+        }
+        return false;
     }
 
     @Override

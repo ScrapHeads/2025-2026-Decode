@@ -601,8 +601,8 @@ public class Matrix<R extends Num, C extends Num> {
      if (!chol.decompose(temp.getMatrix())) {
        // check that the input is not all zeros -- if they are, we special case and return all
        // zeros.
-       var matData = temp.getDDRM().data;
-       var isZeros = true;
+       double[] matData = temp.getDDRM().data;
+       boolean isZeros = true;
        for (double matDatum : matData) {
          isZeros &= Math.abs(matDatum) < 1e-6;
        }
@@ -729,10 +729,14 @@ public class Matrix<R extends Num, C extends Num> {
     */
    @Override
    public boolean equals(Object other) {
-     return this == other
-         || other instanceof Matrix<?, ?> matrix
-             && !MatrixFeatures_DDRM.hasUncountable(matrix.m_storage.getDDRM())
-             && MatrixFeatures_DDRM.isEquals(this.m_storage.getDDRM(), matrix.m_storage.getDDRM());
+       if (other == this) {
+           return true;
+       } else if (other instanceof Matrix<?, ?>) {
+           Matrix<?, ?> matrix = (Matrix<?, ?>) other;
+           return !MatrixFeatures_DDRM.hasUncountable(matrix.m_storage.getDDRM())
+                   && MatrixFeatures_DDRM.isEquals(this.m_storage.getDDRM(), matrix.m_storage.getDDRM());
+       }
+       return false;
    }
 
    @Override

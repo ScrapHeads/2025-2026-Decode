@@ -69,7 +69,7 @@ public class PoseEstimator {
      *     theta]ᵀ, with units in meters and radians.
      */
     public final void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
-        var r = new double[3];
+        double[] r = new double[3];
         for (int i = 0; i < 3; ++i) {
             r[i] = visionMeasurementStdDevs.get(i, 0) * visionMeasurementStdDevs.get(i, 0);
         }
@@ -157,10 +157,10 @@ public class PoseEstimator {
 
         // Step 3: Get the latest vision update from before or at the timestamp to sample at.
         double floorTimestamp = m_visionUpdates.floorKey(timestampSeconds);
-        var visionUpdate = m_visionUpdates.get(floorTimestamp);
+        VisionUpdate visionUpdate = m_visionUpdates.get(floorTimestamp);
 
         // Step 4: Get the pose measured by odometry at the time of the sample.
-        var odometryEstimate = m_odometryPoseBuffer.getSample(timestampSeconds);
+        Optional<Pose2d> odometryEstimate = m_odometryPoseBuffer.getSample(timestampSeconds);
 
         // Step 5: Apply the vision compensation to the odometry pose.
         return odometryEstimate.map(odometryPose -> visionUpdate.compensate(odometryPose));
@@ -214,33 +214,33 @@ public class PoseEstimator {
         cleanUpVisionUpdates();
 
         // Step 2: Get the pose measured by odometry at the moment the vision measurement was made.
-        var odometrySample = m_odometryPoseBuffer.getSample(timestampSeconds);
+        Optional<Pose2d> odometrySample = m_odometryPoseBuffer.getSample(timestampSeconds);
 
-        if (odometrySample.isEmpty()) {
+        if (!odometrySample.isPresent()) {
             return;
         }
 
         // Step 3: Get the vision-compensated pose estimate at the moment the vision measurement was
         // made.
-        var visionSample = sampleAt(timestampSeconds);
+        Optional<Pose2d> visionSample = sampleAt(timestampSeconds);
 
-        if (visionSample.isEmpty()) {
+        if (!visionSample.isPresent()) {
             return;
         }
 
         // Step 4: Measure the twist between the old pose estimate and the vision pose.
-        var twist = visionSample.get().log(visionRobotPoseMeters);
+        Twist2d twist = visionSample.get().log(visionRobotPoseMeters);
 
         // Step 5: We should not trust the twist entirely, so instead we scale this twist by a Kalman
         // gain matrix representing how much we trust vision measurements compared to our current pose.
-        var k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
+        Matrix<N3, N1> k_times_twist = m_visionK.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
 
         // Step 6: Convert back to Twist2d.
-        var scaledTwist =
+        Twist2d scaledTwist =
                 new Twist2d(k_times_twist.get(0, 0), k_times_twist.get(1, 0), k_times_twist.get(2, 0));
 
         // Step 7: Calculate and record the vision update.
-        var visionUpdate = new VisionUpdate(visionSample.get().exp(scaledTwist), odometrySample.get());
+        VisionUpdate visionUpdate = new VisionUpdate(visionSample.get().exp(scaledTwist), odometrySample.get());
         m_visionUpdates.put(timestampSeconds, visionUpdate);
 
         // Step 8: Remove later vision measurements. (Matches previous behavior)
@@ -288,7 +288,7 @@ public class PoseEstimator {
      * @return The estimated pose of the robot in meters.
      */
     public Pose2d updateWithTime(double currentTimeSeconds, Twist2d deltaPose) {
-        var odometryEstimate = m_odometryEstimate.exp(deltaPose);
+        Pose2d odometryEstimate = m_odometryEstimate.exp(deltaPose);
 
         m_odometryPoseBuffer.addSample(currentTimeSeconds, odometryEstimate);
         m_odometryEstimate = odometryEstimate;
@@ -296,7 +296,7 @@ public class PoseEstimator {
         if (m_visionUpdates.isEmpty()) {
             m_poseEstimate = odometryEstimate;
         } else {
-            var visionUpdate = m_visionUpdates.get(m_visionUpdates.lastKey());
+            VisionUpdate visionUpdate = m_visionUpdates.get(m_visionUpdates.lastKey());
             m_poseEstimate = visionUpdate.compensate(odometryEstimate);
         }
 
@@ -312,7 +312,7 @@ public class PoseEstimator {
      * @return The estimated pose of the robot in meters.
      */
     public Pose2d updateWithTime(double currentTimeSeconds, Pose2d pose) {
-        var odometryEstimate = pose;
+        Pose2d odometryEstimate = pose;
 
         m_odometryPoseBuffer.addSample(currentTimeSeconds, odometryEstimate);
         m_odometryEstimate = odometryEstimate;
@@ -320,7 +320,7 @@ public class PoseEstimator {
         if (m_visionUpdates.isEmpty()) {
             m_poseEstimate = odometryEstimate;
         } else {
-            var visionUpdate = m_visionUpdates.get(m_visionUpdates.lastKey());
+            VisionUpdate visionUpdate = m_visionUpdates.get(m_visionUpdates.lastKey());
             m_poseEstimate = visionUpdate.compensate(odometryEstimate);
         }
 
@@ -357,7 +357,7 @@ public class PoseEstimator {
          * @return The compensated pose.
          */
         public Pose2d compensate(Pose2d pose) {
-            var delta = pose.minus(this.odometryPose);
+            Transform2d delta = pose.minus(this.odometryPose);
             return this.visionPose.plus(delta);
         }
     }
