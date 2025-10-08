@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
+import static org.firstinspires.ftc.teamcode.util.ConversionUtil.convertChassisSpeeds;
+import static org.firstinspires.ftc.teamcode.util.ConversionUtil.convertPose2D;
 
 import androidx.annotation.NonNull;
 
@@ -34,7 +36,6 @@ import com.acmerobotics.roadrunner.ftc.FlightRecorder;
 import com.acmerobotics.roadrunner.ftc.LazyHardwareMapImu;
 import com.acmerobotics.roadrunner.ftc.LazyImu;
 import com.acmerobotics.roadrunner.ftc.LynxFirmware;
-import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -55,6 +56,7 @@ import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.PoseMessage;
 import org.firstinspires.ftc.teamcode.roadrunner.PinpointLocalizer;
 import org.firstinspires.ftc.teamcode.state.RobotState;
+import org.firstinspires.ftc.teamcode.util.TimeTracker;
 
 import java.util.Arrays;
 import java.util.List;
@@ -190,24 +192,6 @@ public final class Drivetrain implements Subsystem {
         localizer = new PinpointLocalizer(hardwareMap, PARAMS.inPerTick, pose);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
-    }
-
-    public Pose2d convertPose2D(com.acmerobotics.roadrunner.Pose2d pose) {
-        return new Pose2d(pose.position.x, pose.position.y, new Rotation2d(pose.heading.toDouble()));
-    }
-
-    public com.acmerobotics.roadrunner.Pose2d convertPose2D(Pose2d pose) {
-        Vector2d vec = new Vector2d(pose.getX(), pose.getY());
-        return new com.acmerobotics.roadrunner.Pose2d(vec, pose.getRotation().getRadians());
-    }
-
-    public ChassisSpeeds convertChassisSpeeds(PoseVelocity2d speeds) {
-        return new ChassisSpeeds(speeds.linearVel.x, speeds.linearVel.y, speeds.angVel);
-    }
-
-    public PoseVelocity2d convertChassisSpeeds(ChassisSpeeds speeds) {
-        Vector2d vec = new Vector2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
-        return new PoseVelocity2d(vec, speeds.omegaRadiansPerSecond);
     }
 
     public void setDrivePowers(ChassisSpeeds speeds) {
@@ -429,7 +413,7 @@ public final class Drivetrain implements Subsystem {
     public ChassisSpeeds updatePoseEstimate() {
         ChassisSpeeds vel = localizer.update();
 
-        RobotState.getInstance().setOdometryPose(localizer.getPose());
+        RobotState.getInstance().addOdometryObservation(localizer.getPose(), TimeTracker.getTime());
         RobotState.getInstance().setChassisSpeeds(vel);
 
         estimatedPoseWriter.write(new PoseMessage(convertPose2D(RobotState.getInstance().getOdometryPose())));

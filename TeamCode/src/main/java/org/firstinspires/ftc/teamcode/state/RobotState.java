@@ -3,7 +3,15 @@ package org.firstinspires.ftc.teamcode.state;
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Matrix;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N1;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N3;
+import org.firstinspires.ftc.teamcode.RilLib.Math.PoseEstimator;
 import org.firstinspires.ftc.teamcode.util.BallColor;
+
+import java.util.Vector;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Serializable snapshot of robot state to transfer from Auto to TeleOp.
@@ -14,6 +22,10 @@ import org.firstinspires.ftc.teamcode.util.BallColor;
  */
 public class RobotState {
     private int version = 1;
+
+    private PoseEstimator poseEstimator = null;
+
+    private Lock poseLock = new ReentrantLock();
 
     // Pose on the field
     private Pose2d odometryPose;
@@ -37,9 +49,7 @@ public class RobotState {
      * generate a default constructor once a parameterized constructor is
      * defined. Typically not called directly in user code.
      */
-    public RobotState() {
-
-    }
+    private RobotState() {}
 
     public static RobotState getInstance() {
         if (instance == null) {
@@ -57,7 +67,7 @@ public class RobotState {
      * @param pose   the robot's estimated field position and heading
      * @param isBlue true if on the blue alliance, false if on the red alliance
      */
-    public RobotState(Pose2d pose, boolean isBlue, BallColor[] ballColors, ChassisSpeeds chassisSpeeds) {
+    private RobotState(Pose2d pose, boolean isBlue, BallColor[] ballColors, ChassisSpeeds chassisSpeeds) {
         this.odometryPose = pose;
         this.estimatedPose = pose;
         this.isBlue = isBlue;
@@ -70,9 +80,25 @@ public class RobotState {
 
     public Pose2d getEstimatedPose() {return estimatedPose;}
 
-    public void setOdometryPose(Pose2d newPose) {
+    public void addOdometryObservation(Pose2d newPose, double time) {
+        poseLock.lock();
+
         odometryPose = newPose;
-        estimatedPose = newPose;
+
+        if (poseEstimator == null) poseEstimator = new PoseEstimator(newPose);
+        poseEstimator.updateWithTime(time, newPose);
+        estimatedPose = poseEstimator.getEstimatedPosition();
+
+        poseLock.unlock();
+    }
+
+    public void addVisionObservation(Pose2d visionPose, double time, Matrix<N3, N1> visionStdDevs) {
+        if (poseEstimator == null) return;
+        poseLock.lock();
+
+        poseEstimator.addVisionMeasurement(visionPose, time, visionStdDevs);
+
+        poseLock.unlock();
     }
 
     public void setChassisSpeeds (ChassisSpeeds chassisSpeeds) {this.chassisSpeeds = chassisSpeeds;}
