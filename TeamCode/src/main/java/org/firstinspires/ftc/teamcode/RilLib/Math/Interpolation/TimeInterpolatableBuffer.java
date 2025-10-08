@@ -12,9 +12,12 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 /**
- * The TimeInterpolatableBuffer provides an easy way to estimate past measurements. One application
- * might be in conjunction with the DifferentialDrivePoseEstimator, where knowledge of the robot
- * pose at the time when vision or other global measurement were recorded is necessary, or for
+ * The TimeInterpolatableBuffer provides an easy way to estimate past
+ * measurements. One application
+ * might be in conjunction with the DifferentialDrivePoseEstimator, where
+ * knowledge of the robot
+ * pose at the time when vision or other global measurement were recorded is
+ * necessary, or for
  * recording the past angles of mechanisms as measured by encoders.
  *
  * @param <T> The type stored in this buffer.
@@ -33,8 +36,8 @@ public final class TimeInterpolatableBuffer<T> {
      * Create a new TimeInterpolatableBuffer.
      *
      * @param interpolateFunction The function used to interpolate between values.
-     * @param historySizeSeconds The history size of the buffer.
-     * @param <T> The type of data to store in the buffer.
+     * @param historySizeSeconds  The history size of the buffer.
+     * @param <T>                 The type of data to store in the buffer.
      * @return The new TimeInterpolatableBuffer.
      */
     public static <T> TimeInterpolatableBuffer<T> createBuffer(
@@ -43,10 +46,12 @@ public final class TimeInterpolatableBuffer<T> {
     }
 
     /**
-     * Create a new TimeInterpolatableBuffer that stores a given subclass of {@link Interpolatable}.
+     * Create a new TimeInterpolatableBuffer that stores a given subclass of
+     * {@link Interpolatable}.
      *
      * @param historySizeSeconds The history size of the buffer.
-     * @param <T> The type of {@link Interpolatable} to store in the buffer.
+     * @param <T>                The type of {@link Interpolatable} to store in the
+     *                           buffer.
      * @return The new TimeInterpolatableBuffer.
      */
     public static <T extends Interpolatable<T>> TimeInterpolatableBuffer<T> createBuffer(
@@ -68,7 +73,7 @@ public final class TimeInterpolatableBuffer<T> {
      * Add a sample to the buffer.
      *
      * @param timeSeconds The timestamp of the sample.
-     * @param sample The sample object.
+     * @param sample      The sample object.
      */
     public void addSample(double timeSeconds, T sample) {
         cleanUp(timeSeconds);
@@ -97,7 +102,8 @@ public final class TimeInterpolatableBuffer<T> {
     }
 
     /**
-     * Sample the buffer at the given time. If the buffer is empty, an empty Optional is returned.
+     * Sample the buffer at the given time. If the buffer is empty, an empty
+     * Optional is returned.
      *
      * @param timeSeconds The time at which to sample.
      * @return The interpolated value at that timestamp or an empty Optional.
@@ -116,7 +122,8 @@ public final class TimeInterpolatableBuffer<T> {
         Map.Entry<Double, T> topBound = m_pastSnapshots.ceilingEntry(timeSeconds);
         Map.Entry<Double, T> bottomBound = m_pastSnapshots.floorEntry(timeSeconds);
 
-        // Return null if neither sample exists, and the opposite bound if the other is null
+        // Return null if neither sample exists, and the opposite bound if the other is
+        // null
         if (topBound == null && bottomBound == null) {
             return Optional.empty();
         } else if (topBound == null) {
@@ -124,8 +131,10 @@ public final class TimeInterpolatableBuffer<T> {
         } else if (bottomBound == null) {
             return Optional.of(topBound.getValue());
         } else {
-            // Otherwise, interpolate. Because T is between [0, 1], we want the ratio of (the difference
-            // between the current time and bottom bound) and (the difference between top and bottom
+            // Otherwise, interpolate. Because T is between [0, 1], we want the ratio of
+            // (the difference
+            // between the current time and bottom bound) and (the difference between top
+            // and bottom
             // bounds).
             return Optional.of(
                     m_interpolatingFunc.interpolate(
@@ -135,8 +144,16 @@ public final class TimeInterpolatableBuffer<T> {
         }
     }
 
+    public Optional<T> getLatest() {
+        if (m_pastSnapshots.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(m_pastSnapshots.lastEntry().getValue());
+    }
+
     /**
-     * Grant access to the internal sample buffer. Used in Pose Estimation to replay odometry inputs
+     * Grant access to the internal sample buffer. Used in Pose Estimation to replay
+     * odometry inputs
      * stored within this buffer.
      *
      * @return The internal sample buffer.

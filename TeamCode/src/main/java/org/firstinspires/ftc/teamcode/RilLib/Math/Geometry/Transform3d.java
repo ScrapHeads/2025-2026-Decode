@@ -6,22 +6,22 @@ package org.firstinspires.ftc.teamcode.RilLib.Math.Geometry;
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.MatBuilder;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Matrix;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N3;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N4;
 
 import java.util.Objects;
 
-/** Represents a transformation for a Pose2d in the pose's frame. */
-public class Transform2d {
+/** Represents a transformation for a Pose3d in the pose's frame. */
+public class Transform3d {
     /**
-     * A preallocated Transform2d representing no transformation.
+     * A preallocated Transform3d representing no transformation.
      *
      * <p>
      * This exists to avoid allocations for common transformations.
      */
-    public static final Transform2d kZero = new Transform2d();
+    public static final Transform3d kZero = new Transform3d();
 
-    private final Translation2d m_translation;
-    private final Rotation2d m_rotation;
+    private final Translation3d m_translation;
+    private final Rotation3d m_rotation;
 
     /**
      * Constructs the transform that maps the initial pose to the final pose.
@@ -29,7 +29,7 @@ public class Transform2d {
      * @param initial The initial pose for the transformation.
      * @param last    The final pose for the transformation.
      */
-    public Transform2d(Pose2d initial, Pose2d last) {
+    public Transform3d(Pose3d initial, Pose3d last) {
         // We are rotating the difference between the translations
         // using a clockwise rotation matrix. This transforms the global
         // delta into a local delta (relative to the initial pose).
@@ -46,23 +46,25 @@ public class Transform2d {
      * @param translation Translational component of the transform.
      * @param rotation    Rotational component of the transform.
      */
-    public Transform2d(Translation2d translation, Rotation2d rotation) {
+    public Transform3d(Translation3d translation, Rotation3d rotation) {
         m_translation = translation;
         m_rotation = rotation;
     }
 
     /**
-     * Constructs a transform with x and y translations instead of a separate
-     * Translation2d.
+     * Constructs a transform with x, y, and z translations instead of a separate
+     * Translation3d.
      *
      * @param x        The x component of the translational component of the
      *                 transform.
      * @param y        The y component of the translational component of the
      *                 transform.
+     * @param z        The z component of the translational component of the
+     *                 transform.
      * @param rotation The rotational component of the transform.
      */
-    public Transform2d(double x, double y, Rotation2d rotation) {
-        m_translation = new Translation2d(x, y);
+    public Transform3d(double x, double y, double z, Rotation3d rotation) {
+        m_translation = new Translation3d(x, y, z);
         m_rotation = rotation;
     }
 
@@ -73,37 +75,52 @@ public class Transform2d {
      * @throws IllegalArgumentException if the affine transformation matrix is
      *                                  invalid.
      */
-    public Transform2d(Matrix<N3, N3> matrix) {
-        m_translation = new Translation2d(matrix.get(0, 2), matrix.get(1, 2));
-        m_rotation = new Rotation2d(matrix.block(2, 2, 0, 0));
-        if (matrix.get(2, 0) != 0.0 || matrix.get(2, 1) != 0.0 || matrix.get(2, 2) != 1.0) {
+    public Transform3d(Matrix<N4, N4> matrix) {
+        m_translation = new Translation3d(matrix.get(0, 3), matrix.get(1, 3), matrix.get(2, 3));
+        m_rotation = new Rotation3d(matrix.block(3, 3, 0, 0));
+        if (matrix.get(3, 0) != 0.0
+                || matrix.get(3, 1) != 0.0
+                || matrix.get(3, 2) != 0.0
+                || matrix.get(3, 3) != 1.0) {
             throw new IllegalArgumentException("Affine transformation matrix is invalid");
         }
     }
 
     /** Constructs the identity transform -- maps an initial pose to itself. */
-    public Transform2d() {
-        m_translation = Translation2d.kZero;
-        m_rotation = Rotation2d.kZero;
+    public Transform3d() {
+        m_translation = Translation3d.kZero;
+        m_rotation = Rotation3d.kZero;
+    }
+
+    /**
+     * Constructs a 3D transform from a 2D transform in the X-Y plane.
+     *
+     * @param transform The 2D transform.
+     * @see Rotation3d#Rotation3d(Rotation2d)
+     * @see Translation3d#Translation3d(Translation2d)
+     */
+    public Transform3d(Transform2d transform) {
+        m_translation = new Translation3d(transform.getTranslation());
+        m_rotation = new Rotation3d(transform.getRotation());
     }
 
     /**
      * Multiplies the transform by the scalar.
      *
      * @param scalar The scalar.
-     * @return The scaled Transform2d.
+     * @return The scaled Transform3d.
      */
-    public Transform2d times(double scalar) {
-        return new Transform2d(m_translation.times(scalar), m_rotation.times(scalar));
+    public Transform3d times(double scalar) {
+        return new Transform3d(m_translation.times(scalar), m_rotation.times(scalar));
     }
 
     /**
      * Divides the transform by the scalar.
      *
      * @param scalar The scalar.
-     * @return The scaled Transform2d.
+     * @return The scaled Transform3d.
      */
-    public Transform2d div(double scalar) {
+    public Transform3d div(double scalar) {
         return times(1.0 / scalar);
     }
 
@@ -115,8 +132,8 @@ public class Transform2d {
      * @param other The transform to compose with this one.
      * @return The composition of the two transformations.
      */
-    public Transform2d plus(Transform2d other) {
-        return new Transform2d(Pose2d.kZero, Pose2d.kZero.transformBy(this).transformBy(other));
+    public Transform3d plus(Transform3d other) {
+        return new Transform3d(Pose3d.kZero, Pose3d.kZero.transformBy(this).transformBy(other));
     }
 
     /**
@@ -124,7 +141,7 @@ public class Transform2d {
      *
      * @return The translational component of the transform.
      */
-    public Translation2d getTranslation() {
+    public Translation3d getTranslation() {
         return m_translation;
     }
 
@@ -147,24 +164,40 @@ public class Transform2d {
     }
 
     /**
+     * Returns the Z component of the transformation's translation.
+     *
+     * @return The z component of the transformation's translation.
+     */
+    public double getZ() {
+        return m_translation.getZ();
+    }
+
+    /**
      * Returns an affine transformation matrix representation of this
      * transformation.
      *
      * @return An affine transformation matrix representation of this
      *         transformation.
      */
-    public Matrix<N3, N3> toMatrix() {
+    public Matrix<N4, N4> toMatrix() {
         var vec = m_translation.toVector();
         var mat = m_rotation.toMatrix();
         return MatBuilder.fill(
-                N3.instance,
-                N3.instance,
+                N4.instance,
+                N4.instance,
                 mat.get(0, 0),
                 mat.get(0, 1),
+                mat.get(0, 2),
                 vec.get(0),
                 mat.get(1, 0),
                 mat.get(1, 1),
+                mat.get(1, 2),
                 vec.get(1),
+                mat.get(2, 0),
+                mat.get(2, 1),
+                mat.get(2, 2),
+                vec.get(2),
+                0.0,
                 0.0,
                 0.0,
                 1.0);
@@ -175,7 +208,7 @@ public class Transform2d {
      *
      * @return Reference to the rotational component of the transform.
      */
-    public Rotation2d getRotation() {
+    public Rotation3d getRotation() {
         return m_rotation;
     }
 
@@ -184,33 +217,30 @@ public class Transform2d {
      *
      * @return The inverted transformation.
      */
-    public Transform2d inverse() {
+    public Transform3d inverse() {
         // We are rotating the difference between the translations
         // using a clockwise rotation matrix. This transforms the global
         // delta into a local delta (relative to the initial pose).
-        return new Transform2d(
+        return new Transform3d(
                 getTranslation().unaryMinus().rotateBy(getRotation().unaryMinus()),
                 getRotation().unaryMinus());
     }
 
     @Override
     public String toString() {
-        return String.format("Transform2d(%s, %s)", m_translation, m_rotation);
+        return String.format("Transform3d(%s, %s)", m_translation, m_rotation);
     }
 
     /**
-     * Checks equality between this Transform2d and another object.
+     * Checks equality between this Transform3d and another object.
      *
      * @param obj The other object.
      * @return Whether the two objects are equal or not.
      */
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Transform2d))
-            return false;
-
-        Transform2d other = (Transform2d) obj;
-        return other.m_translation.equals(m_translation)
+        return obj instanceof Transform3d other
+                && other.m_translation.equals(m_translation)
                 && other.m_rotation.equals(m_rotation);
     }
 

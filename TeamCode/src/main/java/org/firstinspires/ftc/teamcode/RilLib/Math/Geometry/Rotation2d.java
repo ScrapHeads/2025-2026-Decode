@@ -4,17 +4,21 @@
 
 package org.firstinspires.ftc.teamcode.RilLib.Math.Geometry;
 
+import org.firstinspires.ftc.teamcode.RilLib.Math.*;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.Interpolatable;
-import org.firstinspires.ftc.teamcode.RilLib.Math.MathUtil;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Units;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N2;
 
 import java.util.Objects;
 
 /**
- * A rotation in a 2D coordinate frame represented by a point on the unit circle (cosine and sine).
+ * A rotation in a 2D coordinate frame represented by a point on the unit circle
+ * (cosine and sine).
  *
- * <p>The angle is continuous, that is if a Rotation2d is constructed with 361 degrees, it will
- * return 361 degrees. This allows algorithms that wouldn't want to see a discontinuity in the
+ * <p>
+ * The angle is continuous, that is if a Rotation2d is constructed with 361
+ * degrees, it will
+ * return 361 degrees. This allows algorithms that wouldn't want to see a
+ * discontinuity in the
  * rotations as it sweeps past from 360 to 0 on the second time around.
  */
 public class Rotation2d
@@ -22,49 +26,60 @@ public class Rotation2d
     /**
      * A preallocated Rotation2d representing no rotation.
      *
-     * <p>This exists to avoid allocations for common rotations.
+     * <p>
+     * This exists to avoid allocations for common rotations.
      */
     public static final Rotation2d kZero = new Rotation2d();
 
     /**
      * A preallocated Rotation2d representing a clockwise rotation by π/2 rad (90°).
      *
-     * <p>This exists to avoid allocations for common rotations.
+     * <p>
+     * This exists to avoid allocations for common rotations.
      */
     public static final Rotation2d kCW_Pi_2 = new Rotation2d(-Math.PI / 2);
 
     /**
      * A preallocated Rotation2d representing a clockwise rotation by 90° (π/2 rad).
      *
-     * <p>This exists to avoid allocations for common rotations.
+     * <p>
+     * This exists to avoid allocations for common rotations.
      */
     public static final Rotation2d kCW_90deg = kCW_Pi_2;
 
     /**
-     * A preallocated Rotation2d representing a counterclockwise rotation by π/2 rad (90°).
+     * A preallocated Rotation2d representing a counterclockwise rotation by π/2 rad
+     * (90°).
      *
-     * <p>This exists to avoid allocations for common rotations.
+     * <p>
+     * This exists to avoid allocations for common rotations.
      */
     public static final Rotation2d kCCW_Pi_2 = new Rotation2d(Math.PI / 2);
 
     /**
-     * A preallocated Rotation2d representing a counterclockwise rotation by 90° (π/2 rad).
+     * A preallocated Rotation2d representing a counterclockwise rotation by 90°
+     * (π/2 rad).
      *
-     * <p>This exists to avoid allocations for common rotations.
+     * <p>
+     * This exists to avoid allocations for common rotations.
      */
     public static final Rotation2d kCCW_90deg = kCCW_Pi_2;
 
     /**
-     * A preallocated Rotation2d representing a counterclockwise rotation by π rad (180°).
+     * A preallocated Rotation2d representing a counterclockwise rotation by π rad
+     * (180°).
      *
-     * <p>This exists to avoid allocations for common rotations.
+     * <p>
+     * This exists to avoid allocations for common rotations.
      */
     public static final Rotation2d kPi = new Rotation2d(Math.PI);
 
     /**
-     * A preallocated Rotation2d representing a counterclockwise rotation by 180° (π rad).
+     * A preallocated Rotation2d representing a counterclockwise rotation by 180° (π
+     * rad).
      *
-     * <p>This exists to avoid allocations for common rotations.
+     * <p>
+     * This exists to avoid allocations for common rotations.
      */
     public static final Rotation2d k180deg = kPi;
 
@@ -109,6 +124,37 @@ public class Rotation2d
     }
 
     /**
+     * Constructs a Rotation2d from a rotation matrix.
+     *
+     * @param rotationMatrix The rotation matrix.
+     * @throws IllegalArgumentException if the rotation matrix isn't special
+     *                                  orthogonal.
+     */
+    public Rotation2d(Matrix<N2, N2> rotationMatrix) {
+        final var R = rotationMatrix;
+
+        // Require that the rotation matrix is special orthogonal. This is true if
+        // the matrix is orthogonal (RRᵀ = I) and normalized (determinant is 1).
+        if (R.times(R.transpose()).minus(Matrix.eye((Nat<N2>) N2.instance)).normF() > 1e-9) {
+            var msg = "Rotation matrix isn't orthogonal\n\nR =\n" + R.getStorage().toString() + '\n';
+            throw new IllegalArgumentException(msg);
+        }
+        if (Math.abs(R.det() - 1.0) > 1e-9) {
+            var msg = "Rotation matrix is orthogonal but not special orthogonal\n\nR =\n"
+                    + R.getStorage().toString()
+                    + '\n';
+            throw new IllegalArgumentException(msg);
+        }
+
+        // R = [cosθ −sinθ]
+        // [sinθ cosθ]
+        m_cos = R.get(0, 0);
+        m_sin = R.get(1, 0);
+
+        m_value = Math.atan2(m_sin, m_cos);
+    }
+
+    /**
      * Constructs and returns a Rotation2d with the given radian value.
      *
      * @param radians The value of the angle in radians.
@@ -141,7 +187,10 @@ public class Rotation2d
     /**
      * Adds two rotations together, with the result being bounded between -π and π.
      *
-     * <p>For example, <code>Rotation2d.fromDegrees(30).plus(Rotation2d.fromDegrees(60))</code> equals
+     * <p>
+     * For example,
+     * <code>Rotation2d.fromDegrees(30).plus(Rotation2d.fromDegrees(60))</code>
+     * equals
      * <code>Rotation2d(Math.PI/2.0)</code>
      *
      * @param other The rotation to add.
@@ -152,9 +201,12 @@ public class Rotation2d
     }
 
     /**
-     * Subtracts the new rotation from the current rotation and returns the new rotation.
+     * Subtracts the new rotation from the current rotation and returns the new
+     * rotation.
      *
-     * <p>For example, <code>Rotation2d.fromDegrees(10).minus(Rotation2d.fromDegrees(100))</code>
+     * <p>
+     * For example,
+     * <code>Rotation2d.fromDegrees(10).minus(Rotation2d.fromDegrees(100))</code>
      * equals <code>Rotation2d(-Math.PI/2.0)</code>
      *
      * @param other The rotation to subtract.
@@ -165,7 +217,8 @@ public class Rotation2d
     }
 
     /**
-     * Takes the inverse of the current rotation. This is simply the negative of the current angular
+     * Takes the inverse of the current rotation. This is simply the negative of the
+     * current angular
      * value.
      *
      * @return The inverse of the current rotation.
@@ -197,7 +250,8 @@ public class Rotation2d
     /**
      * Adds the new rotation to the current rotation using a rotation matrix.
      *
-     * <p>The matrix multiplication is as follows:
+     * <p>
+     * The matrix multiplication is as follows:
      *
      * <pre>
      * [cos_new]   [other.cos, -other.sin][cos]
@@ -214,10 +268,22 @@ public class Rotation2d
     }
 
     /**
+     * Returns matrix representation of this rotation.
+     *
+     * @return Matrix representation of this rotation.
+     */
+    public Matrix<N2, N2> toMatrix() {
+        // R = [cosθ −sinθ]
+        // [sinθ cosθ]
+        return MatBuilder.fill(N2.instance, N2.instance, m_cos, -m_sin, m_sin, m_cos);
+    }
+
+    /**
      * Returns the radian value of the Rotation2d.
      *
      * @return The radian value of the Rotation2d.
-     * @see MathUtil#angleModulus(double) to constrain the angle within (-π, π]
+     * @see org.firstinspires.ftc.teamcode.RilLib.Math.MathUtil#angleModulus(double)
+     *      to constrain the angle within (-π, π]
      */
     public double getRadians() {
         return m_value;
@@ -227,8 +293,9 @@ public class Rotation2d
      * Returns the degree value of the Rotation2d.
      *
      * @return The degree value of the Rotation2d.
-     * @see MathUtil#inputModulus(double, double, double) to constrain the angle
-     *     within (-180, 180]
+     * @see org.firstinspires.ftc.teamcode.RilLib.Math.MathUtil#inputModulus(double,
+     *      double, double) to constrain the angle
+     *      within (-180, 180]
      */
     public double getDegrees() {
         return Math.toDegrees(m_value);
@@ -283,7 +350,8 @@ public class Rotation2d
      */
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Rotation2d)) return false;
+        if (!(obj instanceof Rotation2d))
+            return false;
 
         Rotation2d other = (Rotation2d) obj;
         return Math.hypot(m_cos - other.m_cos, m_sin - other.m_sin) < 1E-9;

@@ -7,7 +7,8 @@ package org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation;
 import org.firstinspires.ftc.teamcode.RilLib.Math.MathUtil;
 
 /**
- * An interpolation function that returns a value interpolated between an upper and lower bound.
+ * An interpolation function that returns a value interpolated between an upper
+ * and lower bound.
  * This behavior can be linear or nonlinear.
  *
  * @param <T> The type that the {@link Interpolator} will operate on.
@@ -19,7 +20,8 @@ public interface Interpolator<T> {
      *
      * @param startValue The value to start at.
      * @param endValue   The value to end at.
-     * @param t          How far between the two values to interpolate. This should be bounded to [0, 1].
+     * @param t          How far between the two values to interpolate. This should
+     *                   be bounded to [0, 1].
      * @return The interpolated value.
      */
     T interpolate(T startValue, T endValue, double t);

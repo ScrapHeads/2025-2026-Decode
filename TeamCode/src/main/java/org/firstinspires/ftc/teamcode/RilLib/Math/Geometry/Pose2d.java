@@ -5,6 +5,9 @@
 package org.firstinspires.ftc.teamcode.RilLib.Math.Geometry;
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.Interpolatable;
+import org.firstinspires.ftc.teamcode.RilLib.Math.MatBuilder;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Matrix;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N3;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,7 +21,8 @@ public class Pose2d implements Interpolatable<Pose2d> {
     /**
      * A preallocated Pose2d representing the origin.
      *
-     * <p>This exists to avoid allocations for common poses.
+     * <p>
+     * This exists to avoid allocations for common poses.
      */
     public static final Pose2d kZero = new Pose2d();
 
@@ -47,7 +51,8 @@ public class Pose2d implements Interpolatable<Pose2d> {
     }
 
     /**
-     * Constructs a pose with x and y translations instead of a separate Translation2d.
+     * Constructs a pose with x and y translations instead of a separate
+     * Translation2d.
      *
      * @param x        The x component of the translational component of the pose.
      * @param y        The y component of the translational component of the pose.
@@ -59,7 +64,23 @@ public class Pose2d implements Interpolatable<Pose2d> {
     }
 
     /**
-     * Transforms the pose by the given transformation and returns the new transformed pose.
+     * Constructs a pose with the specified affine transformation matrix.
+     *
+     * @param matrix The affine transformation matrix.
+     * @throws IllegalArgumentException if the affine transformation matrix is
+     *                                  invalid.
+     */
+    public Pose2d(Matrix<N3, N3> matrix) {
+        m_translation = new Translation2d(matrix.get(0, 2), matrix.get(1, 2));
+        m_rotation = new Rotation2d(matrix.block(2, 2, 0, 0));
+        if (matrix.get(2, 0) != 0.0 || matrix.get(2, 1) != 0.0 || matrix.get(2, 2) != 1.0) {
+            throw new IllegalArgumentException("Affine transformation matrix is invalid");
+        }
+    }
+
+    /**
+     * Transforms the pose by the given transformation and returns the new
+     * transformed pose.
      *
      * <pre>
      * [x_new]    [cos, -sin, 0][transform.x]
@@ -152,7 +173,8 @@ public class Pose2d implements Interpolatable<Pose2d> {
     }
 
     /**
-     * Transforms the pose by the given transformation and returns the new pose. See + operator for
+     * Transforms the pose by the given transformation and returns the new pose. See
+     * + operator for
      * the matrix multiplication performed.
      *
      * @param other The transform to transform the pose by.
@@ -167,10 +189,13 @@ public class Pose2d implements Interpolatable<Pose2d> {
     /**
      * Returns the current pose relative to the given pose.
      *
-     * <p>This function can often be used for trajectory tracking or pose stabilization algorithms to
+     * <p>
+     * This function can often be used for trajectory tracking or pose stabilization
+     * algorithms to
      * get the error between the reference and the current pose.
      *
-     * @param other The pose that is the origin of the new coordinate frame that the current pose will
+     * @param other The pose that is the origin of the new coordinate frame that the
+     *              current pose will
      *              be converted into.
      * @return The current pose relative to the new origin pose.
      */
@@ -193,20 +218,31 @@ public class Pose2d implements Interpolatable<Pose2d> {
     /**
      * Obtain a new Pose2d from a (constant curvature) velocity.
      *
-     * <p>See <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">Controls
-     * Engineering in the FIRST Robotics Competition</a> section 10.2 "Pose exponential" for a
+     * <p>
+     * See <a href=
+     * "https://file.tavsys.net/control/controls-engineering-in-frc.pdf">Controls
+     * Engineering in the FIRST Robotics Competition</a> section 10.2 "Pose
+     * exponential" for a
      * derivation.
      *
-     * <p>The twist is a change in pose in the robot's coordinate frame since the previous pose
-     * update. When the user runs exp() on the previous known field-relative pose with the argument
+     * <p>
+     * The twist is a change in pose in the robot's coordinate frame since the
+     * previous pose
+     * update. When the user runs exp() on the previous known field-relative pose
+     * with the argument
      * being the twist, the user will receive the new field-relative pose.
      *
-     * <p>"Exp" represents the pose exponential, which is solving a differential equation moving the
+     * <p>
+     * "Exp" represents the pose exponential, which is solving a differential
+     * equation moving the
      * pose forward in time.
      *
-     * @param twist The change in pose in the robot's coordinate frame since the previous pose update.
-     *              For example, if a non-holonomic robot moves forward 0.01 meters and changes angle by 0.5
-     *              degrees since the previous pose update, the twist would be Twist2d(0.01, 0.0,
+     * @param twist The change in pose in the robot's coordinate frame since the
+     *              previous pose update.
+     *              For example, if a non-holonomic robot moves forward 0.01 meters
+     *              and changes angle by 0.5
+     *              degrees since the previous pose update, the twist would be
+     *              Twist2d(0.01, 0.0,
      *              Units.degreesToRadians(0.5)).
      * @return The new pose of the robot.
      */
@@ -227,16 +263,16 @@ public class Pose2d implements Interpolatable<Pose2d> {
             s = sinTheta / dtheta;
             c = (1 - cosTheta) / dtheta;
         }
-        Transform2d transform =
-                new Transform2d(
-                        new Translation2d(dx * s - dy * c, dx * c + dy * s),
-                        new Rotation2d(cosTheta, sinTheta));
+        Transform2d transform = new Transform2d(
+                new Translation2d(dx * s - dy * c, dx * c + dy * s),
+                new Rotation2d(cosTheta, sinTheta));
 
         return this.plus(transform);
     }
 
     /**
-     * Returns a Twist2d that maps this pose to the end pose. If c is the output of {@code a.Log(b)},
+     * Returns a Twist2d that maps this pose to the end pose. If c is the output of
+     * {@code a.Log(b)},
      * then {@code a.Exp(c)} would yield b.
      *
      * @param end The end pose for the transformation.
@@ -256,17 +292,39 @@ public class Pose2d implements Interpolatable<Pose2d> {
             halfThetaByTanOfHalfDtheta = -(halfDtheta * transform.getRotation().getSin()) / cosMinusOne;
         }
 
-        Translation2d translationPart =
-                transform
-                        .getTranslation()
-                        .rotateBy(new Rotation2d(halfThetaByTanOfHalfDtheta, -halfDtheta))
-                        .times(Math.hypot(halfThetaByTanOfHalfDtheta, halfDtheta));
+        Translation2d translationPart = transform
+                .getTranslation()
+                .rotateBy(new Rotation2d(halfThetaByTanOfHalfDtheta, -halfDtheta))
+                .times(Math.hypot(halfThetaByTanOfHalfDtheta, halfDtheta));
 
         return new Twist2d(translationPart.getX(), translationPart.getY(), dtheta);
     }
 
     /**
-     * Returns the nearest Pose2d from a list of poses. If two or more poses in the list have the same
+     * Returns an affine transformation matrix representation of this pose.
+     *
+     * @return An affine transformation matrix representation of this pose.
+     */
+    public Matrix<N3, N3> toMatrix() {
+        var vec = m_translation.toVector();
+        var mat = m_rotation.toMatrix();
+        return MatBuilder.fill(
+                N3.instance,
+                N3.instance,
+                mat.get(0, 0),
+                mat.get(0, 1),
+                vec.get(0),
+                mat.get(1, 0),
+                mat.get(1, 1),
+                vec.get(1),
+                0.0,
+                0.0,
+                1.0);
+    }
+
+    /**
+     * Returns the nearest Pose2d from a list of poses. If two or more poses in the
+     * list have the same
      * distance from this pose, return the one with the closest rotation component.
      *
      * @param poses The list of poses to find the nearest.
@@ -276,10 +334,10 @@ public class Pose2d implements Interpolatable<Pose2d> {
         return Collections.min(
                 poses,
                 Comparator.comparing(
-                                (Pose2d other) -> this.getTranslation().getDistance(other.getTranslation()))
+                        (Pose2d other) -> this.getTranslation().getDistance(other.getTranslation()))
                         .thenComparing(
-                                (Pose2d other) ->
-                                        Math.abs(this.getRotation().minus(other.getRotation()).getRadians())));
+                                (Pose2d other) -> Math
+                                        .abs(this.getRotation().minus(other.getRotation()).getRadians())));
     }
 
     @Override
@@ -295,7 +353,8 @@ public class Pose2d implements Interpolatable<Pose2d> {
      */
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Pose2d)) return false;
+        if (!(obj instanceof Pose2d))
+            return false;
 
         Pose2d pose = (Pose2d) obj;
         return m_translation.equals(pose.m_translation)

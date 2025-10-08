@@ -7,10 +7,13 @@ package org.firstinspires.ftc.teamcode.RilLib.Math.Geometry;
 import java.util.Objects;
 
 /**
- * A change in distance along a 2D arc since the last pose update. We can use ideas from
- * differential calculus to create new Pose2d objects from a Twist2d and vice versa.
+ * A change in distance along a 2D arc since the last pose update. We can use
+ * ideas from
+ * differential calculus to create new Pose2d objects from a Twist2d and vice
+ * versa.
  *
- * <p>A Twist can be used to represent a difference between two poses.
+ * <p>
+ * A Twist can be used to represent a difference between two poses.
  */
 public class Twist2d {
     /** Linear "dx" component. */
@@ -23,13 +26,14 @@ public class Twist2d {
     public double dtheta;
 
     /** Default constructor. */
-    public Twist2d() {}
+    public Twist2d() {
+    }
 
     /**
      * Constructs a Twist2d with the given values.
      *
-     * @param dx Change in x direction relative to robot.
-     * @param dy Change in y direction relative to robot.
+     * @param dx     Change in x direction relative to robot.
+     * @param dy     Change in y direction relative to robot.
      * @param dtheta Change in angle relative to robot.
      */
     public Twist2d(double dx, double dy, double dtheta) {
@@ -51,7 +55,8 @@ public class Twist2d {
      */
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Twist2d)) return false;
+        if (!(obj instanceof Twist2d))
+            return false;
 
         Twist2d other = (Twist2d) obj;
         return Math.abs(other.dx - dx) < 1E-9

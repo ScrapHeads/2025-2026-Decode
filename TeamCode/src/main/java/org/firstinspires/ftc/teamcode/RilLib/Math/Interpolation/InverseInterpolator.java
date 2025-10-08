@@ -7,7 +7,8 @@ package org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation;
 import org.firstinspires.ftc.teamcode.RilLib.Math.MathUtil;
 
 /**
- * An inverse interpolation function which determines where within an interpolation range an object
+ * An inverse interpolation function which determines where within an
+ * interpolation range an object
  * lies. This behavior can be linear or nonlinear.
  *
  * @param <T> The type that the {@link InverseInterpolator} will operate on.
@@ -15,7 +16,8 @@ import org.firstinspires.ftc.teamcode.RilLib.Math.MathUtil;
 @FunctionalInterface
 public interface InverseInterpolator<T> {
     /**
-     * Return where within interpolation range [0, 1] q is between startValue and endValue.
+     * Return where within interpolation range [0, 1] q is between startValue and
+     * endValue.
      *
      * @param startValue Lower part of interpolation range.
      * @param endValue   Upper part of interpolation range.
