@@ -8,11 +8,12 @@ import org.firstinspires.ftc.teamcode.RilLib.Control.TrapezoidProfile;
 import org.firstinspires.ftc.teamcode.RilLib.Math.MathUtil;
 
 /**
- * Implements a PID control loop whose setpoint is constrained by a trapezoid profile. Users should
- * call reset() when they first start running the controller to avoid unwanted behavior.
+ * Implements a PID control loop whose setpoint is constrained by a trapezoid
+ * profile. Users should
+ * call reset() when they first start running the controller to avoid unwanted
+ * behavior.
  */
 public class ProfiledPIDController {
-    private static int instances;
 
     private PIDController m_controller;
     private double m_minimumInput;
@@ -24,11 +25,12 @@ public class ProfiledPIDController {
     private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
     /**
-     * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and Kd.
+     * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and
+     * Kd.
      *
-     * @param Kp The proportional coefficient.
-     * @param Ki The integral coefficient.
-     * @param Kd The derivative coefficient.
+     * @param Kp          The proportional coefficient.
+     * @param Ki          The integral coefficient.
+     * @param Kd          The derivative coefficient.
      * @param constraints Velocity and acceleration constraints for goal.
      * @throws IllegalArgumentException if kp &lt; 0
      * @throws IllegalArgumentException if ki &lt; 0
@@ -40,13 +42,15 @@ public class ProfiledPIDController {
     }
 
     /**
-     * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and Kd.
+     * Allocates a ProfiledPIDController with the given constants for Kp, Ki, and
+     * Kd.
      *
-     * @param Kp The proportional coefficient.
-     * @param Ki The integral coefficient.
-     * @param Kd The derivative coefficient.
+     * @param Kp          The proportional coefficient.
+     * @param Ki          The integral coefficient.
+     * @param Kd          The derivative coefficient.
      * @param constraints Velocity and acceleration constraints for goal.
-     * @param period The period between controller updates in seconds. The default is 0.02 seconds.
+     * @param period      The period between controller updates in seconds. The
+     *                    default is 0.02 seconds.
      * @throws IllegalArgumentException if kp &lt; 0
      * @throws IllegalArgumentException if ki &lt; 0
      * @throws IllegalArgumentException if kd &lt; 0
@@ -58,13 +62,13 @@ public class ProfiledPIDController {
         m_controller = new PIDController(Kp, Ki, Kd, period);
         m_constraints = constraints;
         m_profile = new TrapezoidProfile(m_constraints);
-        instances++;
     }
 
     /**
      * Sets the PID Controller gain parameters.
      *
-     * <p>Sets the proportional, integral, and differential coefficients.
+     * <p>
+     * Sets the proportional, integral, and differential coefficients.
      *
      * @param Kp The proportional coefficient. Must be &gt;= 0.
      * @param Ki The integral coefficient. Must be &gt;= 0.
@@ -102,10 +106,14 @@ public class ProfiledPIDController {
     }
 
     /**
-     * Sets the IZone range. When the absolute value of the position error is greater than IZone, the
-     * total accumulated error will reset to zero, disabling integral gain until the absolute value of
-     * the position error is less than IZone. This is used to prevent integral windup. Must be
-     * non-negative. Passing a value of zero will effectively disable integral gain. Passing a value
+     * Sets the IZone range. When the absolute value of the position error is
+     * greater than IZone, the
+     * total accumulated error will reset to zero, disabling integral gain until the
+     * absolute value of
+     * the position error is less than IZone. This is used to prevent integral
+     * windup. Must be
+     * non-negative. Passing a value of zero will effectively disable integral gain.
+     * Passing a value
      * of {@link Double#POSITIVE_INFINITY} disables IZone functionality.
      *
      * @param iZone Maximum magnitude of error to allow integral control.
@@ -179,7 +187,8 @@ public class ProfiledPIDController {
     }
 
     /**
-     * Returns the accumulated error used in the integral calculation of this controller.
+     * Returns the accumulated error used in the integral calculation of this
+     * controller.
      *
      * @return The accumulated error of this controller.
      */
@@ -217,7 +226,8 @@ public class ProfiledPIDController {
     /**
      * Returns true if the error is within the tolerance of the error.
      *
-     * <p>This will return false until at least one input value has been computed.
+     * <p>
+     * This will return false until at least one input value has been computed.
      *
      * @return True if the error is within the tolerance of the error.
      */
@@ -256,7 +266,8 @@ public class ProfiledPIDController {
     /**
      * Returns true if the error is within the tolerance of the error.
      *
-     * <p>This will return false until at least one input value has been computed.
+     * <p>
+     * This will return false until at least one input value has been computed.
      *
      * @return True if the error is within the tolerance of the error.
      */
@@ -267,7 +278,9 @@ public class ProfiledPIDController {
     /**
      * Enables continuous input.
      *
-     * <p>Rather then using the max and min input range as constraints, it considers them to be the
+     * <p>
+     * Rather then using the max and min input range as constraints, it considers
+     * them to be the
      * same point and automatically calculates the shortest route to the setpoint.
      *
      * @param minimumInput The minimum value expected from the input.
@@ -287,8 +300,11 @@ public class ProfiledPIDController {
     /**
      * Sets the minimum and maximum contributions of the integral term.
      *
-     * <p>The internal integrator is clamped so that the integral term's contribution to the output
-     * stays between minimumIntegral and maximumIntegral. This prevents integral windup.
+     * <p>
+     * The internal integrator is clamped so that the integral term's contribution
+     * to the output
+     * stays between minimumIntegral and maximumIntegral. This prevents integral
+     * windup.
      *
      * @param minimumIntegral The minimum contribution of the integral term.
      * @param maximumIntegral The maximum contribution of the integral term.
@@ -344,15 +360,18 @@ public class ProfiledPIDController {
         if (m_controller.isContinuousInputEnabled()) {
             // Get error which is the smallest distance between goal and measurement
             double errorBound = (m_maximumInput - m_minimumInput) / 2.0;
-            double goalMinDistance =
-                    MathUtil.inputModulus(m_goal.position - measurement, -errorBound, errorBound);
-            double setpointMinDistance =
-                    MathUtil.inputModulus(m_setpoint.position - measurement, -errorBound, errorBound);
+            double goalMinDistance = MathUtil.inputModulus(m_goal.position - measurement, -errorBound, errorBound);
+            double setpointMinDistance = MathUtil.inputModulus(m_setpoint.position - measurement, -errorBound,
+                    errorBound);
 
-            // Recompute the profile goal with the smallest error, thus giving the shortest path. The goal
-            // may be outside the input range after this operation, but that's OK because the controller
-            // will still go there and report an error of zero. In other words, the setpoint only needs to
-            // be offset from the measurement by the input range modulus; they don't need to be equal.
+            // Recompute the profile goal with the smallest error, thus giving the shortest
+            // path. The goal
+            // may be outside the input range after this operation, but that's OK because
+            // the controller
+            // will still go there and report an error of zero. In other words, the setpoint
+            // only needs to
+            // be offset from the measurement by the input range modulus; they don't need to
+            // be equal.
             m_goal.position = goalMinDistance + measurement;
             m_setpoint.position = setpointMinDistance + measurement;
         }
@@ -365,7 +384,7 @@ public class ProfiledPIDController {
      * Returns the next output of the PID controller.
      *
      * @param measurement The current measurement of the process variable.
-     * @param goal The new goal of the controller.
+     * @param goal        The new goal of the controller.
      * @return The controller's next output.
      */
     public double calculate(double measurement, TrapezoidProfile.State goal) {
@@ -377,7 +396,7 @@ public class ProfiledPIDController {
      * Returns the next output of the PIDController.
      *
      * @param measurement The current measurement of the process variable.
-     * @param goal The new goal of the controller.
+     * @param goal        The new goal of the controller.
      * @return The controller's next output.
      */
     public double calculate(double measurement, double goal) {
@@ -389,7 +408,7 @@ public class ProfiledPIDController {
      * Returns the next output of the PID controller.
      *
      * @param measurement The current measurement of the process variable.
-     * @param goal The new goal of the controller.
+     * @param goal        The new goal of the controller.
      * @param constraints Velocity and acceleration constraints for goal.
      * @return The controller's next output.
      */
@@ -422,8 +441,9 @@ public class ProfiledPIDController {
     /**
      * Reset the previous error and the integral term.
      *
-     * @param measuredPosition The current measured position of the system. The velocity is assumed to
-     *     be zero.
+     * @param measuredPosition The current measured position of the system. The
+     *                         velocity is assumed to
+     *                         be zero.
      */
     public void reset(double measuredPosition) {
         reset(measuredPosition, 0.0);

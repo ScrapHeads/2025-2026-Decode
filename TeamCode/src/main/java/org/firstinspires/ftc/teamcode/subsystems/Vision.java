@@ -82,33 +82,33 @@ public class Vision implements Subsystem {
      */
     @Override
     public void periodic() {
-        if (!rateLimit.hasExpired()) return;
-        rateLimit.reset();
-
-        HuskyLens.Block[] blocks = huskyLens.blocks();
-        TelemetryPacket packet = new TelemetryPacket();
-        packet.put("Tag Count", blocks.length);
-
-        for (HuskyLens.Block block : blocks) {
-            boolean trackThis = false;
-            for (int id : TRACKED_TAG_IDS) {
-                if (block.id == id) {
-                    trackThis = true;
-                    break;
-                }
-            }
-
-            if (!trackThis) continue;
-            if (Math.min(block.width, block.height) < MIN_TAG_PIXEL_SIZE) continue;
-
-            Pose2d correctedPose = processor.getCorrectedRobotPoseFromTag(drivetrain, block);
-            if (correctedPose != null) {
-                latestPose = correctedPose;
-                packet.put("Corrected Pose", correctedPose);
-            }
-        }
-
-        dashboard.sendTelemetryPacket(packet);
+//        if (!rateLimit.hasExpired()) return;
+//        rateLimit.reset();
+//
+//        HuskyLens.Block[] blocks = huskyLens.blocks();
+//        TelemetryPacket packet = new TelemetryPacket();
+//        packet.put("Tag Count", blocks.length);
+//
+//        for (HuskyLens.Block block : blocks) {
+//            boolean trackThis = false;
+//            for (int id : TRACKED_TAG_IDS) {
+//                if (block.id == id) {
+//                    trackThis = true;
+//                    break;
+//                }
+//            }
+//
+//            if (!trackThis) continue;
+//            if (Math.min(block.width, block.height) < MIN_TAG_PIXEL_SIZE) continue;
+//
+//            Pose2d correctedPose = processor.getCorrectedRobotPoseFromTag(drivetrain, block);
+//            if (correctedPose != null) {
+//                latestPose = correctedPose;
+//                packet.put("Corrected Pose", correctedPose);
+//            }
+//        }
+//
+//        dashboard.sendTelemetryPacket(packet);
     }
 
     /**
@@ -116,18 +116,18 @@ public class Vision implements Subsystem {
      *
      * @param pose the new pose to store
      */
-    public void setLatestPose(Pose2d pose) {
-        this.latestPose = pose;
-    }
+//    public void setLatestPose(Pose2d pose) {
+//        this.latestPose = pose;
+//    }
 
     /**
      * Returns the most recently corrected pose.
      *
      * @return last corrected pose, or null if none available
      */
-    public Pose2d getLatestPose() {
-        return latestPose;
-    }
+//    public Pose2d getLatestPose() {
+//        return latestPose;
+//    }
 
     /**
      * Returns raw blocks reported by HuskyLens without correction or filtering.

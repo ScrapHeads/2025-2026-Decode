@@ -5,8 +5,11 @@ import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
@@ -14,6 +17,7 @@ import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.util.TimeTracker;
 
 @TeleOp(name = "DriveOnly", group = "ScrapHeads")
 public class DriveOnly extends CommandOpMode {
@@ -33,6 +37,8 @@ public class DriveOnly extends CommandOpMode {
         // Can only have one active DRIVETRAIN controller at once
         driver = new GamepadEx(gamepad1);
 
+        TimeTracker.setOffset();
+
         // Initialize the subsystems declared at the top of the code
         drivetrain = new Drivetrain(hm, new Pose2d());
         drivetrain.register();
@@ -43,6 +49,12 @@ public class DriveOnly extends CommandOpMode {
 
     public void assignControls() {
         drivetrain.setDefaultCommand(new DriveContinous(drivetrain, driver, 1));
+
+//        driver.getGamepadButton(GamepadKeys.Button.A).whenPressed(new InstantCommand(() -> {
+//            TelemetryPacket p = new TelemetryPacket();
+//            p.put("Current Time:", TimeTracker.getTime());
+//            dashboard.sendTelemetryPacket(p);
+//        }));
     }
 
 }

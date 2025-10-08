@@ -6,12 +6,16 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 
+import org.firstinspires.ftc.teamcode.RilLib.Math.SlewRateLimiter;
+import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
+import org.firstinspires.ftc.teamcode.util.TimeTracker;
 
 /**
  * A continuous drive command for TeleOp.
@@ -30,6 +34,10 @@ public class DriveContinous extends CommandBase {
     private final GamepadEx driver;
     private final double speed;
 
+    private final SlewRateLimiter xLimiter;
+    private final SlewRateLimiter yLimiter;
+    private final SlewRateLimiter rotLimiter;
+
     /**
      * Creates a new continuous drive command.
      *
@@ -42,6 +50,10 @@ public class DriveContinous extends CommandBase {
         this.driver = driver;
         this.speed = speed;
 
+        xLimiter = new SlewRateLimiter(2, TimeTracker.getTime());
+        yLimiter = new SlewRateLimiter(2, TimeTracker.getTime());
+        rotLimiter = new SlewRateLimiter(2, TimeTracker.getTime());
+
         addRequirements(drivetrain);
     }
 
@@ -50,12 +62,12 @@ public class DriveContinous extends CommandBase {
      */
     @Override
     public void execute() {
-        Rotation2d rot = drivetrain.localizer.getPose().getRotation();
-        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                driver.getLeftY() * speed,
-                -driver.getLeftX() * speed,
-                -driver.getRightX() * speed,
-                rot);
+        double xSpeed = xLimiter.calculate(driver.getLeftY(), TimeTracker.getTime()) * speed;
+        double ySpeed = yLimiter.calculate(-driver.getLeftX(), TimeTracker.getTime()) * speed;
+        double rotSpeed = rotLimiter.calculate(-driver.getRightX(), TimeTracker.getTime()) * speed;
+
+        Rotation2d rot = RobotState.getInstance().getOdometryPose().getRotation();
+        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, rot);
 
         drivetrain.setDrivePowers(robotSpeeds);
     }

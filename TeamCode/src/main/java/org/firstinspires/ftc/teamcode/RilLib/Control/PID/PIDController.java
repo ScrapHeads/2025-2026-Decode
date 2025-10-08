@@ -8,7 +8,6 @@ import org.firstinspires.ftc.teamcode.RilLib.Math.MathUtil;
 
 /** Implements a PID control loop. */
 public class PIDController {
-    private static int instances;
 
     // Factor for "proportional" control
     private double m_kp;
@@ -40,7 +39,8 @@ public class PIDController {
     private double m_error;
     private double m_errorDerivative;
 
-    // The error at the time of the second-most-recent call to calculate() (used to compute velocity)
+    // The error at the time of the second-most-recent call to calculate() (used to
+    // compute velocity)
     private double m_prevError;
 
     // The sum of the errors for use in the integral calc
@@ -57,7 +57,8 @@ public class PIDController {
     private boolean m_haveSetpoint;
 
     /**
-     * Allocates a PIDController with the given constants for kp, ki, and kd and a default period of
+     * Allocates a PIDController with the given constants for kp, ki, and kd and a
+     * default period of
      * 0.02 seconds.
      *
      * @param kp The proportional coefficient.
@@ -74,9 +75,9 @@ public class PIDController {
     /**
      * Allocates a PIDController with the given constants for kp, ki, and kd.
      *
-     * @param kp The proportional coefficient.
-     * @param ki The integral coefficient.
-     * @param kd The derivative coefficient.
+     * @param kp     The proportional coefficient.
+     * @param ki     The integral coefficient.
+     * @param kd     The derivative coefficient.
      * @param period The period between controller updates in seconds.
      * @throws IllegalArgumentException if kp &lt; 0
      * @throws IllegalArgumentException if ki &lt; 0
@@ -102,14 +103,13 @@ public class PIDController {
             throw new IllegalArgumentException("Controller period must be a positive number!");
         }
         m_period = period;
-
-        instances++;
     }
 
     /**
      * Sets the PID Controller gain parameters.
      *
-     * <p>Set the proportional, integral, and differential coefficients.
+     * <p>
+     * Set the proportional, integral, and differential coefficients.
      *
      * @param kp The proportional coefficient.
      * @param ki The integral coefficient.
@@ -149,10 +149,14 @@ public class PIDController {
     }
 
     /**
-     * Sets the IZone range. When the absolute value of the position error is greater than IZone, the
-     * total accumulated error will reset to zero, disabling integral gain until the absolute value of
-     * the position error is less than IZone. This is used to prevent integral windup. Must be
-     * non-negative. Passing a value of zero will effectively disable integral gain. Passing a value
+     * Sets the IZone range. When the absolute value of the position error is
+     * greater than IZone, the
+     * total accumulated error will reset to zero, disabling integral gain until the
+     * absolute value of
+     * the position error is less than IZone. This is used to prevent integral
+     * windup. Must be
+     * non-negative. Passing a value of zero will effectively disable integral gain.
+     * Passing a value
      * of {@link Double#POSITIVE_INFINITY} disables IZone functionality.
      *
      * @param iZone Maximum magnitude of error to allow integral control.
@@ -229,7 +233,8 @@ public class PIDController {
     }
 
     /**
-     * Returns the accumulated error used in the integral calculation of this controller.
+     * Returns the accumulated error used in the integral calculation of this
+     * controller.
      *
      * @return The accumulated error of this controller.
      */
@@ -266,10 +271,12 @@ public class PIDController {
     }
 
     /**
-     * Returns true if the error is within the tolerance of the setpoint. The error tolerance defaults
+     * Returns true if the error is within the tolerance of the setpoint. The error
+     * tolerance defaults
      * to 0.05, and the error derivative tolerance defaults to ∞.
      *
-     * <p>This will return false until at least one input value has been computed.
+     * <p>
+     * This will return false until at least one input value has been computed.
      *
      * @return Whether the error is within the acceptable bounds.
      */
@@ -283,7 +290,9 @@ public class PIDController {
     /**
      * Enables continuous input.
      *
-     * <p>Rather then using the max and min input range as constraints, it considers them to be the
+     * <p>
+     * Rather then using the max and min input range as constraints, it considers
+     * them to be the
      * same point and automatically calculates the shortest route to the setpoint.
      *
      * @param minimumInput The minimum value expected from the input.
@@ -312,8 +321,11 @@ public class PIDController {
     /**
      * Sets the minimum and maximum contributions of the integral term.
      *
-     * <p>The internal integrator is clamped so that the integral term's contribution to the output
-     * stays between minimumIntegral and maximumIntegral. This prevents integral windup.
+     * <p>
+     * The internal integrator is clamped so that the integral term's contribution
+     * to the output
+     * stays between minimumIntegral and maximumIntegral. This prevents integral
+     * windup.
      *
      * @param minimumIntegral The minimum contribution of the integral term.
      * @param maximumIntegral The maximum contribution of the integral term.
@@ -335,7 +347,7 @@ public class PIDController {
     /**
      * Sets the error which is considered tolerable for use with atSetpoint().
      *
-     * @param errorTolerance Error which is tolerable.
+     * @param errorTolerance           Error which is tolerable.
      * @param errorDerivativeTolerance Error derivative which is tolerable.
      */
     public void setTolerance(double errorTolerance, double errorDerivativeTolerance) {
@@ -365,7 +377,7 @@ public class PIDController {
      * Returns the next output of the PID controller.
      *
      * @param measurement The current measurement of the process variable.
-     * @param setpoint The new setpoint of the controller.
+     * @param setpoint    The new setpoint of the controller.
      * @return The next controller output.
      */
     public double calculate(double measurement, double setpoint) {
@@ -394,15 +406,15 @@ public class PIDController {
 
         m_errorDerivative = (m_error - m_prevError) / m_period;
 
-        // If the absolute value of the position error is greater than IZone, reset the total error
+        // If the absolute value of the position error is greater than IZone, reset the
+        // total error
         if (Math.abs(m_error) > m_iZone) {
             m_totalError = 0;
         } else if (m_ki != 0) {
-            m_totalError =
-                    MathUtil.clamp(
-                            m_totalError + m_error * m_period,
-                            m_minimumIntegral / m_ki,
-                            m_maximumIntegral / m_ki);
+            m_totalError = MathUtil.clamp(
+                    m_totalError + m_error * m_period,
+                    m_minimumIntegral / m_ki,
+                    m_maximumIntegral / m_ki);
         }
 
         return m_kp * m_error + m_ki * m_totalError + m_kd * m_errorDerivative;

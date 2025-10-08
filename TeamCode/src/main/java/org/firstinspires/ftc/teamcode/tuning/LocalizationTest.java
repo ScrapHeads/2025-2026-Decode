@@ -30,7 +30,7 @@ public class LocalizationTest extends LinearOpMode {
                         -gamepad1.right_stick_x
                 ));
 
-                Pose2d pose = RobotState.getInstance().getPose();
+                Pose2d pose = RobotState.getInstance().getOdometryPose();
                 telemetry.addData("x", pose.getX());
                 telemetry.addData("y", pose.getY());
                 telemetry.addData("heading (deg)", pose.getRotation().toString());

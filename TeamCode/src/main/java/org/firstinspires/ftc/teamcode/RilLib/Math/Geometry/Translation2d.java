@@ -6,6 +6,9 @@ package org.firstinspires.ftc.teamcode.RilLib.Math.Geometry;
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.Interpolatable;
 import org.firstinspires.ftc.teamcode.RilLib.Math.MathUtil;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N2;
+import org.firstinspires.ftc.teamcode.RilLib.Math.VecBuilder;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Vector;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,16 +16,21 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Represents a translation in 2D space. This object can be used to represent a point or a vector.
+ * Represents a translation in 2D space. This object can be used to represent a
+ * point or a vector.
  *
- * <p>This assumes that you are using conventional mathematical axes. When the robot is at the
- * origin facing in the positive X direction, forward is positive X and left is positive Y.
+ * <p>
+ * This assumes that you are using conventional mathematical axes. When the
+ * robot is at the
+ * origin facing in the positive X direction, forward is positive X and left is
+ * positive Y.
  */
 public class Translation2d implements Interpolatable<Translation2d> {
     /**
      * A preallocated Translation2d representing the origin.
      *
-     * <p>This exists to avoid allocations for common translations.
+     * <p>
+     * This exists to avoid allocations for common translations.
      */
     public static final Translation2d kZero = new Translation2d();
 
@@ -37,7 +45,8 @@ public class Translation2d implements Interpolatable<Translation2d> {
     }
 
     /**
-     * Constructs a Translation2d with the X and Y components equal to the provided values.
+     * Constructs a Translation2d with the X and Y components equal to the provided
+     * values.
      *
      * @param x The x component of the translation.
      * @param y The y component of the translation.
@@ -48,7 +57,8 @@ public class Translation2d implements Interpolatable<Translation2d> {
     }
 
     /**
-     * Constructs a Translation2d with the provided distance and angle. This is essentially converting
+     * Constructs a Translation2d with the provided distance and angle. This is
+     * essentially converting
      * from polar coordinates to Cartesian coordinates.
      *
      * @param distance The distance from the origin to the end of the translation.
@@ -60,15 +70,48 @@ public class Translation2d implements Interpolatable<Translation2d> {
     }
 
     /**
+     * Constructs a Translation2d from a 2D translation vector. The values are
+     * assumed to be in
+     * meters.
+     *
+     * @param vector The translation vector.
+     */
+    public Translation2d(Vector<N2> vector) {
+        this(vector.get(0), vector.get(1));
+    }
+
+    /**
      * Calculates the distance between two translations in 2D space.
      *
-     * <p>The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²).
+     * <p>
+     * The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²).
      *
      * @param other The translation to compute the distance to.
      * @return The distance between the two translations.
      */
     public double getDistance(Translation2d other) {
         return Math.hypot(other.m_x - m_x, other.m_y - m_y);
+    }
+
+    /**
+     * Calculates the square of the distance between two translations in 2D space.
+     * This is equivalent
+     * to squaring the result of {@link #getDistance(Translation2d)}, but avoids
+     * computing a square
+     * root.
+     *
+     * <p>
+     * The square of the distance between translations is defined as
+     * (x₂−x₁)²+(y₂−y₁)².
+     *
+     * @param other The translation to compute the squared distance to.
+     * @return The square of the distance between the two translations, in square
+     *         meters.
+     */
+    public double getSquaredDistance(Translation2d other) {
+        double dx = other.m_x - m_x;
+        double dy = other.m_y - m_y;
+        return dx * dx + dy * dy;
     }
 
     /**
@@ -90,12 +133,33 @@ public class Translation2d implements Interpolatable<Translation2d> {
     }
 
     /**
+     * Returns a 2D translation vector representation of this translation.
+     *
+     * @return A 2D translation vector representation of this translation.
+     */
+    public Vector<N2> toVector() {
+        return VecBuilder.fill(m_x, m_y);
+    }
+
+    /**
      * Returns the norm, or distance from the origin to the translation.
      *
      * @return The norm of the translation.
      */
     public double getNorm() {
         return Math.hypot(m_x, m_y);
+    }
+
+    /**
+     * Returns the squared norm, or squared distance from the origin to the
+     * translation. This is
+     * equivalent to squaring the result of {@link #getNorm()}, but avoids computing
+     * a square root.
+     *
+     * @return The squared norm of the translation, in square meters.
+     */
+    public double getSquaredNorm() {
+        return m_x * m_x + m_y * m_y;
     }
 
     /**
@@ -110,7 +174,9 @@ public class Translation2d implements Interpolatable<Translation2d> {
     /**
      * Applies a rotation to the translation in 2D space.
      *
-     * <p>This multiplies the translation vector by a counterclockwise rotation matrix of the given
+     * <p>
+     * This multiplies the translation vector by a counterclockwise rotation matrix
+     * of the given
      * angle.
      *
      * <pre>
@@ -118,7 +184,9 @@ public class Translation2d implements Interpolatable<Translation2d> {
      * [y_new] = [other.sin,  other.cos][y]
      * </pre>
      *
-     * <p>For example, rotating a Translation2d of &lt;2, 0&gt; by 90 degrees will return a
+     * <p>
+     * For example, rotating a Translation2d of &lt;2, 0&gt; by 90 degrees will
+     * return a
      * Translation2d of &lt;0, 2&gt;.
      *
      * @param other The rotation to rotate the translation by.
@@ -148,9 +216,39 @@ public class Translation2d implements Interpolatable<Translation2d> {
     }
 
     /**
+     * Computes the dot product between this translation and another translation in
+     * 2D space.
+     *
+     * <p>
+     * The dot product between two translations is defined as x₁x₂+y₁y₂.
+     *
+     * @param other The translation to compute the dot product with.
+     * @return The dot product between the two translations, in square meters.
+     */
+    public double dot(Translation2d other) {
+        return m_x * other.m_x + m_y * other.m_y;
+    }
+
+    /**
+     * Computes the cross product between this translation and another translation
+     * in 2D space.
+     *
+     * <p>
+     * The 2D cross product between two translations is defined as x₁y₂-x₂y₁.
+     *
+     * @param other The translation to compute the cross product with.
+     * @return The cross product between the two translations, in square meters.
+     */
+    public double cross(Translation2d other) {
+        return m_x * other.m_y - m_y * other.m_x;
+    }
+
+    /**
      * Returns the sum of two translations in 2D space.
      *
-     * <p>For example, Translation3d(1.0, 2.5) + Translation3d(2.0, 5.5) = Translation3d{3.0, 8.0).
+     * <p>
+     * For example, Translation3d(1.0, 2.5) + Translation3d(2.0, 5.5) =
+     * Translation3d{3.0, 8.0).
      *
      * @param other The translation to add.
      * @return The sum of the translations.
@@ -162,7 +260,9 @@ public class Translation2d implements Interpolatable<Translation2d> {
     /**
      * Returns the difference between two translations.
      *
-     * <p>For example, Translation2d(5.0, 4.0) - Translation2d(1.0, 2.0) = Translation2d(4.0, 2.0).
+     * <p>
+     * For example, Translation2d(5.0, 4.0) - Translation2d(1.0, 2.0) =
+     * Translation2d(4.0, 2.0).
      *
      * @param other The translation to subtract.
      * @return The difference between the two translations.
@@ -172,8 +272,10 @@ public class Translation2d implements Interpolatable<Translation2d> {
     }
 
     /**
-     * Returns the inverse of the current translation. This is equivalent to rotating by 180 degrees,
-     * flipping the point over both axes, or negating all components of the translation.
+     * Returns the inverse of the current translation. This is equivalent to
+     * rotating by 180 degrees,
+     * flipping the point over both axes, or negating all components of the
+     * translation.
      *
      * @return The inverse of the current translation.
      */
@@ -184,7 +286,8 @@ public class Translation2d implements Interpolatable<Translation2d> {
     /**
      * Returns the translation multiplied by a scalar.
      *
-     * <p>For example, Translation2d(2.0, 2.5) * 2 = Translation2d(4.0, 5.0).
+     * <p>
+     * For example, Translation2d(2.0, 2.5) * 2 = Translation2d(4.0, 5.0).
      *
      * @param scalar The scalar to multiply by.
      * @return The scaled translation.
@@ -196,7 +299,8 @@ public class Translation2d implements Interpolatable<Translation2d> {
     /**
      * Returns the translation divided by a scalar.
      *
-     * <p>For example, Translation3d(2.0, 2.5) / 2 = Translation3d(1.0, 1.25).
+     * <p>
+     * For example, Translation3d(2.0, 2.5) / 2 = Translation3d(1.0, 1.25).
      *
      * @param scalar The scalar to multiply by.
      * @return The reference to the new mutated object.
@@ -228,7 +332,8 @@ public class Translation2d implements Interpolatable<Translation2d> {
      */
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Translation2d)) return false;
+        if (!(obj instanceof Translation2d))
+            return false;
 
         Translation2d other = (Translation2d) obj;
         return Math.abs(other.m_x - m_x) < 1E-9

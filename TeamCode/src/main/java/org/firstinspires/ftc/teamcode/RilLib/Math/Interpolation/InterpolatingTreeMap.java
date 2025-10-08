@@ -8,10 +8,13 @@ import java.util.Comparator;
 import java.util.TreeMap;
 
 /**
- * Interpolating Tree Maps are used to get values at points that are not defined by making a guess
+ * Interpolating Tree Maps are used to get values at points that are not defined
+ * by making a guess
  * from points that are defined. This uses linear interpolation.
  *
- * <p>{@code K} must implement {@link Comparable}, or a {@link Comparator} on {@code K} can be
+ * <p>
+ * {@code K} must implement {@link Comparable}, or a {@link Comparator} on
+ * {@code K} can be
  * provided.
  *
  * @param <K> The type of keys held in this map.
@@ -26,8 +29,9 @@ public class InterpolatingTreeMap<K, V> {
     /**
      * Constructs an InterpolatingTreeMap.
      *
-     * @param inverseInterpolator Function to use for inverse interpolation of the keys.
-     * @param interpolator Function to use for interpolation of the values.
+     * @param inverseInterpolator Function to use for inverse interpolation of the
+     *                            keys.
+     * @param interpolator        Function to use for interpolation of the values.
      */
     public InterpolatingTreeMap(
             InverseInterpolator<K> inverseInterpolator, Interpolator<V> interpolator) {
@@ -39,9 +43,10 @@ public class InterpolatingTreeMap<K, V> {
     /**
      * Constructs an InterpolatingTreeMap using {@code comparator}.
      *
-     * @param inverseInterpolator Function to use for inverse interpolation of the keys.
-     * @param interpolator Function to use for interpolation of the values.
-     * @param comparator Comparator to use on keys.
+     * @param inverseInterpolator Function to use for inverse interpolation of the
+     *                            keys.
+     * @param interpolator        Function to use for interpolation of the values.
+     * @param comparator          Comparator to use on keys.
      */
     public InterpolatingTreeMap(
             InverseInterpolator<K> inverseInterpolator,
@@ -55,7 +60,7 @@ public class InterpolatingTreeMap<K, V> {
     /**
      * Inserts a key-value pair.
      *
-     * @param key The key.
+     * @param key   The key.
      * @param value The value.
      */
     public void put(K key, V value) {
@@ -65,7 +70,9 @@ public class InterpolatingTreeMap<K, V> {
     /**
      * Returns the value associated with a given key.
      *
-     * <p>If there's no matching key, the value returned will be an interpolation between the keys
+     * <p>
+     * If there's no matching key, the value returned will be an interpolation
+     * between the keys
      * before and after the provided one, using the {@link Interpolator} and {@link
      * InverseInterpolator} provided.
      *

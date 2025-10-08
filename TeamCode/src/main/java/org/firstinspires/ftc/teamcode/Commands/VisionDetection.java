@@ -7,8 +7,12 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 
+import org.firstinspires.ftc.teamcode.RilLib.Math.VecBuilder;
+import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
+import org.firstinspires.ftc.teamcode.util.ConversionUtil;
+import org.firstinspires.ftc.teamcode.util.TimeTracker;
 import org.firstinspires.ftc.teamcode.vision.VisionProcessor;
 
 /**
@@ -72,17 +76,29 @@ public class VisionDetection extends CommandBase {
             if (Math.min(block.width, block.height) < MIN_TAG_PIXEL_SIZE) continue;
 
             // Convert the first valid block into a pose estimate
-            visionPose = processor.blockToRobotPose(block);
-            break;
+//            visionPose = processor.blockToRobotPose(block);
+            double trustValue = 0.8 * (1.0 / (block.width / 2.0 + block.height / 2.0)) * 2;
+            RobotState.getInstance().addVisionObservation(
+                    ConversionUtil.convertPose2D(processor.blockToRobotPose(block)),
+                    TimeTracker.getTime(),
+                    VecBuilder.fill(
+                            trustValue,
+                            trustValue,
+                            9999999)
+            );
+//            VecBuilder.fill(
+//                    Math.pow(0.8, visionInputs.tagCount) * (visionInputs.avgTagDist) * 2,
+//                    Math.pow(0.8, visionInputs.tagCount) * (visionInputs.avgTagDist) * 2,
+//                    9999999)
         }
 
-        if (visionPose != null) {
-            if (updateLocalizer) {
-                drivetrain.localizer.setPose(visionPose);
-            }
-            // Always update Vision subsystem with latest pose
-            vision.setLatestPose(visionPose);
-        }
+//        if (visionPose != null) {
+//            if (updateLocalizer) {
+//                drivetrain.localizer.setPose(visionPose);
+//            }
+//            // Always update Vision subsystem with latest pose
+//            vision.setLatestPose(visionPose);
+//        }
     }
 
     /**
