@@ -211,9 +211,4 @@ public final class LauncherBall implements Subsystem {
     private static double clamp(double v, double lo, double hi) {
         return Math.max(lo, Math.min(hi, v));
     }
-
-    public void end() {
-        disable();
-    }
-
 }
