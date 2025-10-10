@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N1;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N3;
 import org.firstinspires.ftc.teamcode.RilLib.Math.PoseEstimator;
 import org.firstinspires.ftc.teamcode.util.BallColor;
+import org.firstinspires.ftc.teamcode.util.TimeTracker;
 
 import java.util.Vector;
 import java.util.concurrent.locks.Lock;
@@ -37,7 +38,7 @@ public class RobotState {
     private BallColor[] ballColors;
 
     // If true on blue alliance if false on red alliance
-    private boolean isBlue;
+    private Boolean isBlue;
 
     private static RobotState instance;
 
@@ -67,7 +68,7 @@ public class RobotState {
      * @param pose   the robot's estimated field position and heading
      * @param isBlue true if on the blue alliance, false if on the red alliance
      */
-    private RobotState(Pose2d pose, boolean isBlue, BallColor[] ballColors, ChassisSpeeds chassisSpeeds) {
+    private RobotState(Pose2d pose, Boolean isBlue, BallColor[] ballColors, ChassisSpeeds chassisSpeeds) {
         this.odometryPose = pose;
         this.estimatedPose = pose;
         this.isBlue = isBlue;
@@ -76,7 +77,7 @@ public class RobotState {
         this.ballColors = ballColors;
     }
 
-    public void setAll(Pose2d pose, boolean isBlue, BallColor[] ballColors, ChassisSpeeds chassisSpeeds) {
+    public void setAll(Pose2d pose, Boolean isBlue, BallColor[] ballColors, ChassisSpeeds chassisSpeeds) {
         this.odometryPose = pose;
         this.estimatedPose = pose;
         this.isBlue = isBlue;
@@ -92,17 +93,16 @@ public class RobotState {
     public void setAll(RobotState other) {
         if (other == null) return;
 
-        this.odometryPose = other.getOdometryPose();
+        addOdometryObservation(other.getOdometryPose(), TimeTracker.getTime());
         this.estimatedPose = other.getEstimatedPose();
         this.isBlue = other.getTeam();
         this.chassisSpeeds = other.getChassisSpeeds();
         this.ballColors = other.getBallColors();
     }
 
-    public boolean getTeam() {return isBlue;}
+    public Boolean getTeam() {return isBlue;}
 
-    public void setTeam(boolean isBlue) {this.isBlue = isBlue;}
-
+    public void setTeam(Boolean isBlue) {this.isBlue = isBlue;}
 
     public Pose2d getOdometryPose() {return odometryPose;}
 

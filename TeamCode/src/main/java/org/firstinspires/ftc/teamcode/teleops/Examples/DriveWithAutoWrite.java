@@ -41,8 +41,12 @@ public class DriveWithAutoWrite extends CommandOpMode {
 
         StateIO.load();
 
+        if (RobotState.getInstance().getTeam() == null) {
+            RobotState.getInstance().setTeam(true);
+        }
+
         // Initialize the subsystems declared at the top of the code
-        drivetrain = new Drivetrain(hm, new Pose2d(0,0, new Rotation2d(0)));
+        drivetrain = new Drivetrain(hm, RobotState.getInstance().getEstimatedPose());
         drivetrain.register();
 
         // Calling assignControls to set input commands

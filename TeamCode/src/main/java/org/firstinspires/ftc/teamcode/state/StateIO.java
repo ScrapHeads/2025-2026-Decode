@@ -7,6 +7,10 @@ import com.google.gson.GsonBuilder;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
+import org.firstinspires.ftc.teamcode.util.BallColor;
 
 import java.io.File;
 
@@ -71,6 +75,12 @@ public class StateIO {
 
         } catch (Exception e) {
             // Possibly add a mock RobotState file update
+            RobotState.getInstance().setAll(
+                    new Pose2d(0, 0, new Rotation2d(0)),
+                    null,
+                    new BallColor[] {BallColor.EMPTY, BallColor.EMPTY, BallColor.EMPTY},
+                    new ChassisSpeeds()
+            );
             tele.addLine("Failed to load");
             tele.update();
         }
