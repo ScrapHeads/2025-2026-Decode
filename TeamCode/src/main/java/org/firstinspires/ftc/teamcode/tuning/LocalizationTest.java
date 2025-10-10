@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.tuning;
 
+import static org.firstinspires.ftc.teamcode.util.ConversionUtil.convertPose2D;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -38,7 +40,7 @@ public class LocalizationTest extends LinearOpMode {
 
                 TelemetryPacket packet = new TelemetryPacket();
                 packet.fieldOverlay().setStroke("#3F51B5");
-                Drawing.drawRobot(packet.fieldOverlay(), drive.convertPose2D(pose));
+                Drawing.drawRobot(packet.fieldOverlay(), convertPose2D(pose));
                 FtcDashboard.getInstance().sendTelemetryPacket(packet);
             }
         } else {

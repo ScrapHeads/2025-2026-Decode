@@ -32,6 +32,7 @@ import org.firstinspires.ftc.teamcode.Commands.HoldControlCommand;
 import org.firstinspires.ftc.teamcode.Commands.RunIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
+import org.firstinspires.ftc.teamcode.Commands.launcher.SetPowerLauncher;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
@@ -107,6 +108,7 @@ public class AllSystemsTele extends CommandOpMode {
         // A: spin up and hold 6000 RPM (command ends only when launcher.disable() is called)
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
                 .whenActive(new SetFlywheelRpm(launcher, 5000));
+//                .whenActive(new SetPowerLauncher(launcher, 1));
 
         // Left Trigger: disable PID and stop motor
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
@@ -119,7 +121,8 @@ public class AllSystemsTele extends CommandOpMode {
                 .whenPressed(new RunIntakeCommand(intake, 0));
 
         driver.getGamepadButton(X)
-                .whenPressed(new TurnOneSlot(sorter, -0.5));
+                .whenPressed(new TurnOneSlot(sorter, -0.5))
+                .whenReleased(new TurnOneSlot(sorter, 0.0));
 
         driver.getGamepadButton(Y)
                         .whenPressed(shootAllLoaded(launcher, sorter, 100));

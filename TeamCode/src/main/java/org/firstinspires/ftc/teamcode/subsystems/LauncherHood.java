@@ -35,7 +35,7 @@ public class LauncherHood implements Subsystem {
     public LauncherHood(HardwareMap hm) {
         // Axon MAX M2 compatible (270° travel range)
         hoodServo = new SimpleServo(hm, "hood", MIN_ANGLE, MAX_ANGLE);
-        hoodServo.turnToAngle(1485); // Start at 0° (lowest hood position)
+        hoodServo.turnToAngle(MAX_SHOOT_ANGLE); // Start at MAX_SHOOT_ANGLE° (lowest hood position)
     }
 
     /**

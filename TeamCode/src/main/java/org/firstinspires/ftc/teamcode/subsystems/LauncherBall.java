@@ -52,14 +52,14 @@ public final class LauncherBall implements Subsystem {
 
         // --- Control ---
         /** Single PID controller for the shooter motor. */
-        public double PIDKs = 0.3;
+        public double PIDKs = 0.02;
         public double PIDKi = 0.0;
         public double PIDKd = 0.0;
 
         /** Static feedforward to overcome friction. */
         public double feedForwardKS = 0.05;
         /** Velocity feedforward (power per RPM). */
-        public double feedForwardKV = 1.0 / 9000.0;  // ~full power near 9000 RPM
+        public double feedForwardKV = 1.0 / 6000.0;  // ~full power near 6000 RPM
     }
 
     /** Instance of params for this launcher. */
@@ -72,7 +72,7 @@ public final class LauncherBall implements Subsystem {
 
     // Encoder resolution calculations
     public static final double MOTOR_TPR   = 28;   // ticks per motor rev
-    public static final double GEAR_RATIO  = 1.5;  // motor:wheel upgear
+    public static final double GEAR_RATIO  = 1;  // motor:wheel upgear
     public static final double TICKS_PER_REV = MOTOR_TPR / GEAR_RATIO;
 
     /**
@@ -137,7 +137,7 @@ public final class LauncherBall implements Subsystem {
 
     // ----------------- Telemetry helpers -----------------
 
-    public double getTicksPerSec()  { return shooter.getVelocity(); }
+    public double getTicksPerSec()  { return shooter.encoder.getCorrectedVelocity(); }
     public double getShooterRPM()  { return (getTicksPerSec() * 60.0) / TICKS_PER_REV; }
     public double rpmToTicksPerSec(double rpm) { return (rpm * TICKS_PER_REV) / 60.0; }
     public boolean isReadyToLaunch() {
