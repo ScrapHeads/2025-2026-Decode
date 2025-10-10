@@ -159,5 +159,14 @@ public class AllSystemsTele extends CommandOpMode {
         dashboard.sendTelemetryPacket(packet);
         return command;
     }
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+        super.runOpMode();
+
+        new InstantCommand(() -> new StopFlywheel(launcher));
+        tele.addLine("Tele stoped");
+        tele.update();
+    }
 }
 

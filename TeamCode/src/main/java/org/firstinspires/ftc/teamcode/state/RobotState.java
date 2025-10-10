@@ -76,6 +76,34 @@ public class RobotState {
         this.ballColors = ballColors;
     }
 
+    public void setAll(Pose2d pose, boolean isBlue, BallColor[] ballColors, ChassisSpeeds chassisSpeeds) {
+        this.odometryPose = pose;
+        this.estimatedPose = pose;
+        this.isBlue = isBlue;
+        this.chassisSpeeds = chassisSpeeds;
+
+        this.ballColors = ballColors;
+    }
+
+    /**
+     * Updates this RobotState from another RobotState instance.
+     * Copies all relevant fields safely into the singleton.
+     */
+    public void setAll(RobotState other) {
+        if (other == null) return;
+
+        this.odometryPose = other.getOdometryPose();
+        this.estimatedPose = other.getEstimatedPose();
+        this.isBlue = other.getTeam();
+        this.chassisSpeeds = other.getChassisSpeeds();
+        this.ballColors = other.getBallColors();
+    }
+
+    public boolean getTeam() {return isBlue;}
+
+    public void setTeam(boolean isBlue) {this.isBlue = isBlue;}
+
+
     public Pose2d getOdometryPose() {return odometryPose;}
 
     public Pose2d getEstimatedPose() {return estimatedPose;}

@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
 import org.firstinspires.ftc.teamcode.R;
+import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.state.RobotState;
@@ -27,8 +28,6 @@ public class DriveWithAutoWrite extends CommandOpMode {
 
     Drivetrain drivetrain = null;
 
-//    RobotState robotState = null;
-
     @Override
     public void initialize() {
         // Initializing the hardware map for motors, telemetry, and dashboard
@@ -40,12 +39,7 @@ public class DriveWithAutoWrite extends CommandOpMode {
         // Can only have one active DRIVETRAIN controller at once
         driver = new GamepadEx(gamepad1);
 
-//        robotState = StateIO.load();
-//
-//        if (robotState == null) {
-//            BallColor[] ballColors = new BallColor[] {BallColor.EMPTY, BallColor.EMPTY, BallColor.EMPTY};
-//            robotState = new RobotState(new Pose2d(0,0, new Rotation2d(0)), false, ballColors);
-//        }
+        StateIO.load();
 
         // Initialize the subsystems declared at the top of the code
         drivetrain = new Drivetrain(hm, new Pose2d(0,0, new Rotation2d(0)));

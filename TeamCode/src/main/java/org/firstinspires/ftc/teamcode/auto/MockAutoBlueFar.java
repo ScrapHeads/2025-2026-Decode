@@ -104,7 +104,7 @@ public class MockAutoBlueFar extends CommandOpMode {
     private void writeAutoHandoff() {
         try {
             // Save the RobotState class to the json file
-            StateIO.save(robotState);
+            StateIO.save();
 
         } catch (Exception e) {
             // Keep Auto safe-avoid throwing out of end(); add a log

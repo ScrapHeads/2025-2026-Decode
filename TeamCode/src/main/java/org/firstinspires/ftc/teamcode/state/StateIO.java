@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.state;
 
+import static org.firstinspires.ftc.teamcode.Constants.tele;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.qualcomm.robotcore.util.ReadWriteFile;
@@ -20,13 +22,13 @@ public class StateIO {
     // Prevent instantiation
     private StateIO() {}
 
-    private static final String FILENAME = "auto_handoff.json";  // corrected extension
-    private static final Gson GSON = new GsonBuilder().create();
+    private static final String FILENAME = "RobotState.json";  // corrected extension
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     /**
      * Gets the file reference for storing the robot state.
      *
-     * @return the File object pointing to auto_handoff.json in the FIRST settings directory
+     * @return the File object pointing to RobotState.json in the FIRST settings directory
      */
     private static File getFile() {
         return AppUtil.getInstance().getSettingsFile(FILENAME);
@@ -36,16 +38,17 @@ public class StateIO {
      * Saves the given RobotState to disk as JSON.
      * If the state is null or an error occurs, nothing is written.
      *
-     * @param state the RobotState object to save
      */
-    public static void save(RobotState state) {
-        if (state == null) return;
+    public static void save() {
         try {
-            String json = GSON.toJson(state);
-            ReadWriteFile.writeFile(getFile(), json);
+            File file = getFile();
+            String json = GSON.toJson(RobotState.getInstance());
+
+            ReadWriteFile.writeFile(file, json);
+
         } catch (Exception e) {
-            // Errors are ignored to avoid crashing an OpMode.
-            // Consider logging with telemetry for debugging.
+            tele.addLine("save failed");
+            tele.update();
         }
     }
 
@@ -55,15 +58,21 @@ public class StateIO {
      * @return the deserialized RobotState, or null if the file is missing
      *         or could not be parsed
      */
-    public static RobotState load() {
+    public static void load() {
         try {
-            File f = getFile();
-            if (f == null || !f.exists()) return null;
-            String json = ReadWriteFile.readFile(f);
-            if (json == null || json.isEmpty()) return null;
-            return GSON.fromJson(json, RobotState.class);
-        } catch (Exception ignored) {
-            return null;
+            File file = getFile();
+            if (file == null || !file.exists()) return;
+
+            String json = ReadWriteFile.readFile(file);
+            if (json == null || json.isEmpty()) return;
+
+            // Create a temp container to transfer data
+            RobotState.getInstance().setAll(GSON.fromJson(json, RobotState.class));
+
+        } catch (Exception e) {
+            // Possibly add a mock RobotState file update
+            tele.addLine("Failed to load");
+            tele.update();
         }
     }
 
