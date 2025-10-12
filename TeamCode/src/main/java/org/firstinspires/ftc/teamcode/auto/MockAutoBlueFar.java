@@ -13,6 +13,7 @@ import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -35,8 +36,6 @@ public class MockAutoBlueFar extends CommandOpMode {
 
     Drivetrain drivetrain;
 
-    RobotState robotState;
-
     public boolean isBlue = true;
 
     public static final List<Pose2d> path = mockAutoBlueFar.PATH;
@@ -57,10 +56,10 @@ public class MockAutoBlueFar extends CommandOpMode {
         tele = telemetry;
         dashboard = FtcDashboard.getInstance();
 
-//        robotState = new RobotState(path.get(0), isBlue, ballColors);
-
         drivetrain = new Drivetrain(hm, path.get(0));
         drivetrain.register();
+
+        setUpRobotState();
 
         // Wait to start the auto path till the play button is pressed
         waitForStart();
@@ -89,7 +88,7 @@ public class MockAutoBlueFar extends CommandOpMode {
                 drivetrain.setDrivePowers(new ChassisSpeeds(0,0, 0));
 
                 // Write the Auto -> teleop handoff
-                writeAutoHandoff();
+                StateIO.save();
 
                 // telemetry/logging
                 tele.addData("Auto ended", interrupted ? "interrupted" : "finished");
@@ -101,15 +100,13 @@ public class MockAutoBlueFar extends CommandOpMode {
         schedule(followPath);
     }
 
-    private void writeAutoHandoff() {
-        try {
-            // Save the RobotState class to the json file
-            StateIO.save();
-
-        } catch (Exception e) {
-            // Keep Auto safe-avoid throwing out of end(); add a log
-            tele.addData("Handoff write error", e.getMessage());
-            tele.update();
-        }
+    public void setUpRobotState() {
+        RobotState.getInstance().setAll(
+                path.get(0),
+                isBlue,
+                ballColors,
+                new ChassisSpeeds(0,0, 0)
+        );
     }
+
 }

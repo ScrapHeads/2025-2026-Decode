@@ -6,14 +6,10 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
-import static org.firstinspires.ftc.teamcode.subsystems.HoldControl.HoldPosition.LAUNCHING;
-import static org.firstinspires.ftc.teamcode.subsystems.HoldControl.HoldPosition.LOADING;
-
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -30,11 +26,9 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
-import org.firstinspires.ftc.teamcode.Commands.HoldControlCommand;
+import org.firstinspires.ftc.teamcode.Commands.DriveContinousStickOff;
 import org.firstinspires.ftc.teamcode.Commands.RunIntakeCommand;
-import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
-import org.firstinspires.ftc.teamcode.Commands.launcher.SetPowerLauncher;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
@@ -47,10 +41,13 @@ import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
-@TeleOp(name = "AllSystemsTele", group = "ScrapHeads")
-public class AllSystemsTele extends CommandOpMode {
+import java.util.Random;
+
+@TeleOp(name = "DriverTryouts", group = "ScrapHeads")
+public class DriverTryouts extends CommandOpMode {
     // Controller
     private GamepadEx driver;
+    private GamepadEx driver2;
 
     // Subsystem
     private Drivetrain drivetrain;
@@ -74,6 +71,7 @@ public class AllSystemsTele extends CommandOpMode {
 
         // Gamepad
         driver = new GamepadEx(gamepad1);
+        driver2 = new GamepadEx(gamepad2);
 
         // Subsystem
         launcher = new LauncherBall(hm);
@@ -145,6 +143,17 @@ public class AllSystemsTele extends CommandOpMode {
 
 //        driver.getGamepadButton(DPAD_UP)
 //                .whenPressed(new SetHoodAngleCommand(hood, 0));
+
+        driver2.getGamepadButton(A)
+                .whenHeld(new InstantCommand(() -> launcher.disable()))
+                .whenReleased(new InstantCommand(() -> launcher.enable()));
+
+        driver2.getGamepadButton(B)
+                .whenHeld(new RunIntakeCommand(intake, 0));
+
+        driver2.getGamepadButton(Y)
+                .whenPressed(new DriveContinousStickOff(drivetrain, driver, Math.random()))
+                .whenReleased(new DriveContinous(drivetrain, driver, 1));
     }
 
     public static Command shootAllLoaded(LauncherBall launcher, Sorter sorter, long recoveryMs) {

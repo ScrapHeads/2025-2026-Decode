@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.Constants.tele;
+import static org.firstinspires.ftc.teamcode.util.BallColor.GREEN;
+import static org.firstinspires.ftc.teamcode.util.BallColor.PURPLE;
 
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -12,6 +14,8 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.teamcode.util.BallColor;
+
+import java.util.Arrays;
 
 /**
  * The Sorter subsystem handles the rotation of the sorting wheel that organizes balls
@@ -103,7 +107,12 @@ public class Sorter implements Subsystem {
      * @param direction 1 increase or -1 decrease
      */
     public void advanceSlot(double direction) {
-        currentIndex = wrapIndex(currentIndex + (int) Math.rint(direction));
+        if (direction > 0) {
+            direction = 1;
+        } else if (direction < 0) {
+            direction = -1;
+        }
+        currentIndex = wrapIndex(currentIndex + (int) direction);
     }
 
     /**
@@ -122,6 +131,34 @@ public class Sorter implements Subsystem {
             copyCurrentIndex = wrapIndex(copyCurrentIndex - 1);
         }
         return -1;
+    }
+
+    public int findStartIndex (BallColor[] pattern, BallColor[] stored) {
+        if (Arrays.equals(pattern, stored)) {
+            return 0;
+        }
+
+        int patternsGreen = 0;
+        int storedGreen = 0;
+
+        for (int i = 0; i < pattern.length; i++) {
+            if (pattern[i] == GREEN) {
+                patternsGreen = i;
+            }
+            if (stored[i] == GREEN) {
+                storedGreen = i;
+            }
+        }
+
+        int offset = 0;
+
+        if (patternsGreen == 2) {
+            offset = 1;
+        } else if (patternsGreen == 1) {
+            offset = -1;
+        }
+
+        return wrapIndex(storedGreen + offset);
     }
 
     /**
@@ -172,7 +209,7 @@ public class Sorter implements Subsystem {
 
         // --- GREEN detection: strong green dominance ---
         if (gNorm > rNorm * 1.3 && gNorm > bNorm * 1.3) {
-            return BallColor.GREEN;
+            return GREEN;
         }
 
         // --- PURPLE detection: red + blue high, green low ---

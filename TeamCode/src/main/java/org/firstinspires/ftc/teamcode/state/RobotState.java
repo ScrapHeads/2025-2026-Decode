@@ -36,6 +36,7 @@ public class RobotState {
 
     // get all the ball colors
     private BallColor[] ballColors;
+    private BallColor[] pattern;
 
     // If true on blue alliance if false on red alliance
     private Boolean isBlue;
@@ -98,7 +99,11 @@ public class RobotState {
         this.isBlue = other.getTeam();
         this.chassisSpeeds = other.getChassisSpeeds();
         this.ballColors = other.getBallColors();
+        this.pattern = other.getPattern();
     }
+
+    public void setPattern(BallColor[] pattern) { this.pattern = pattern; }
+    public BallColor[] getPattern () { return pattern; }
 
     public Boolean getTeam() {return isBlue;}
 
