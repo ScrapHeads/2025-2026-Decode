@@ -118,26 +118,22 @@ public class AllSystemsTele extends CommandOpMode {
 //        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
 //                .whenActive(new StopFlywheel(launcher));
 
-        driver.getGamepadButton(A)
-                .whenPressed(new RunIntakeCommand(intake, Intake.INTAKE_POWER));
-
-        driver.getGamepadButton(B)
-                .whenPressed(new RunIntakeCommand(intake, 0));
-
         driver.getGamepadButton(RIGHT_BUMPER)
-                        .whenPressed(new TurnOneSlot(sorter, 1));
+                .whenPressed(new TurnOneSlot(sorter, .1))
+                .whenReleased(new TurnOneSlot(sorter, 0));
 
         driver.getGamepadButton(LEFT_BUMPER)
-                        .whenPressed(new TurnOneSlot(sorter, -1));
+                .whenPressed(new TurnOneSlot(sorter, -1))
+                .whenReleased(new TurnOneSlot(sorter, 0));
 
         driver.getGamepadButton(A)
-                        .whenPressed(shootAllLoaded(launcher, sorter, 100));
+                .whenPressed(shootAllLoaded(launcher, sorter, 100));
 
         driver.getGamepadButton(B)
-                        .whenPressed(shootPattern(launcher, sorter, 100));
+                .whenPressed(shootPattern(launcher, sorter, 100));
 
         driver.getGamepadButton(DPAD_UP)
-                .whenPressed(new SetFlywheelRpm(launcher, 5000));
+                .whenPressed(new SetFlywheelRpm(launcher, 4400));
 //                .whenPressed(new HoldControlCommand(holdControl, LAUNCHING));
 
         driver.getGamepadButton(DPAD_DOWN)

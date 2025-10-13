@@ -52,9 +52,9 @@ public final class LauncherBall implements Subsystem {
 
         // --- Control ---
         /** Single PID controller for the shooter motor. */
-        public double PIDKs = 0.02;
-        public double PIDKi = 0.0;
-        public double PIDKd = 0.0;
+        public double PIDKp = 0.05;
+        public double PIDKi = 0.01;
+        public double PIDKd = 0.01;
 
         /** Static feedforward to overcome friction. */
         public double feedForwardKS = 0.05;
@@ -65,7 +65,7 @@ public final class LauncherBall implements Subsystem {
     /** Instance of params for this launcher. */
     public static Params PARAMS = new Params();
 
-    public final PIDController shooterPid = new PIDController(PARAMS.PIDKs, PARAMS.PIDKi, PARAMS.PIDKd);
+    public final PIDController shooterPid = new PIDController(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd);
 
     /** Motor driving the shooter flywheel. */
     private final MotorEx shooter;
@@ -83,8 +83,14 @@ public final class LauncherBall implements Subsystem {
     public LauncherBall(HardwareMap hm) {
         shooter = new MotorEx(hm, "shooter"); // name must match configuration
 
+        shooterPid.setTolerance(PARAMS.readyToleranceRpm);
+
         shooter.setInverted(false);
         shooter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+
+        shooter.stopAndResetEncoder();
+
+        disable();
 
         // We run our own PIDF, so use raw power mode.
         shooter.setRunMode(Motor.RunMode.RawPower);
@@ -122,6 +128,7 @@ public final class LauncherBall implements Subsystem {
         shooter.stopMotor();
         PARAMS.inTolStartNanos = 0L;
         PARAMS.isReadyToLaunch = false;
+        PARAMS.currentTargetRpm = 0;
     }
 
     // ----------------- Target & tuning -----------------
@@ -137,7 +144,7 @@ public final class LauncherBall implements Subsystem {
 
     // ----------------- Telemetry helpers -----------------
 
-    public double getTicksPerSec()  { return shooter.encoder.getCorrectedVelocity(); }
+    public double getTicksPerSec()  { return shooter.encoder.getRawVelocity(); }
     public double getShooterRPM()  { return (getTicksPerSec() * 60.0) / TICKS_PER_REV; }
     public double rpmToTicksPerSec(double rpm) { return (rpm * TICKS_PER_REV) / 60.0; }
     public boolean isReadyToLaunch() {

@@ -19,8 +19,8 @@ public class FeederRail implements Subsystem {
     private boolean deployed = false;
 
     // === Configurable positions ===
-    public static final double DEPLOY_POS = 210;   // adjust as needed
-    public static final double RETRACT_POS = 30;  // adjust as needed
+    public static final double DEPLOY_POS = 1548;   // adjust as needed
+    public static final double RETRACT_POS = 1500;  // adjust as needed
 
     /**
      * Initializes the feeder rail using the given hardware map.
@@ -28,7 +28,7 @@ public class FeederRail implements Subsystem {
      * @param hm the HardwareMap to retrieve the servo device
      */
     public FeederRail(HardwareMap hm) {
-        feederServo = new SimpleServo(hm, "feederRail", 0, 270);
+        feederServo = new SimpleServo(hm, "feederRail", 500, 2500);
 
         feederServo.setRange(0.0, 1.0);   // logical safety clamp
         // Optional: set servo direction, limits, or default speed

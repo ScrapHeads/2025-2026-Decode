@@ -21,8 +21,8 @@ public class LauncherHood implements Subsystem {
     public static final double MIN_ANGLE = 500;
     public static final double MAX_ANGLE = 2500;
 
-    public static final double MAX_SHOOT_ANGLE = 1585;
-    public static final double MIN_SHOOT_ANGLE = 1300;
+    public static final double HIGH_SHOOT_ANGLE = 1384;
+    public static final double LOW_SHOOT_ANGLE = 1635;
 
 
     private double currentAngle = 0.0;
@@ -35,8 +35,10 @@ public class LauncherHood implements Subsystem {
     public LauncherHood(HardwareMap hm) {
         // Axon MAX M2 compatible (270° travel range)
         hoodServo = new SimpleServo(hm, "hood", MIN_ANGLE, MAX_ANGLE);
-        hoodServo.turnToAngle(MAX_SHOOT_ANGLE); // Start at MAX_SHOOT_ANGLE° (lowest hood position)
+//        hoodServo.turnToAngle(1540); // Start at LOW_SHOOT_ANGLE (lowest hood position)
+        hoodServo.turnToAngle(LOW_SHOOT_ANGLE);
     }
+
 
     /**
      * Sets the hood to a specific angle in degrees.
@@ -45,7 +47,7 @@ public class LauncherHood implements Subsystem {
      */
     public void setAngle(double angle) {
         // Clamp angle to physical servo limits
-        double safeAngle = Math.max(MIN_SHOOT_ANGLE, Math.min(MAX_SHOOT_ANGLE, angle));
+        double safeAngle = Math.min(LOW_SHOOT_ANGLE, Math.max(HIGH_SHOOT_ANGLE, angle));
         hoodServo.turnToAngle(safeAngle);
         currentAngle = safeAngle;
     }
