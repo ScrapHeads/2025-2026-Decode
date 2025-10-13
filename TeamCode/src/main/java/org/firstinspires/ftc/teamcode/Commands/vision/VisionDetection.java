@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Commands;
+package org.firstinspires.ftc.teamcode.Commands.vision;
 
 import static org.firstinspires.ftc.teamcode.Constants.MIN_TAG_PIXEL_SIZE;
 import static org.firstinspires.ftc.teamcode.Constants.TRACKED_TAG_IDS;

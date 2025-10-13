@@ -146,7 +146,6 @@ public final class LauncherBall implements Subsystem {
 
     public double getTicksPerSec()  { return shooter.encoder.getRawVelocity(); }
     public double getShooterRPM()  { return (getTicksPerSec() * 60.0) / TICKS_PER_REV; }
-    public double rpmToTicksPerSec(double rpm) { return (rpm * TICKS_PER_REV) / 60.0; }
     public boolean isReadyToLaunch() {
 //        return true;
         return PARAMS.isReadyToLaunch;

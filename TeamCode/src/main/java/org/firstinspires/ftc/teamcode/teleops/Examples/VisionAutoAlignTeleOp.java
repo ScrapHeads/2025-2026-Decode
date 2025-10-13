@@ -11,7 +11,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Commands.VisionAutoAlign;
+import org.firstinspires.ftc.teamcode.Commands.vision.VisionAutoAlign;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;

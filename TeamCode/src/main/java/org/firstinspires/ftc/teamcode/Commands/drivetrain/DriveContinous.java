@@ -1,14 +1,15 @@
-package org.firstinspires.ftc.teamcode.Commands;
+package org.firstinspires.ftc.teamcode.Commands.drivetrain;
 
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 
-import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.SlewRateLimiter;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+
+import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.util.TimeTracker;
 
 /**
@@ -22,7 +23,7 @@ import org.firstinspires.ftc.teamcode.util.TimeTracker;
  * When the command ends (either because the OpMode stops or it is interrupted),
  * the drivetrain is commanded to stop.
  */
-public class DriveContinousStickOff extends CommandBase {
+public class DriveContinous extends CommandBase {
 
     private final Drivetrain drivetrain;
     private final GamepadEx driver;
@@ -39,7 +40,7 @@ public class DriveContinousStickOff extends CommandBase {
      * @param driver     the gamepad used for driver input
      * @param speed      scaling factor for input values (0.0–1.0 typical)
      */
-    public DriveContinousStickOff(Drivetrain drivetrain, GamepadEx driver, double speed) {
+    public DriveContinous(Drivetrain drivetrain, GamepadEx driver, double speed) {
         this.drivetrain = drivetrain;
         this.driver = driver;
         this.speed = speed;
@@ -57,11 +58,12 @@ public class DriveContinousStickOff extends CommandBase {
     @Override
     public void execute() {
         double xSpeed = xLimiter.calculate(driver.getLeftY(), TimeTracker.getTime()) * speed;
-//        double ySpeed = yLimiter.calculate(-driver.getLeftX(), TimeTracker.getTime()) * speed;
+        double ySpeed = yLimiter.calculate(-driver.getLeftX(), TimeTracker.getTime()) * speed;
         double rotSpeed = rotLimiter.calculate(-driver.getRightX(), TimeTracker.getTime()) * speed;
 
         Rotation2d rot = RobotState.getInstance().getOdometryPose().getRotation();
-        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, 0, rotSpeed, rot);
+        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, rot);
+
         drivetrain.setDrivePowers(robotSpeeds);
     }
 

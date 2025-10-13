@@ -32,6 +32,9 @@ public class TurnOneSlot extends CommandBase {
 
     @Override
     public void initialize() {
+        if (power == 0) {
+            return;
+        }
         sorter.setPower(power);
         sorter.advanceSlot(power);
 

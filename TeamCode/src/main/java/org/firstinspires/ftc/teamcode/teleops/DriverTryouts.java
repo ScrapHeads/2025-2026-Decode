@@ -25,8 +25,8 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
-import org.firstinspires.ftc.teamcode.Commands.DriveContinousStickOff;
+import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
+import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinousStickOff;
 import org.firstinspires.ftc.teamcode.Commands.RunIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
@@ -40,8 +40,6 @@ import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 import org.firstinspires.ftc.teamcode.util.BallColor;
-
-import java.util.Random;
 
 @TeleOp(name = "DriverTryouts", group = "ScrapHeads")
 public class DriverTryouts extends CommandOpMode {

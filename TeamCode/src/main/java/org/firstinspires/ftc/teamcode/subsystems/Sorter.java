@@ -167,10 +167,12 @@ public class Sorter implements Subsystem {
      * @return -1 if index < currentIndex else 1
      */
     public int getIndexOffset(int index) {
-        if (index < currentIndex) {
+        if (wrapIndex(currentIndex + 1) == index) {
             return -1;
-        } else {
+        } else if (wrapIndex(currentIndex - 1) == index) {
             return 1;
+        } else {
+            return 0;
         }
     }
 

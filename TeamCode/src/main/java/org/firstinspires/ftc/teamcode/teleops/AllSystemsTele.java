@@ -6,13 +6,9 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
-import static org.firstinspires.ftc.teamcode.subsystems.HoldControl.HoldPosition.LAUNCHING;
-import static org.firstinspires.ftc.teamcode.subsystems.HoldControl.HoldPosition.LOADING;
 
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -29,12 +25,9 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
-import org.firstinspires.ftc.teamcode.Commands.HoldControlCommand;
+import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.RunIntakeCommand;
-import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
-import org.firstinspires.ftc.teamcode.Commands.launcher.SetPowerLauncher;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
@@ -147,7 +140,7 @@ public class AllSystemsTele extends CommandOpMode {
         TelemetryPacket packet = new TelemetryPacket();
         SequentialCommandGroup command = new SequentialCommandGroup();
 
-        for (int offset = 0; offset < Sorter.SLOT_COUNT; offset++) {
+        for (int offset = 0; offset < RobotState.getInstance().getBallColors().length; offset++) {
             command.addCommands(
 //                    new FeederRailCommand(FeederRail, FeederRailCommand.Mode.DEPLOY),
 
@@ -156,9 +149,8 @@ public class AllSystemsTele extends CommandOpMode {
                     new ConditionalCommand(
                             new SequentialCommandGroup(
                                     new WaitUntilCommand(launcher::isReadyToLaunch),
-                                    new TurnOneSlot(sorter, -1),
-                                    new WaitCommand(recoveryMs),
-                                    new WaitUntilCommand(launcher::isReadyToLaunch)
+                                    new TurnOneSlot(sorter, Sorter.CCW_POWER),
+                                    new WaitCommand(recoveryMs)
                             ),
                             new TurnOneSlot(sorter, Sorter.CCW_POWER),
                             () -> sorter.getCurrentColor().isBall()        // evaluated at runtime

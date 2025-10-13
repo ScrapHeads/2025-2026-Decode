@@ -10,15 +10,10 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Commands.DriveContinous;
-import org.firstinspires.ftc.teamcode.R;
-import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
+import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.util.BallColor;
 
 @Disabled
 @TeleOp(name = "DriveWithAutoWrite", group = "ScrapHeads")
