@@ -10,10 +10,8 @@ import com.acmerobotics.roadrunner.AngularVelConstraint;
 import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.TurnConstraints;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -21,8 +19,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
-import org.firstinspires.ftc.teamcode.auto.paths.mockAutoBlueFar;
+import org.firstinspires.ftc.teamcode.auto.paths.testPath;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
@@ -31,14 +28,14 @@ import org.firstinspires.ftc.teamcode.util.BallColor;
 import java.util.Arrays;
 import java.util.List;
 
-@Autonomous(name = "MockAutoBlueFar", group = "ScrapHeads")
-public class MockAutoBlueFar extends CommandOpMode {
+@Autonomous(name = "TestPath", group = "ScrapHeads")
+public class TestPath extends CommandOpMode {
 
     Drivetrain drivetrain;
 
     public boolean isBlue = true;
 
-    public static final List<Pose2d> path = mockAutoBlueFar.PATH;
+    public static final List<Pose2d> path = testPath.PATH;
 
     public BallColor[] ballColors = new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN};
 
@@ -67,34 +64,9 @@ public class MockAutoBlueFar extends CommandOpMode {
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
                 new DynamicStrafeCommand(drivetrain, () -> path.get(1)),
-                new WaitCommand(3000),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
-                new WaitCommand(3000),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
-                new WaitCommand(3000),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
-                new WaitCommand(3000)
-        ) {
-            // When the auto ends or gets interrupted will write to a jason file for auto -> tele data transfer.
-            @Override
-            public void end(boolean interrupted) {
-                // Stop motors
-                drivetrain.setDrivePowers(new ChassisSpeeds(0,0, 0));
-
-                // Write the Auto -> teleop handoff
-                StateIO.save();
-
-                // telemetry/logging
-                tele.addData("Auto ended", interrupted ? "interrupted" : "finished");
-                tele.update();
-            }
-        };
+                new DynamicStrafeCommand(drivetrain, () -> path.get(4)));
 
         // Scheduled the sequential command group
         schedule(followPath);
@@ -108,5 +80,4 @@ public class MockAutoBlueFar extends CommandOpMode {
                 new ChassisSpeeds(0,0, 0)
         );
     }
-
 }

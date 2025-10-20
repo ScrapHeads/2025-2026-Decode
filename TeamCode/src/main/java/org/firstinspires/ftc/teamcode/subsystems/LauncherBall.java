@@ -28,7 +28,7 @@ public final class LauncherBall implements Subsystem {
      */
     public static class Params {
         /** Desired target wheel speed in RPM. */
-        public double targetRpm = 5000;
+        public double targetRpm = 0;
 
         /** Allowed RPM error margin to consider launcher "ready". */
         public double readyToleranceRpm = 200;
@@ -52,9 +52,9 @@ public final class LauncherBall implements Subsystem {
 
         // --- Control ---
         /** Single PID controller for the shooter motor. */
-        public double PIDKp = 0.05;
-        public double PIDKi = 0.01;
-        public double PIDKd = 0.01;
+        public double PIDKp = 0.02;
+        public double PIDKi = 0.0025;
+        public double PIDKd = 0.0025;
 
         /** Static feedforward to overcome friction. */
         public double feedForwardKS = 0.05;
@@ -83,7 +83,7 @@ public final class LauncherBall implements Subsystem {
     public LauncherBall(HardwareMap hm) {
         shooter = new MotorEx(hm, "shooter"); // name must match configuration
 
-        shooterPid.setTolerance(PARAMS.readyToleranceRpm);
+        shooterPid.setTolerance(100);
 
         shooter.setInverted(false);
         shooter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
@@ -180,7 +180,9 @@ public final class LauncherBall implements Subsystem {
 
             // 5) Apply
             double output = clamp(ff + pidOut, 0.0, 1.0);
+
             shooter.set(output);
+
         }
 
         // --- Readiness logic ---

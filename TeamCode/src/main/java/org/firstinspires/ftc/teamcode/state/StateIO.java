@@ -81,6 +81,7 @@ public class StateIO {
                     new BallColor[] {BallColor.EMPTY, BallColor.EMPTY, BallColor.EMPTY},
                     new ChassisSpeeds()
             );
+
             tele.addLine("Failed to load");
             tele.update();
         }

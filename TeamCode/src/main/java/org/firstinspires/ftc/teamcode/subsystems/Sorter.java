@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
+import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
 import java.util.Arrays;
@@ -57,10 +58,6 @@ public class Sorter implements Subsystem {
     public Sorter(HardwareMap hm, int currentIndex, BallColor[] slots) {
         this.sorterRotate = hm.get(CRServo.class, "sorter");
 
-        // Configure the CR servo for proper PWM range
-        if (sorterRotate instanceof CRServoImplEx) {
-            ((CRServoImplEx) sorterRotate).setPwmRange(new PwmControl.PwmRange(500, 2500));
-        }
         sorterRotate.setPower(0);
 
         // === Initialize color sensor ===
@@ -216,7 +213,7 @@ public class Sorter implements Subsystem {
 
         // --- PURPLE detection: red + blue high, green low ---
         double avgRB = (rNorm + bNorm) / 2.0;
-        if (avgRB > gNorm * 1.6) {
+        if (avgRB > gNorm * 1.1) {
             return BallColor.PURPLE;
         }
 
@@ -263,7 +260,9 @@ public class Sorter implements Subsystem {
     // === Periodic Telemetry ===
     @Override
     public void periodic() {
-        if (detectBallColor() != getCurrentColor() && isMagnetTriggered()) {
+        RobotState.getInstance().setMagSensorState(isMagnetTriggered());
+
+        if (detectBallColor() != getCurrentColor() && RobotState.getInstance().getMagSensorState()) {
             setSlotCurrent(detectBallColor());
         }
 
@@ -273,6 +272,6 @@ public class Sorter implements Subsystem {
         tele.addData("Color Sensor (R,G,B)", "%d, %d, %d",
                 colorSensorV3.red(), colorSensorV3.green(), colorSensorV3.blue());
         tele.addData("Detected Color", detectBallColor());
-        tele.addData("Mag Sensor Triggered", isMagnetTriggered());
+        tele.addData("Mag Sensor Triggered", RobotState.getInstance().getMagSensorState());
     }
 }

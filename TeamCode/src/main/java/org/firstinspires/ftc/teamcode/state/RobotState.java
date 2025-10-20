@@ -41,6 +41,8 @@ public class RobotState {
     // If true on blue alliance if false on red alliance
     private Boolean isBlue;
 
+    private boolean magSensorState;
+
     private static RobotState instance;
 
     /**
@@ -102,6 +104,10 @@ public class RobotState {
         this.pattern = other.getPattern();
     }
 
+    public void setMagSensorState (boolean magSensorState) {this.magSensorState = magSensorState;}
+
+    public boolean getMagSensorState () {return magSensorState;}
+
     public void setPattern(BallColor[] pattern) { this.pattern = pattern; }
     public BallColor[] getPattern () { return pattern; }
 
@@ -139,6 +145,15 @@ public class RobotState {
     public ChassisSpeeds getChassisSpeeds() {return chassisSpeeds;}
 
     public BallColor[] getBallColors() {return ballColors;}
+
+    public boolean hasEmpty() {
+        for (BallColor ball : ballColors) {
+            if (ball == BallColor.EMPTY) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public void setBallColorAtIndex(int index, BallColor ballColor) {
         ballColors[index] = ballColor;

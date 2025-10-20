@@ -18,7 +18,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.auto.paths.MoveForwardPath;
+import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.util.TimeTracker;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +41,8 @@ public class MoveForward extends CommandOpMode {
 
         drivetrain = new Drivetrain(hm, testPath.get(0));
         drivetrain.register();
+
+        RobotState.getInstance().addOdometryObservation(testPath.get(0), TimeTracker.getTime());
 
         // Custom constraints for some moves
         TurnConstraints turnConstraintsFast = new TurnConstraints(4, -4, 4);

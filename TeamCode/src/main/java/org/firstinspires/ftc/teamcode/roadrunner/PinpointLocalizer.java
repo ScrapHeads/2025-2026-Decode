@@ -17,7 +17,7 @@ import java.util.Objects;
 @Config
 public final class PinpointLocalizer implements Localizer {
     public static class Params {
-        public double parYTicks = 3661.357976760987; // y position of the parallel encoder (in tick units)
+        public double parYTicks = 3704.9589480347263; // y position of the parallel encoder (in tick units)
         public double perpXTicks = 0.0; // x position of the perpendicular encoder (in tick units)
     }
 
@@ -35,11 +35,12 @@ public final class PinpointLocalizer implements Localizer {
         driver = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
         double mmPerTick = inPerTick * 25.4;
+        //.050213506247
         driver.setEncoderResolution(1 / mmPerTick, DistanceUnit.MM);
 //        driver.setOffsets(mmPerTick * PARAMS.parYTicks, mmPerTick * PARAMS.perpXTicks, DistanceUnit.MM);
-        driver.setOffsets(-6.5 * 25.4, 0, DistanceUnit.MM);
+        driver.setOffsets(167.35, -15.637, DistanceUnit.MM);
         // TODO: reverse encoder directions if needed
-        initialParDirection = GoBildaPinpointDriver.EncoderDirection.REVERSED;
+        initialParDirection = GoBildaPinpointDriver.EncoderDirection.FORWARD;
         initialPerpDirection = GoBildaPinpointDriver.EncoderDirection.FORWARD;
 
         driver.setEncoderDirections(initialParDirection, initialPerpDirection);
@@ -67,13 +68,13 @@ public final class PinpointLocalizer implements Localizer {
         driver.update();
         if (Objects.requireNonNull(driver.getDeviceStatus()) == GoBildaPinpointDriver.DeviceStatus.READY) {
             txPinpointRobot = new Pose2d(
-                    driver.getPosX(DistanceUnit.METER),
-                    driver.getPosY(DistanceUnit.METER),
+                    driver.getPosX(DistanceUnit.INCH),
+                    driver.getPosY(DistanceUnit.INCH),
                     new Rotation2d(driver.getHeading(UnnormalizedAngleUnit.RADIANS)));
 
             return ChassisSpeeds.fromFieldRelativeSpeeds(
-                    driver.getVelX(DistanceUnit.METER),
-                    driver.getVelY(DistanceUnit.METER),
+                    driver.getVelX(DistanceUnit.INCH),
+                    driver.getVelY(DistanceUnit.INCH),
                     driver.getHeadingVelocity(UnnormalizedAngleUnit.RADIANS),
                     txPinpointRobot.getRotation());
         }

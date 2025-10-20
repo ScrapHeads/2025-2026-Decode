@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
@@ -13,7 +14,20 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  *
  * <p>This uses angle-based control via turnToAngle() for precise positioning.
  */
+@Config
 public class LauncherHood implements Subsystem {
+
+    /**
+     * Holds all tunable parameters and control state for the launcher.
+     * Marked public so FTC Dashboard can reflect values in the Config tab.
+     */
+    public static class Params {
+        public double currentAngle = 0.0;
+    }
+
+    /** Instance of params for this launcher. */
+    public static Params PARAMS = new Params();
+
 
     private final ServoEx hoodServo;
 
@@ -22,10 +36,7 @@ public class LauncherHood implements Subsystem {
     public static final double MAX_ANGLE = 2500;
 
     public static final double HIGH_SHOOT_ANGLE = 1384;
-    public static final double LOW_SHOOT_ANGLE = 1635;
-
-
-    private double currentAngle = 0.0;
+    public static final double LOW_SHOOT_ANGLE = 1551;
 
     /**
      * Creates a new LauncherHood subsystem.
@@ -36,7 +47,7 @@ public class LauncherHood implements Subsystem {
         // Axon MAX M2 compatible (270° travel range)
         hoodServo = new SimpleServo(hm, "hood", MIN_ANGLE, MAX_ANGLE);
 //        hoodServo.turnToAngle(1540); // Start at LOW_SHOOT_ANGLE (lowest hood position)
-        hoodServo.turnToAngle(LOW_SHOOT_ANGLE);
+        setAngle(LOW_SHOOT_ANGLE);
     }
 
 
@@ -49,16 +60,17 @@ public class LauncherHood implements Subsystem {
         // Clamp angle to physical servo limits
         double safeAngle = Math.min(LOW_SHOOT_ANGLE, Math.max(HIGH_SHOOT_ANGLE, angle));
         hoodServo.turnToAngle(safeAngle);
-        currentAngle = safeAngle;
+        PARAMS.currentAngle = safeAngle;
     }
 
     /** @return The current logical hood angle (degrees). */
     public double getCurrentAngle() {
-        return currentAngle;
+        return PARAMS.currentAngle;
     }
 
     @Override
     public void periodic() {
+        setAngle(getCurrentAngle());
         tele.addData("Launcher Hood Angle", "%.1f°", hoodServo.getAngle());
     }
 }

@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode.Commands.sorter;
 
+import static org.firstinspires.ftc.teamcode.Constants.tele;
+
 import com.arcrobotics.ftclib.command.CommandBase;
+
+import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 
 /**
@@ -20,7 +24,7 @@ public class TurnOneSlot extends CommandBase {
     private boolean triggeredOnce;
 
     // Optional debounce timing (to prevent false double-triggers)
-    private static final long DEBOUNCE_MS = 150;
+    private static final long DEBOUNCE_MS = 30;
     private long lastTriggerTime = 0;
 
     public TurnOneSlot(Sorter sorter, double power) {
@@ -35,17 +39,18 @@ public class TurnOneSlot extends CommandBase {
         if (power == 0) {
             return;
         }
+
         sorter.setPower(power);
         sorter.advanceSlot(power);
 
-        initialMagnetState = sorter.isMagnetTriggered();
+        initialMagnetState = RobotState.getInstance().getMagSensorState();
         triggeredOnce = false;
         lastTriggerTime = System.currentTimeMillis();
     }
 
     @Override
     public void execute() {
-        boolean currentState = sorter.isMagnetTriggered();
+        boolean currentState = RobotState.getInstance().getMagSensorState();
 
         // Detect change in magnetic sensor state (rising/falling edge)
         if (currentState != initialMagnetState) {
@@ -53,8 +58,10 @@ public class TurnOneSlot extends CommandBase {
 
             // Debounce: ensure a short delay before counting a trigger
             if (now - lastTriggerTime > DEBOUNCE_MS) {
+                tele.addLine("in statement");
                 triggeredOnce = true;
                 lastTriggerTime = now;
+                sorter.setPower(0);
             }
 
             // Update last known state

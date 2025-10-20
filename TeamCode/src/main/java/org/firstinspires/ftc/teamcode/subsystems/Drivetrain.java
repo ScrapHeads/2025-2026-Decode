@@ -90,13 +90,13 @@ public final class Drivetrain implements Subsystem {
 
         // drive model parameters
         public double inPerTick = 0.00197222585;
-        public double lateralInPerTick = 0.0016504424770049388;
-        public double trackWidthTicks = 6750.929119379205;
+        public double lateralInPerTick = 0.0013198824301367726;
+        public double trackWidthTicks = 7018.915898072283;
 
         // feedforward parameters (in tick units)
-        public double kS = 0.5894557719505222;
-        public double kV =  0.0002976080726198164;
-        public double kA = 0.00003;
+        public double kS = 1.0314389076602932;
+        public double kV =  0.000307111074021038;
+        public double kA = 0.00005;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 60;
@@ -109,12 +109,12 @@ public final class Drivetrain implements Subsystem {
 
         // path controller gains
         public double axialGain = 5;
-        public double lateralGain = 5;
-        public double headingGain = 5; // shared with turn
+        public double lateralGain = 7;
+        public double headingGain = 6; // shared with turn
 
-        public double axialVelGain = 0.5;
+        public double axialVelGain = 0.3;
         public double lateralVelGain = 0.5;
-        public double headingVelGain = 0.5; // shared with turn
+        public double headingVelGain = 0.3; // shared with turn
 
         public double defaultPosTolerance = .1;
         public double defaultHeadingTolerance = Math.toRadians(2);
@@ -179,10 +179,10 @@ public final class Drivetrain implements Subsystem {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // TODO: reverse motor directions if needed
-//        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
-//        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+//        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+//        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
@@ -556,11 +556,12 @@ public final class Drivetrain implements Subsystem {
     @Override
     public void periodic() {
         ChassisSpeeds vel = updatePoseEstimate();
-        Pose2d pose = RobotState.getInstance().getEstimatedPose();
+        Pose2d pose = RobotState.getInstance().getOdometryPose();
 
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("X", pose.getX());
         packet.put("Y", pose.getY());
+        packet.put("Localizer pose", localizer.getPose().toString());
         packet.put("rot", pose.getRotation().toString());
         packet.put("xVel", vel.vxMetersPerSecond);
         packet.put("yVel", vel.vyMetersPerSecond);
