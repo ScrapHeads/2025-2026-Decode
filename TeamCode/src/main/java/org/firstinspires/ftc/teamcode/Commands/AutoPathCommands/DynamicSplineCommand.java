@@ -155,7 +155,7 @@ public class DynamicSplineCommand extends CommandBase {
      */
     @Override
     public void initialize() {
-        Pose2d currentPose = RobotState.getInstance().getEstimatedPose();
+        Pose2d currentPose = RobotState.getInstance().getOdometryPose();
         Vector2d targetPosition = targetPositionSupplier.get();
 
         trajectoryAction = drivetrain.actionBuilder(

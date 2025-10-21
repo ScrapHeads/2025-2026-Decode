@@ -38,9 +38,10 @@ public final class PinpointLocalizer implements Localizer {
         //.050213506247
         driver.setEncoderResolution(1 / mmPerTick, DistanceUnit.MM);
 //        driver.setOffsets(mmPerTick * PARAMS.parYTicks, mmPerTick * PARAMS.perpXTicks, DistanceUnit.MM);
-        driver.setOffsets(167.35, -15.637, DistanceUnit.MM);
+        driver.setOffsets(-175, 0, DistanceUnit.MM);
+
         // TODO: reverse encoder directions if needed
-        initialParDirection = GoBildaPinpointDriver.EncoderDirection.FORWARD;
+        initialParDirection = GoBildaPinpointDriver.EncoderDirection.REVERSED;
         initialPerpDirection = GoBildaPinpointDriver.EncoderDirection.FORWARD;
 
         driver.setEncoderDirections(initialParDirection, initialPerpDirection);

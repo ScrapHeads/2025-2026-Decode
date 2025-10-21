@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.canvas.Rotation;
 import com.acmerobotics.roadrunner.AccelConstraint;
 import com.acmerobotics.roadrunner.AngularVelConstraint;
 import com.acmerobotics.roadrunner.MinVelConstraint;
@@ -17,8 +18,10 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
+import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicTurnCommand;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.auto.paths.testPath;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
@@ -63,10 +66,10 @@ public class TestPath extends CommandOpMode {
 
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
-                new DynamicStrafeCommand(drivetrain, () -> path.get(1)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(4)));
+                new DynamicStrafeCommand(drivetrain, () -> new Pose2d(0, 20, new Rotation2d(Math.toRadians(180)))),
+                new DynamicTurnCommand(drivetrain, () -> 0));
+//                new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
+//                new DynamicStrafeCommand(drivetrain, () -> path.get(4)));
 
         // Scheduled the sequential command group
         schedule(followPath);

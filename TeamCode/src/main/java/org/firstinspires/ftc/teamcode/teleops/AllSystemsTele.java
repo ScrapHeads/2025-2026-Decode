@@ -120,11 +120,11 @@ public class AllSystemsTele extends CommandOpMode {
 //                .whenActive(new StopFlywheel(launcher));
 
         driver.getGamepadButton(RIGHT_BUMPER)
-                .whenPressed(new TurnOneSlot(sorter, .1));
+                .whenPressed(new InstantCommand(() -> sorter.setPower(0)));
 //                .whenReleased(new TurnOneSlot(sorter, 0));
 
         driver.getGamepadButton(LEFT_BUMPER)
-                .whenPressed(new TurnOneSlot(sorter, -.1));
+                .whenPressed(new InstantCommand(() -> sorter.setPower(-1)));
 //                .whenReleased(new TurnOneSlot(sorter, 0));
 
         driver.getGamepadButton(A)

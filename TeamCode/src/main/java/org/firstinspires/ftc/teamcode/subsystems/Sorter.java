@@ -233,7 +233,7 @@ public class Sorter implements Subsystem {
      */
     public boolean isMagnetTriggered() {
         // Some sensors return LOW when triggered. Invert logic if needed.
-        return !magneticSensor.getState();
+        return magneticSensor.getState();
     }
 
     // === Utility ===

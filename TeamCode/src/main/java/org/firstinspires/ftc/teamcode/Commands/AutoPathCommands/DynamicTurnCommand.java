@@ -147,7 +147,7 @@ public class DynamicTurnCommand extends CommandBase {
      */
     @Override
     public void initialize() {
-        Pose2d currentPose = RobotState.getInstance().getEstimatedPose();
+        Pose2d currentPose = RobotState.getInstance().getOdometryPose();
 
         Pose2d targetPose = new Pose2d(
                 currentPose.getX(), currentPose.getY(),
