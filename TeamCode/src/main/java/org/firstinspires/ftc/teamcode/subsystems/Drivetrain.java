@@ -56,6 +56,7 @@ import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.PoseMessage;
 import org.firstinspires.ftc.teamcode.roadrunner.PinpointLocalizer;
 import org.firstinspires.ftc.teamcode.state.RobotState;
+import org.firstinspires.ftc.teamcode.util.ConversionUtil;
 import org.firstinspires.ftc.teamcode.util.TimeTracker;
 
 import java.util.Arrays;
@@ -90,13 +91,13 @@ public final class Drivetrain implements Subsystem {
 
         // drive model parameters
         public double inPerTick = 0.00197222585;
-        public double lateralInPerTick = 0.0013198824301367726;
-        public double trackWidthTicks = 7018.915898072283;
+        public double lateralInPerTick = 0.00136350999629398;
+        public double trackWidthTicks = 6954.993894439933;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.0314389076602932;
-        public double kV =  0.000307111074021038;
-        public double kA = 0.00005;
+        public double kS = 1.087398092081325;
+        public double kV =  0.00029516434282168336;
+        public double kA = 0.00006;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 60;
@@ -108,13 +109,13 @@ public final class Drivetrain implements Subsystem {
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 1;
-        public double lateralGain = 1;
-        public double headingGain = 1; // shared with turn
+        public double axialGain = 3;
+        public double lateralGain = 3;
+        public double headingGain = 3; // shared with turn
 
-        public double axialVelGain = 0.0;
-        public double lateralVelGain = 0.0;
-        public double headingVelGain = 0.0; // shared with turn
+        public double axialVelGain = 0.2;
+        public double lateralVelGain = 0.2;
+        public double headingVelGain = 0.2; // shared with turn
 
         public double defaultPosTolerance = .1;
         public double defaultHeadingTolerance = Math.toRadians(2);
@@ -191,7 +192,7 @@ public final class Drivetrain implements Subsystem {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new PinpointLocalizer(hardwareMap, PARAMS.inPerTick, pose);
+        localizer = new PinpointLocalizer(hardwareMap, PARAMS.inPerTick, ConversionUtil.convertPose2D(pose));
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
@@ -415,7 +416,7 @@ public final class Drivetrain implements Subsystem {
     public ChassisSpeeds updatePoseEstimate() {
         ChassisSpeeds vel = localizer.update();
 
-        RobotState.getInstance().addOdometryObservation(localizer.getPose(), TimeTracker.getTime());
+        RobotState.getInstance().addOdometryObservation(ConversionUtil.convertPose2D(localizer.getPose()), TimeTracker.getTime());
         RobotState.getInstance().setChassisSpeeds(vel);
 
         estimatedPoseWriter.write(new PoseMessage(convertPose2D(RobotState.getInstance().getOdometryPose())));

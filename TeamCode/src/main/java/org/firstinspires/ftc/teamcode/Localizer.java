@@ -17,7 +17,7 @@ public interface Localizer {
      *
      * @return the Localizer's current pose
      */
-    org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d getPose();
+    Pose2d getPose();
 
     /**
      * Updates the Localizer's pose estimate.
