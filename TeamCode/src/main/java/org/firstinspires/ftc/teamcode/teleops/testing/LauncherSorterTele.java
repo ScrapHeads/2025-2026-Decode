@@ -51,7 +51,7 @@ public class LauncherSorterTele extends CommandOpMode {
         launcher = new LauncherBall(hm);
         launcher.register();
 
-        sorter = new Sorter(hm, 0, new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN});
+        sorter = new Sorter(hm);
         sorter.register();
 
         // Bind controls

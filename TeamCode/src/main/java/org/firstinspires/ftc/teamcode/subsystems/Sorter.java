@@ -5,14 +5,15 @@ import static org.firstinspires.ftc.teamcode.util.BallColor.GREEN;
 import static org.firstinspires.ftc.teamcode.util.BallColor.PURPLE;
 
 import com.arcrobotics.ftclib.command.Subsystem;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
+import org.firstinspires.ftc.teamcode.RilLib.Control.PID.PIDController;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
@@ -43,19 +44,24 @@ public class Sorter implements Subsystem {
     private final CRServo sorterRotate;
     private final RevColorSensorV3 colorSensorV3;
     private final DigitalChannel magneticSensor;
+    private final MotorEx encoder;
 
     private int currentIndex;
     private BallColor[] slots = new BallColor[SLOT_COUNT];
     private boolean ledEnabled = false;
 
+    //TODO find this value one encoder attached
+    private final double TICKSPERTHIRDOFTURN = 0;
+
+    //TODO tune the pidController
+    private PIDController pidController = new PIDController(0, 0, 0);
+
     /**
      * Constructor initializes servo, color sensor, and magnetic sensor.
      *
      * @param hm           The HardwareMap used for device lookup
-     * @param currentIndex The starting index position of the sorter
-     * @param slots        The initial color state of each slot
      */
-    public Sorter(HardwareMap hm, int currentIndex, BallColor[] slots) {
+    public Sorter(HardwareMap hm) {
         this.sorterRotate = hm.get(CRServo.class, "sorter");
 
         sorterRotate.setPower(0);
@@ -65,12 +71,15 @@ public class Sorter implements Subsystem {
         colorSensorV3.setGain(2); // Gain range 1–60 depending on ambient light
         setLed(true);
 
+        encoder = new MotorEx(hm, "encoder");
+        encoder.resetEncoder();
+
         // === Initialize magnetic sensor ===
         magneticSensor = hm.get(DigitalChannel.class, "magSensor");
         magneticSensor.setMode(DigitalChannel.Mode.INPUT);
 
-        setCurrentIndex(currentIndex);
-        setSlots(slots);
+        setCurrentIndex(0);
+        setSlots(RobotState.getInstance().getBallColors());
     }
 
     // === Inventory/Index helpers ===
@@ -235,6 +244,9 @@ public class Sorter implements Subsystem {
         // Some sensors return LOW when triggered. Invert logic if needed.
         return magneticSensor.getState();
     }
+
+    public double getCurrentPos() {return encoder.getCurrentPosition();}
+    public void resetCurrentPos() {encoder.resetEncoder();}
 
     // === Utility ===
 

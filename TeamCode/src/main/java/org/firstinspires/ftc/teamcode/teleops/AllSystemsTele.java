@@ -80,7 +80,7 @@ public class AllSystemsTele extends CommandOpMode {
         launcher = new LauncherBall(hm);
         launcher.register();
 
-        sorter = new Sorter(hm, 0, RobotState.getInstance().getBallColors());
+        sorter = new Sorter(hm);
         sorter.register();
 
 //        feederRail = new FeederRail(hm);
