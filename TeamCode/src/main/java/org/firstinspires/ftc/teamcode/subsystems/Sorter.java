@@ -2,10 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 import static org.firstinspires.ftc.teamcode.util.BallColor.GREEN;
-import static org.firstinspires.ftc.teamcode.util.BallColor.PURPLE;
 
 import com.arcrobotics.ftclib.command.Subsystem;
-import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -38,7 +36,6 @@ public class Sorter implements Subsystem {
     public static double CCW_POWER = -1;   // CCW is negative
     public static double CW_POWER = 1;     // CW is positive
     public static long STEP_MS = 200;      // time to advance exactly one slot (ms)
-    public static long FEED_MS = 500;      // time to push one ball into flywheel (ms)
     public static int SLOT_COUNT = 3;      // number of slots on the sorter
 
     private final CRServo sorterRotate;
@@ -50,8 +47,11 @@ public class Sorter implements Subsystem {
     private BallColor[] slots = new BallColor[SLOT_COUNT];
     private boolean ledEnabled = false;
 
-    //TODO find this value one encoder attached
-    private final double TICKSPERTHIRDOFTURN = 0;
+    //TODO find these values once the encoder is attached
+    public final int TICKS_PER_THIRD_OF_TURN = 1;
+    private final int TURN_TOLERANCE_IN_TICKS = 0;
+
+    private double turnPos = 0;
 
     //TODO tune the pidController
     private PIDController pidController = new PIDController(0, 0, 0);
@@ -73,6 +73,8 @@ public class Sorter implements Subsystem {
 
         encoder = new MotorEx(hm, "encoder");
         encoder.resetEncoder();
+
+        pidController.setTolerance(2);
 
         // === Initialize magnetic sensor ===
         magneticSensor = hm.get(DigitalChannel.class, "magSensor");
@@ -107,6 +109,18 @@ public class Sorter implements Subsystem {
 
     /** Sets the slot array. */
     public void setSlots(BallColor[] newSlots) { slots = newSlots; }
+
+    public double getTurnPos () {return turnPos;}
+    public void setTurnPos (double turnPos) {this.turnPos = turnPos;}
+
+    public void setTurnPosWithOffset (double offset) {this.turnPos += offset;}
+
+    public boolean isAtSetPoint () {return Math.abs(Math.abs(encoder.getCurrentPosition()) - Math.abs(turnPos)) <= TURN_TOLERANCE_IN_TICKS;}
+
+    public int getIndex () {
+        double pos = encoder.getCurrentPosition();
+        return (int) Math.floorMod(Math.round(pos / TICKS_PER_THIRD_OF_TURN), SLOT_COUNT);
+    }
 
     /**
      * Advances one slot in the direction given
@@ -172,11 +186,11 @@ public class Sorter implements Subsystem {
      * needed to go to that index.
      * @return -1 if index < currentIndex else 1
      */
-    public int getIndexOffset(int index) {
+    public double getTurnOffset(int index) {
         if (wrapIndex(currentIndex + 1) == index) {
-            return -1;
+            return -TICKS_PER_THIRD_OF_TURN;
         } else if (wrapIndex(currentIndex - 1) == index) {
-            return 1;
+            return TICKS_PER_THIRD_OF_TURN;
         } else {
             return 0;
         }
@@ -274,12 +288,19 @@ public class Sorter implements Subsystem {
     public void periodic() {
         RobotState.getInstance().setMagSensorState(isMagnetTriggered());
 
-        if (detectBallColor() != getCurrentColor() && RobotState.getInstance().getMagSensorState()) {
+        currentIndex = getIndex();
+
+        if (detectBallColor() != getCurrentColor() && isAtSetPoint()) {
             setSlotCurrent(detectBallColor());
         }
 
+        double output = pidController.calculate(encoder.getCurrentPosition(), turnPos);
+
+        sorterRotate.setPower(output);
+
         tele.addData("ServoPower", getPower());
         tele.addData("Sorter Index", currentIndex);
+        tele.addData("Sorter pos", getCurrentPos());
         tele.addData("LED Enabled", ledEnabled);
         tele.addData("Color Sensor (R,G,B)", "%d, %d, %d",
                 colorSensorV3.red(), colorSensorV3.green(), colorSensorV3.blue());

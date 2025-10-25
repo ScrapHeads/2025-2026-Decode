@@ -9,14 +9,12 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
-import static org.firstinspires.ftc.teamcode.subsystems.HoldControl.TRANSPORT_ANGLE;
 
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
@@ -120,12 +118,11 @@ public class AllSystemsTele extends CommandOpMode {
 //                .whenActive(new StopFlywheel(launcher));
 
         driver.getGamepadButton(RIGHT_BUMPER)
-                .whenPressed(new InstantCommand(() -> sorter.setPower(0)));
-//                .whenReleased(new TurnOneSlot(sorter, 0));
+//                .whenPressed(new InstantCommand(() -> sorter.setPower(0)));
+                .whenReleased(new TurnOneSlot(sorter, sorter.TICKS_PER_THIRD_OF_TURN));
 
         driver.getGamepadButton(LEFT_BUMPER)
-                .whenPressed(new InstantCommand(() -> sorter.setPower(-1)));
-//                .whenReleased(new TurnOneSlot(sorter, 0));
+                .whenReleased(new TurnOneSlot(sorter, -sorter.TICKS_PER_THIRD_OF_TURN));
 
         driver.getGamepadButton(A)
                 .whenPressed(shootAllLoaded(launcher, sorter, holdControl, 200));
@@ -181,7 +178,7 @@ public class AllSystemsTele extends CommandOpMode {
                 RobotState.getInstance().getPattern(),
                 RobotState.getInstance().getBallColors() );
 
-        new InstantCommand(() -> new TurnOneSlot(sorter, sorter.getIndexOffset(startSlot)));
+        new InstantCommand(() -> new TurnOneSlot(sorter, sorter.getTurnOffset(startSlot)));
 
         return shootAllLoaded(launcher, sorter, holdControl, recoveryMs);
     }

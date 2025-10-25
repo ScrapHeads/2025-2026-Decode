@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Sorter;
  */
 public class TurnOneSlot extends CommandBase {
     private final Sorter sorter;
-    private final double power;
+    private final int direction;
 
     // === Magnetic trigger state ===
     private boolean initialMagnetState;
@@ -27,21 +27,25 @@ public class TurnOneSlot extends CommandBase {
     private static final long DEBOUNCE_MS = 30;
     private long lastTriggerTime = 0;
 
-    public TurnOneSlot(Sorter sorter, double power) {
+    /**
+     * @param sorter the sorter subsystem
+     * @param direction either 1 turn CW or -1 turn CCW 0 does nothing
+     * */
+    public TurnOneSlot(Sorter sorter, int direction) {
         this.sorter = sorter;
-        this.power = power;
+        this.direction = direction;
 
         addRequirements(sorter);
     }
 
     @Override
     public void initialize() {
-        if (power == 0) {
+        if (direction == 0) {
             return;
         }
 
-        sorter.setPower(power);
-        sorter.advanceSlot(power);
+        sorter.setPower(direction);
+        sorter.advanceSlot(direction);
 
         initialMagnetState = RobotState.getInstance().getMagSensorState();
         triggeredOnce = false;
