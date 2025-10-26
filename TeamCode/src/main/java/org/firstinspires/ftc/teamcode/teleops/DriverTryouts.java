@@ -170,7 +170,7 @@ public class DriverTryouts extends CommandOpMode {
                                     new WaitCommand(recoveryMs),
                                     new WaitUntilCommand(launcher::isReadyToLaunch)
                             ),
-                            new TurnOneSlot(sorter, Sorter.CCW_POWER),
+                            new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                             () -> sorter.getCurrentColor().isBall()        // evaluated at runtime
                     )
             );

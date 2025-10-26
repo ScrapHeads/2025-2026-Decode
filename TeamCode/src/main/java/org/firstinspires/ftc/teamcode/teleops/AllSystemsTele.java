@@ -161,7 +161,7 @@ public class AllSystemsTele extends CommandOpMode {
 //                    new ConditionalCommand(
                             new SequentialCommandGroup(
                                     new WaitUntilCommand(launcher::isReadyToLaunch),
-                                    new TurnOneSlot(sorter, -.5),
+                                    new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                                     new WaitCommand(recoveryMs)
                             )
 //                            new TurnOneSlot(sorter, Sorter.CCW_POWER),

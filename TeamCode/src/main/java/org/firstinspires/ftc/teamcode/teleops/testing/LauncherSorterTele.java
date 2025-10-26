@@ -25,7 +25,6 @@ import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
-import org.firstinspires.ftc.teamcode.util.BallColor;
 
 @Disabled
 @TeleOp(name = "LauncherSorterTele", group = "ScrapHeads")
@@ -94,7 +93,7 @@ public class LauncherSorterTele extends CommandOpMode {
                                     new WaitCommand(recoveryMs),
                                     new WaitUntilCommand(launcher::isReadyToLaunch)
                             ),
-                            new TurnOneSlot(sorter, Sorter.CCW_POWER),
+                            new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                             () -> sorter.getCurrentColor().isBall()        // evaluated at runtime
                     )
             );

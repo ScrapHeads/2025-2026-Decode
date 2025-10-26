@@ -19,14 +19,6 @@ public class TurnOneSlot extends CommandBase {
     private final Sorter sorter;
     private final int direction;
 
-    // === Magnetic trigger state ===
-    private boolean initialMagnetState;
-    private boolean triggeredOnce;
-
-    // Optional debounce timing (to prevent false double-triggers)
-    private static final long DEBOUNCE_MS = 30;
-    private long lastTriggerTime = 0;
-
     /**
      * @param sorter the sorter subsystem
      * @param direction either 1 turn CW or -1 turn CCW 0 does nothing
@@ -39,47 +31,18 @@ public class TurnOneSlot extends CommandBase {
     }
 
     @Override
-    public void initialize() {
-        if (direction == 0) {
-            return;
-        }
-
-        sorter.setPower(direction);
-        sorter.advanceSlot(direction);
-
-        initialMagnetState = RobotState.getInstance().getMagSensorState();
-        triggeredOnce = false;
-        lastTriggerTime = System.currentTimeMillis();
-    }
+    public void initialize() { }
 
     @Override
     public void execute() {
-        boolean currentState = RobotState.getInstance().getMagSensorState();
-
-        // Detect change in magnetic sensor state (rising/falling edge)
-        if (currentState != initialMagnetState) {
-            long now = System.currentTimeMillis();
-
-            // Debounce: ensure a short delay before counting a trigger
-            if (now - lastTriggerTime > DEBOUNCE_MS) {
-                tele.addLine("in statement");
-                triggeredOnce = true;
-                lastTriggerTime = now;
-                sorter.setPower(0);
-            }
-
-            // Update last known state
-            initialMagnetState = currentState;
-        }
+        sorter.turnOneSlotDirection(direction);
     }
 
     @Override
     public boolean isFinished() {
-        return triggeredOnce;
+        return sorter.isAtSetPoint();
     }
 
     @Override
-    public void end(boolean interrupted) {
-        sorter.setPower(0);
-    }
+    public void end(boolean interrupted) { }
 }
