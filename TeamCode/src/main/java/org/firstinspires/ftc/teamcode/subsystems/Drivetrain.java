@@ -51,6 +51,7 @@ import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Transform2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Units;
 import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.PoseMessage;
@@ -560,6 +561,8 @@ public final class Drivetrain implements Subsystem {
         Pose2d pose = RobotState.getInstance().getOdometryPose();
 
         TelemetryPacket packet = new TelemetryPacket();
+        // Use this when changing pos tracking to meters
+        // Units.metersToInches()
         packet.put("X", pose.getX());
         packet.put("Y", pose.getY());
         packet.put("Localizer pose", localizer.getPose().toString());
