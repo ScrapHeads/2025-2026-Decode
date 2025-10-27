@@ -71,14 +71,15 @@ public class MockAutoBlueFar extends CommandOpMode {
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
-                new WaitCommand(3000),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
+                new WaitCommand(3000),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
-                new WaitCommand(3000),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
+                new WaitCommand(3000),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(11)),
                 new WaitCommand(3000)
         ) {
             // When the auto ends or gets interrupted will write to a jason file for auto -> tele data transfer.
