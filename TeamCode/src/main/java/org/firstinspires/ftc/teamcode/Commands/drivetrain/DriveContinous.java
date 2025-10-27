@@ -45,9 +45,9 @@ public class DriveContinous extends CommandBase {
         this.driver = driver;
         this.speed = speed;
 
-        xLimiter = new SlewRateLimiter(2, TimeTracker.getTime());
-        yLimiter = new SlewRateLimiter(2, TimeTracker.getTime());
-        rotLimiter = new SlewRateLimiter(2, TimeTracker.getTime());
+        xLimiter = new SlewRateLimiter(10, TimeTracker.getTime());
+        yLimiter = new SlewRateLimiter(10, TimeTracker.getTime());
+        rotLimiter = new SlewRateLimiter(10, TimeTracker.getTime());
 
         addRequirements(drivetrain);
     }

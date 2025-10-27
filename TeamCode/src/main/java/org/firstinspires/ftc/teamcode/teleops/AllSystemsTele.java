@@ -15,6 +15,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
@@ -69,7 +70,7 @@ public class AllSystemsTele extends CommandOpMode {
 
         StateIO.load();
         RobotState.getInstance().setBallColors(new BallColor[] {BallColor.EMPTY, BallColor.EMPTY, BallColor.EMPTY});
-        RobotState.getInstance().setPattern(new BallColor[] {BallColor.EMPTY, BallColor.EMPTY, BallColor.EMPTY});
+        RobotState.getInstance().setPattern(new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN});
 
         // Gamepad
         driver = new GamepadEx(gamepad1);
@@ -113,16 +114,19 @@ public class AllSystemsTele extends CommandOpMode {
                 .whenInactive(new RunIntakeCommand(intake, 0));
 //                .whenActive(new SetPowerLauncher(launcher, 1));
 
+        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
+                .whileActiveOnce(new RunIntakeCommand(intake, -1))
+                .whenInactive(new RunIntakeCommand(intake, 0));
+
         // Left Trigger:
 //        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
 //                .whenActive(new StopFlywheel(launcher));
 
         driver.getGamepadButton(RIGHT_BUMPER)
-//                .whenPressed(new InstantCommand(() -> sorter.setPower(0)));
-                .whenReleased(new TurnOneSlot(sorter, sorter.TICKS_PER_THIRD_OF_TURN));
+                .whenPressed(new TurnOneSlot(sorter, sorter.TICKS_PER_THIRD_OF_TURN));
 
         driver.getGamepadButton(LEFT_BUMPER)
-                .whenReleased(new TurnOneSlot(sorter, -sorter.TICKS_PER_THIRD_OF_TURN));
+                .whenPressed(new TurnOneSlot(sorter, -sorter.TICKS_PER_THIRD_OF_TURN));
 
         driver.getGamepadButton(A)
                 .whenPressed(shootAllLoaded(launcher, sorter, holdControl, 200));
@@ -158,15 +162,15 @@ public class AllSystemsTele extends CommandOpMode {
 
                     // if there is a ball in the current slot, shoot it
                     // if not turn to the next slot to run again
-//                    new ConditionalCommand(
+                    new ConditionalCommand(
                             new SequentialCommandGroup(
                                     new WaitUntilCommand(launcher::isReadyToLaunch),
                                     new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                                     new WaitCommand(recoveryMs)
-                            )
-//                            new TurnOneSlot(sorter, Sorter.CCW_POWER),
-//                            () -> sorter.getCurrentColor().isBall()        // evaluated at runtime
-//                    );
+                            ),
+                            new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
+                            () -> sorter.getCurrentColor().isBall()      // evaluated at runtime
+                    )
             );
         }
         dashboard.sendTelemetryPacket(packet);

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 import static org.firstinspires.ftc.teamcode.util.BallColor.GREEN;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -30,8 +31,13 @@ import java.util.Arrays;
  *
  * <p>Constants are adjustable and should be tuned on-robot.
  */
+@Config
 public class Sorter implements Subsystem {
-
+    public static class Params {
+        public double kp = 0.0001;
+        public double ki = 0.00001;
+        public double kd = 0.00;
+    }
     // === Tuning constants (adjust on-robot) ===
     public static final int CCW_DIRECTION = -1;   // CCW is negative
     public static final int CW_DIRECTION = 1;     // CW is positive
@@ -48,13 +54,14 @@ public class Sorter implements Subsystem {
     private boolean ledEnabled = false;
 
     //TODO find these values once the encoder is attached
-    public final int TICKS_PER_THIRD_OF_TURN = 1;
-    private final int TURN_TOLERANCE_IN_TICKS = 0;
+    public final int TICKS_PER_THIRD_OF_TURN = 8231 / 3;
+    private final int TURN_TOLERANCE_IN_TICKS = 120;
+    public static Params PARAMS = new Params();
+    public final PIDController pidController = new PIDController(PARAMS.kp, PARAMS.ki, PARAMS.kd);
 
     private double turnPos = 0;
 
-    //TODO tune the pidController
-    private final PIDController pidController = new PIDController(0, 0, 0);
+    public boolean enabledPid = true;
 
     /**
      * Constructor initializes servo, color sensor, and magnetic sensor.
@@ -74,7 +81,7 @@ public class Sorter implements Subsystem {
         encoder = new MotorEx(hm, "encoder");
         encoder.resetEncoder();
 
-        pidController.setTolerance(2);
+        pidController.setTolerance(TURN_TOLERANCE_IN_TICKS);
 
         // === Initialize magnetic sensor ===
         magneticSensor = hm.get(DigitalChannel.class, "magSensor");
@@ -245,7 +252,7 @@ public class Sorter implements Subsystem {
         double bNorm = b / total;
 
         // --- GREEN detection: strong green dominance ---
-        if (gNorm > rNorm * 1.3 && gNorm > bNorm * 1.3) {
+        if (gNorm > rNorm * 3 && gNorm > bNorm * 1.32) {
             return GREEN;
         }
 
@@ -271,7 +278,7 @@ public class Sorter implements Subsystem {
      */
     public boolean isMagnetTriggered() {
         // Some sensors return LOW when triggered. Invert logic if needed.
-        return magneticSensor.getState();
+        return !magneticSensor.getState();
     }
 
     // === Utility ===
@@ -299,9 +306,11 @@ public class Sorter implements Subsystem {
         tele.addData("ServoPower", getPower());
         tele.addData("Sorter Index", getCurrentIndex());
         tele.addData("Sorter pos", getCurrentPos());
+        tele.addData("Turn pos", getTurnPos());
         tele.addData("LED Enabled", isLedEnabled());
         tele.addData("Color Sensor (R,G,B)", "%d, %d, %d",
                 colorSensorV3.red(), colorSensorV3.green(), colorSensorV3.blue());
+        tele.addData("Slots", Arrays.toString(getSlots()));
         tele.addData("Detected Color", detectBallColor());
         tele.addData("Mag Sensor Triggered", isMagnetTriggered());
     }
@@ -310,10 +319,12 @@ public class Sorter implements Subsystem {
     @Override
     public void periodic() {
 
-        if (isMagnetTriggered() && isAtSetPoint() && getCurrentPos() != 0) {
-            resetCurrentPos();
-            setTurnPos(0);
-        }
+//        if (isMagnetTriggered() && isAtSetPoint() && getCurrentPos() != 0) {
+//            resetCurrentPos();
+//            setTurnPos(0);
+//            pidController.reset();
+//            sorterRotate.setPower(0);
+//        }
 
         if (isAtSetPoint() && getCurrentIndex() != getIndex()) {
             setCurrentIndex(getIndex());
@@ -323,9 +334,16 @@ public class Sorter implements Subsystem {
             setSlotCurrent(detectBallColor());
         }
 
-        double output = pidController.calculate(encoder.getCurrentPosition(), turnPos);
+        RobotState.getInstance().setBallColors(slots);
 
-        sorterRotate.setPower(output);
+        if (enabledPid) {
+            if (isAtSetPoint()) {
+                sorterRotate.setPower(0);
+            } else {
+                double output = pidController.calculate(encoder.getCurrentPosition(), turnPos);
+                sorterRotate.setPower(output);
+            }
+        }
 
         writeData();
     }

@@ -31,16 +31,14 @@ public class TurnOneSlot extends CommandBase {
     }
 
     @Override
-    public void initialize() { }
+    public void initialize() { sorter.turnOneSlotDirection(direction); }
 
     @Override
-    public void execute() {
-        sorter.turnOneSlotDirection(direction);
-    }
+    public void execute() { }
 
     @Override
     public boolean isFinished() {
-        return sorter.isAtSetPoint();
+        return true;
     }
 
     @Override
