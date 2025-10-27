@@ -161,15 +161,15 @@ public class AllSystemsTele extends CommandOpMode {
 
                     // if there is a ball in the current slot, shoot it
                     // if not turn to the next slot to run again
-//                    new ConditionalCommand(
+                    new ConditionalCommand(
                             new SequentialCommandGroup(
                                     new WaitUntilCommand(launcher::isReadyToLaunch),
                                     new TurnOneSlot(sorter, -.5),
                                     new WaitCommand(recoveryMs)
-                            )
-//                            new TurnOneSlot(sorter, Sorter.CCW_POWER),
-//                            () -> sorter.getCurrentColor().isBall()        // evaluated at runtime
-//                    );
+                            ),
+                            new TurnOneSlot(sorter, Sorter.CCW_POWER),
+                            () -> sorter.getCurrentColor().isBall()        // evaluated at runtime
+                    )
             );
         }
         dashboard.sendTelemetryPacket(packet);
