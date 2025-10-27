@@ -37,31 +37,10 @@ public class IntakeSorter extends CommandBase {
     @Override
     public void execute() {
         if (sorter.detectBallColor() != BallColor.EMPTY &&
-                RobotState.getInstance().getBallColors()[sorter.getCurrentIndex()] == BallColor.EMPTY) {
-
-            boolean initialMagnetState = RobotState.getInstance().getMagSensorState();
-            long lastTriggerTime = System.currentTimeMillis();
-            sorter.setPower(-.1);
-            while (true) {
-                boolean currentState = RobotState.getInstance().getMagSensorState();
-
-                // Detect change in magnetic sensor state (rising/falling edge)
-                if (currentState != initialMagnetState) {
-                    long now = System.currentTimeMillis();
-
-                    // Debounce: ensure a short delay before counting a trigger
-                    if (now - lastTriggerTime > 30) {
-                        tele.addLine("in statement");
-                        sorter.setPower(0);
-                        break;
-                    }
-
-                    // Update last known state
-                    initialMagnetState = currentState;
-                }
+                RobotState.getInstance().getBallColors()[sorter.getCurrentIndex()] != BallColor.EMPTY) {
+            if (sorter.isAtSetPoint()) {
+                sorter.turnOneSlotDirection(Sorter.CW_DIRECTION);
             }
-
-            sorter.advanceSlot(1);
         }
     }
 

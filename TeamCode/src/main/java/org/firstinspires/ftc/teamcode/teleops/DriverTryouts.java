@@ -39,7 +39,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
-import org.firstinspires.ftc.teamcode.util.BallColor;
 
 @TeleOp(name = "DriverTryouts", group = "ScrapHeads")
 public class DriverTryouts extends CommandOpMode {
@@ -75,7 +74,7 @@ public class DriverTryouts extends CommandOpMode {
         launcher = new LauncherBall(hm);
         launcher.register();
 
-        sorter = new Sorter(hm, 0, new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN});
+        sorter = new Sorter(hm);
         sorter.register();
 
 //        feederRail = new FeederRail(hm);
@@ -171,7 +170,7 @@ public class DriverTryouts extends CommandOpMode {
                                     new WaitCommand(recoveryMs),
                                     new WaitUntilCommand(launcher::isReadyToLaunch)
                             ),
-                            new TurnOneSlot(sorter, Sorter.CCW_POWER),
+                            new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                             () -> sorter.getCurrentColor().isBall()        // evaluated at runtime
                     )
             );
@@ -185,7 +184,7 @@ public class DriverTryouts extends CommandOpMode {
                 RobotState.getInstance().getPattern(),
                 RobotState.getInstance().getBallColors() );
 
-        new InstantCommand(() -> new TurnOneSlot(sorter, sorter.getIndexOffset(startSlot)));
+        new InstantCommand(() -> new TurnOneSlot(sorter, sorter.getTurnOffset(startSlot)));
 
         return shootAllLoaded(launcher, sorter, recoveryMs);
     }

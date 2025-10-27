@@ -17,65 +17,30 @@ import org.firstinspires.ftc.teamcode.subsystems.Sorter;
  */
 public class TurnOneSlot extends CommandBase {
     private final Sorter sorter;
-    private final double power;
+    private final int direction;
 
-    // === Magnetic trigger state ===
-    private boolean initialMagnetState;
-    private boolean triggeredOnce;
-
-    // Optional debounce timing (to prevent false double-triggers)
-    private static final long DEBOUNCE_MS = 30;
-    private long lastTriggerTime = 0;
-
-    public TurnOneSlot(Sorter sorter, double power) {
+    /**
+     * @param sorter the sorter subsystem
+     * @param direction either 1 turn CW or -1 turn CCW 0 does nothing
+     * */
+    public TurnOneSlot(Sorter sorter, int direction) {
         this.sorter = sorter;
-        this.power = power;
+        this.direction = direction;
 
         addRequirements(sorter);
     }
 
     @Override
-    public void initialize() {
-        if (power == 0) {
-            return;
-        }
-
-        sorter.setPower(power);
-        sorter.advanceSlot(power);
-
-        initialMagnetState = RobotState.getInstance().getMagSensorState();
-        triggeredOnce = false;
-        lastTriggerTime = System.currentTimeMillis();
-    }
+    public void initialize() { sorter.turnOneSlotDirection(direction); }
 
     @Override
-    public void execute() {
-        boolean currentState = RobotState.getInstance().getMagSensorState();
-
-        // Detect change in magnetic sensor state (rising/falling edge)
-        if (currentState != initialMagnetState) {
-            long now = System.currentTimeMillis();
-
-            // Debounce: ensure a short delay before counting a trigger
-            if (now - lastTriggerTime > DEBOUNCE_MS) {
-                tele.addLine("in statement");
-                triggeredOnce = true;
-                lastTriggerTime = now;
-                sorter.setPower(0);
-            }
-
-            // Update last known state
-            initialMagnetState = currentState;
-        }
-    }
+    public void execute() { }
 
     @Override
     public boolean isFinished() {
-        return triggeredOnce;
+        return true;
     }
 
     @Override
-    public void end(boolean interrupted) {
-        sorter.setPower(0);
-    }
+    public void end(boolean interrupted) { }
 }

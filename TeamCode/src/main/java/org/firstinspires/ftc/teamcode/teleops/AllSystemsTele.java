@@ -9,7 +9,6 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
-import static org.firstinspires.ftc.teamcode.subsystems.HoldControl.TRANSPORT_ANGLE;
 
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -71,7 +70,7 @@ public class AllSystemsTele extends CommandOpMode {
 
         StateIO.load();
         RobotState.getInstance().setBallColors(new BallColor[] {BallColor.EMPTY, BallColor.EMPTY, BallColor.EMPTY});
-        RobotState.getInstance().setPattern(new BallColor[] {BallColor.EMPTY, BallColor.EMPTY, BallColor.EMPTY});
+        RobotState.getInstance().setPattern(new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN});
 
         // Gamepad
         driver = new GamepadEx(gamepad1);
@@ -80,7 +79,7 @@ public class AllSystemsTele extends CommandOpMode {
         launcher = new LauncherBall(hm);
         launcher.register();
 
-        sorter = new Sorter(hm, 0, RobotState.getInstance().getBallColors());
+        sorter = new Sorter(hm);
         sorter.register();
 
 //        feederRail = new FeederRail(hm);
@@ -115,17 +114,19 @@ public class AllSystemsTele extends CommandOpMode {
                 .whenInactive(new RunIntakeCommand(intake, 0));
 //                .whenActive(new SetPowerLauncher(launcher, 1));
 
+        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
+                .whileActiveOnce(new RunIntakeCommand(intake, -1))
+                .whenInactive(new RunIntakeCommand(intake, 0));
+
         // Left Trigger:
 //        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
 //                .whenActive(new StopFlywheel(launcher));
 
         driver.getGamepadButton(RIGHT_BUMPER)
-                .whenPressed(new InstantCommand(() -> sorter.setPower(0)));
-//                .whenReleased(new TurnOneSlot(sorter, 0));
+                .whenPressed(new TurnOneSlot(sorter, sorter.TICKS_PER_THIRD_OF_TURN));
 
         driver.getGamepadButton(LEFT_BUMPER)
-                .whenPressed(new InstantCommand(() -> sorter.setPower(-1)));
-//                .whenReleased(new TurnOneSlot(sorter, 0));
+                .whenPressed(new TurnOneSlot(sorter, -sorter.TICKS_PER_THIRD_OF_TURN));
 
         driver.getGamepadButton(A)
                 .whenPressed(shootAllLoaded(launcher, sorter, holdControl, 200));
@@ -164,11 +165,11 @@ public class AllSystemsTele extends CommandOpMode {
                     new ConditionalCommand(
                             new SequentialCommandGroup(
                                     new WaitUntilCommand(launcher::isReadyToLaunch),
-                                    new TurnOneSlot(sorter, -.5),
+                                    new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                                     new WaitCommand(recoveryMs)
                             ),
-                            new TurnOneSlot(sorter, Sorter.CCW_POWER),
-                            () -> sorter.getCurrentColor().isBall()        // evaluated at runtime
+                            new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
+                            () -> sorter.getCurrentColor().isBall()      // evaluated at runtime
                     )
             );
         }
@@ -181,7 +182,7 @@ public class AllSystemsTele extends CommandOpMode {
                 RobotState.getInstance().getPattern(),
                 RobotState.getInstance().getBallColors() );
 
-        new InstantCommand(() -> new TurnOneSlot(sorter, sorter.getIndexOffset(startSlot)));
+        new InstantCommand(() -> new TurnOneSlot(sorter, sorter.getTurnOffset(startSlot)));
 
         return shootAllLoaded(launcher, sorter, holdControl, recoveryMs);
     }
