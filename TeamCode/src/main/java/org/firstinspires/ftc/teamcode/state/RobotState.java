@@ -149,6 +149,15 @@ public class RobotState {
         return true;
     }
 
+    public boolean isEmpty() {
+        for (BallColor ball : ballColors) {
+            if (ball != BallColor.EMPTY) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void setBallColorAtIndex(int index, BallColor ballColor) {
         ballColors[index] = ballColor;
     }

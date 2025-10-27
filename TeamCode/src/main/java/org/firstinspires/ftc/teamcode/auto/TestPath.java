@@ -66,8 +66,7 @@ public class TestPath extends CommandOpMode {
 
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
-//                new DynamicStrafeCommand(drivetrain, () -> new Pose2d(0, 20, new Rotation2d(Math.toRadians(180)))),
-                new DynamicTurnCommand(drivetrain, () -> path.get(1).getRotation().getDegrees()));
+                new DynamicStrafeCommand(drivetrain, () -> path.get(1)));
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(4)));
 

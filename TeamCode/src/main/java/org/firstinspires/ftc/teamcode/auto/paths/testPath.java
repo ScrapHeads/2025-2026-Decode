@@ -12,7 +12,7 @@ public final class testPath {
     private testPath() {}
 
     public static final List<Pose2d> PATH = Arrays.asList(
-    new Pose2d(15, 15, new Rotation2d(3.14)),  // #1  x=62.76in, y=-8.91in, θ=0.0°
-    new Pose2d(0, 0, new Rotation2d(0))  // #2  x=5.00in, y=-9.00in, θ=0.0°
+    new Pose2d(56.50, -9.00, new Rotation2d(3.141593)),  // #1  x=56.50in, y=-9.00in, θ=180.0°
+    new Pose2d(-9.00, -9.00, new Rotation2d(0.000000))  // #2  x=-9.00in, y=-9.00in, θ=0.0°
 );
 }
