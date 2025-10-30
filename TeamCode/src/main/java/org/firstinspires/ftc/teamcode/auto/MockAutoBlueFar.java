@@ -86,8 +86,6 @@ public class MockAutoBlueFar extends CommandOpMode {
         vision = new Vision(hm, drivetrain);
         vision.register();
 
-        RobotState.getInstance().setAll(path.get(0), isBlue, ballColors, new ChassisSpeeds());
-
         // Custom constraints for some moves
         TurnConstraints turnConstraintsFast = new TurnConstraints(4, -4, 4);
         VelConstraint velConstraintFast = new MinVelConstraint(Arrays.asList(
@@ -102,11 +100,8 @@ public class MockAutoBlueFar extends CommandOpMode {
 
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
-                new ParallelCommandGroup(
-                        new GetTagPattern(vision),
-                        new DynamicStrafeCommand(drivetrain, () ->
-                                new Pose2d(0.00, -15.00, new Rotation2d(3.141593)))
-                                .interruptOn(() -> RobotState.getInstance().getPattern() != null)
+                new GetTagPattern(vision).raceWith(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(1))
                 ),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
                 new SortedLuanch(launcher, sorter, holdControl, 300),

@@ -81,35 +81,7 @@ public class Vision implements Subsystem {
      * Updates {@code latestPose} if a valid correction is available.
      */
     @Override
-    public void periodic() {
-//        if (!rateLimit.hasExpired()) return;
-//        rateLimit.reset();
-//
-//        HuskyLens.Block[] blocks = huskyLens.blocks();
-//        TelemetryPacket packet = new TelemetryPacket();
-//        packet.put("Tag Count", blocks.length);
-//
-//        for (HuskyLens.Block block : blocks) {
-//            boolean trackThis = false;
-//            for (int id : TRACKED_TAG_IDS) {
-//                if (block.id == id) {
-//                    trackThis = true;
-//                    break;
-//                }
-//            }
-//
-//            if (!trackThis) continue;
-//            if (Math.min(block.width, block.height) < MIN_TAG_PIXEL_SIZE) continue;
-//
-//            Pose2d correctedPose = processor.getCorrectedRobotPoseFromTag(drivetrain, block);
-//            if (correctedPose != null) {
-//                latestPose = correctedPose;
-//                packet.put("Corrected Pose", correctedPose);
-//            }
-//        }
-//
-//        dashboard.sendTelemetryPacket(packet);
-    }
+    public void periodic() {}
 
     /**
      * Manually sets the latest pose estimate from an external source.

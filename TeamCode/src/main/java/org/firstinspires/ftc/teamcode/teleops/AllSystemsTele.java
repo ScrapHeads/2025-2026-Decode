@@ -71,7 +71,7 @@ public class AllSystemsTele extends CommandOpMode {
         drivetrain.register();
 
         StateIO.load();
-        RobotState.getInstance().setBallColors(new BallColor[] {BallColor.EMPTY, BallColor.EMPTY, BallColor.EMPTY});
+        //TODO REMOVE WHEN DOING DRIVE PRACTICE
         RobotState.getInstance().setPattern(new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN});
 
         // Gamepad
