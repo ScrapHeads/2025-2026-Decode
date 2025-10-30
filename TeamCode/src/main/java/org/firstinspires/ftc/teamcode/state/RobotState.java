@@ -35,8 +35,8 @@ public class RobotState {
     private ChassisSpeeds chassisSpeeds;
 
     // get all the ball colors
-    private BallColor[] ballColors;
-    private BallColor[] pattern;
+    private BallColor[] ballColors = null;
+    private BallColor[] pattern = null;
 
     // If true on blue alliance if false on red alliance
     private Boolean isBlue;

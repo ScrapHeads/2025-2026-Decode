@@ -25,10 +25,11 @@ public class ShootAllLoaded extends SequentialCommandGroup {
                         new ConditionalCommand(
                                 new SequentialCommandGroup(
                                         new WaitUntilCommand(launcher::isReadyToLaunch),
-                                        new TurnOneSlot(sorter, -.5),
+                                        new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
+                                        new WaitUntilCommand(sorter::isAtSetPoint),
                                         new WaitCommand(recoveryMs)
                                 ),
-                                new TurnOneSlot(sorter, Sorter.CCW_POWER),
+                                new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                                 () -> sorter.getCurrentColor().isBall()        // evaluated at runtime
                         )
                 ).interruptOn(() -> RobotState.getInstance().isEmpty())

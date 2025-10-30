@@ -1,10 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.util.BallColor.GREEN;
+import static org.firstinspires.ftc.teamcode.util.BallColor.PURPLE;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.util.BallColor;
 import org.firstinspires.ftc.teamcode.vision.AutoAlignConfig;
 
 import java.util.HashMap;
@@ -45,6 +49,15 @@ public class Constants {
     // --------------------------
     public static double MIN_TAG_PIXEL_SIZE = 20.0; // ignore tiny detections
     public static int[] TRACKED_TAG_IDS = {1, 2, 3};
+
+    //TODO find what the pattern ids are
+    public static int[] PATTERN_TAG_IDS = {0, 0, 0};
+    public static Map<Integer, BallColor[]> patters = Map.of(
+            PATTERN_TAG_IDS[0], new BallColor[] {PURPLE, PURPLE, GREEN},
+            PATTERN_TAG_IDS[1], new BallColor[] {PURPLE, GREEN, PURPLE},
+            PATTERN_TAG_IDS[2], new BallColor[] {GREEN, PURPLE, PURPLE}
+    );
+
 
     // --------------------------
     // Auto-align system

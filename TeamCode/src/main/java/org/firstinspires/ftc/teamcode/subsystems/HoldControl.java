@@ -22,9 +22,9 @@ public class HoldControl implements Subsystem {
     public static final double MAX_ANGLE = 2500.0;
 
     // === Servo angle presets (in degrees) ===
-    public static final double TRANSPORT_ANGLE = 1700;
-    public static final double LOADING_ANGLE   = 2100;
-    public static final double LAUNCHING_ANGLE = 900;
+    public static final double TRANSPORT_ANGLE = 1667;
+    public static final double LOADING_ANGLE   = 2050;
+    public static final double LAUNCHING_ANGLE = 927;
 
     private HoldPosition currentPosition = HoldPosition.TRANSPORT;
 

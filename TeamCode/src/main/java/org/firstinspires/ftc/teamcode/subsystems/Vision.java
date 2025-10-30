@@ -7,12 +7,12 @@ import static org.firstinspires.ftc.teamcode.Constants.CAMERA_YAW_OFFSET;
 import static org.firstinspires.ftc.teamcode.Constants.MIN_TAG_PIXEL_SIZE;
 import static org.firstinspires.ftc.teamcode.Constants.TRACKED_TAG_IDS;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
-import static org.firstinspires.ftc.teamcode.Constants.hm;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.vision.CameraParams;
@@ -48,7 +48,7 @@ public class Vision implements Subsystem {
      *
      * @param drivetrain drivetrain reference used for motion compensation in vision correction
      */
-    public Vision(Drivetrain drivetrain) {
+    public Vision(HardwareMap hm, Drivetrain drivetrain) {
         this.drivetrain = drivetrain;
         huskyLens = hm.get(HuskyLens.class, "huskylens");
 

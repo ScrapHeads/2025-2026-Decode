@@ -45,7 +45,7 @@ public class VisionOnly extends CommandOpMode {
 
         // Create drivetrain + vision subsystem
         drivetrain = new Drivetrain(hm, startPose);
-        vision = new Vision(drivetrain);
+        vision = new Vision(hm, drivetrain);
         vision.register();
 
         // Create processor using Constants

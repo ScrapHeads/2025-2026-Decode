@@ -13,12 +13,15 @@ import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
+import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
+import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
@@ -26,6 +29,12 @@ import org.firstinspires.ftc.teamcode.auto.paths.mockAutoBlueFar;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
+import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
+import org.firstinspires.ftc.teamcode.subsystems.Sorter;
+import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
 import java.util.Arrays;
@@ -34,7 +43,14 @@ import java.util.List;
 @Autonomous(name = "MockAutoBlueFar", group = "ScrapHeads")
 public class MockAutoBlueFar extends CommandOpMode {
 
-    Drivetrain drivetrain;
+    private Drivetrain drivetrain;
+
+    private LauncherBall launcher;
+    private LauncherHood hood;
+    private Intake intake;
+    private HoldControl holdControl;
+    private Sorter sorter;
+    private Vision vision;
 
     public boolean isBlue = true;
 
@@ -52,6 +68,26 @@ public class MockAutoBlueFar extends CommandOpMode {
         drivetrain = new Drivetrain(hm, path.get(0));
         drivetrain.register();
 
+        launcher = new LauncherBall(hm);
+        launcher.register();
+
+        hood = new LauncherHood(hm);
+        hood.register();
+
+        intake = new Intake(hm);
+        intake.register();
+
+        holdControl = new HoldControl(hm);
+        holdControl.register();
+
+        sorter = new Sorter(hm);
+        sorter.register();
+
+        vision = new Vision(hm, drivetrain);
+        vision.register();
+
+        RobotState.getInstance().setAll(path.get(0), isBlue, ballColors, new ChassisSpeeds());
+
         // Custom constraints for some moves
         TurnConstraints turnConstraintsFast = new TurnConstraints(4, -4, 4);
         VelConstraint velConstraintFast = new MinVelConstraint(Arrays.asList(
@@ -66,21 +102,27 @@ public class MockAutoBlueFar extends CommandOpMode {
 
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
-                new DynamicStrafeCommand(drivetrain, () -> path.get(1)),
-                new WaitCommand(3000),
+                new ParallelCommandGroup(
+                        new GetTagPattern(vision),
+                        new DynamicStrafeCommand(drivetrain, () ->
+                                new Pose2d(0.00, -15.00, new Rotation2d(3.141593)))
+                                .interruptOn(() -> RobotState.getInstance().getPattern() != null)
+                ),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
+                new SortedLuanch(launcher, sorter, holdControl, 300),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
-                new WaitCommand(3000),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
+                new SortedLuanch(launcher, sorter, holdControl, 300),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
-                new WaitCommand(3000),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(11)),
-                new WaitCommand(3000)
+                new SortedLuanch(launcher, sorter, holdControl, 300),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(11))
+//                new DynamicStrafeCommand(drivetrain, () -> path.get(11))
+//                new SortedLuanch(launcher, sorter, holdControl, 300),
         ) {
             // When the auto ends or gets interrupted will write to a jason file for auto -> tele data transfer.
             @Override

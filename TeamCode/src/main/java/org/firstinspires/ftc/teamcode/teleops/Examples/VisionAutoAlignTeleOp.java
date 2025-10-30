@@ -39,7 +39,7 @@ public class VisionAutoAlignTeleOp extends CommandOpMode {
 
         // Init subsystems
         drivetrain = new Drivetrain(hm, startPose); // define in Constants if needed
-        vision = new Vision(drivetrain);
+        vision = new Vision(hm, drivetrain);
         vision.register();
 
         assignControls();
