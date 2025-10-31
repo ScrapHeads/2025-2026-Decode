@@ -51,7 +51,7 @@ public class Constants {
     public static int[] TRACKED_TAG_IDS = {1, 2, 3};
 
     //TODO find what the pattern ids are
-    public static int[] PATTERN_TAG_IDS = {0, 0, 0};
+    public static int[] PATTERN_TAG_IDS = {0, 1, 2};
     public static Map<Integer, BallColor[]> patters = Map.of(
             PATTERN_TAG_IDS[0], new BallColor[] {PURPLE, PURPLE, GREEN},
             PATTERN_TAG_IDS[1], new BallColor[] {PURPLE, GREEN, PURPLE},
