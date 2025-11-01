@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Commands.launcher;
 
 import com.arcrobotics.ftclib.command.ConditionalCommand;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.PerpetualCommand;
 import com.arcrobotics.ftclib.command.RepeatCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
@@ -19,20 +21,20 @@ import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 public class ShootAllLoaded extends SequentialCommandGroup {
 
     public ShootAllLoaded (LauncherBall launcher, Sorter sorter, HoldControl holdControl, long recoveryMs) {
+        final int[] loopCount = {0};  // mutable counter
+
         addCommands(
-                new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING),
-                new RepeatCommand(
-                        new ConditionalCommand(
-                                new SequentialCommandGroup(
-                                        new WaitUntilCommand(launcher::isReadyToLaunch),
-                                        new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
-                                        new WaitUntilCommand(sorter::isAtSetPoint),
-                                        new WaitCommand(recoveryMs)
-                                ),
+            new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING),
+
+            new RepeatCommand(
+                        new SequentialCommandGroup(
+                                new WaitUntilCommand(launcher::isReadyToLaunch),
                                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
-                                () -> sorter.getCurrentColor().isBall()        // evaluated at runtime
+                                new WaitUntilCommand(sorter::isAtSetPoint),
+                                new WaitCommand(recoveryMs),
+                                new InstantCommand(() -> loopCount[0]++) // increment counter
                         )
-                ).interruptOn(() -> RobotState.getInstance().isEmpty())
+            ).interruptOn(() -> loopCount[0] >= 3) // stop after 3 loops
         );
     }
 

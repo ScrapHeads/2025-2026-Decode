@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.auto;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
+import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.AccelConstraint;
@@ -20,6 +21,7 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
+import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
@@ -65,6 +67,8 @@ public class MockAutoBlueFar extends CommandOpMode {
         tele = telemetry;
         dashboard = FtcDashboard.getInstance();
 
+        setUpRobotState();
+
         drivetrain = new Drivetrain(hm, path.get(0));
         drivetrain.register();
 
@@ -93,8 +97,6 @@ public class MockAutoBlueFar extends CommandOpMode {
                 new AngularVelConstraint(Math.PI)));
         AccelConstraint accelConstraintFast = new ProfileAccelConstraint(-40, 80);
 
-        setUpRobotState();
-
         // Wait to start the auto path till the play button is pressed
         waitForStart();
 
@@ -103,18 +105,19 @@ public class MockAutoBlueFar extends CommandOpMode {
                 new GetTagPattern(vision).raceWith(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(1))
                 ),
+                new SetFlywheelRpm(launcher, 4400),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
                 new SortedLuanch(launcher, sorter, holdControl, 300),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
                 new SortedLuanch(launcher, sorter, holdControl, 300),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
                 new SortedLuanch(launcher, sorter, holdControl, 300),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(11))
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(11))
 //                new SortedLuanch(launcher, sorter, holdControl, 300),
@@ -145,6 +148,8 @@ public class MockAutoBlueFar extends CommandOpMode {
                 ballColors,
                 new ChassisSpeeds(0,0, 0)
         );
+
+        RobotState.getInstance().setPattern(new BallColor[] {EMPTY, EMPTY, EMPTY});
     }
 
 }

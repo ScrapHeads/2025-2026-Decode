@@ -311,6 +311,7 @@ public class Sorter implements Subsystem {
         tele.addData("Color Sensor (R,G,B)", "%d, %d, %d",
                 colorSensorV3.red(), colorSensorV3.green(), colorSensorV3.blue());
         tele.addData("Slots", Arrays.toString(getSlots()));
+        tele.addData("Pattern", Arrays.toString(RobotState.getInstance().getPattern()));
         tele.addData("Detected Color", detectBallColor());
         tele.addData("Mag Sensor Triggered", isMagnetTriggered());
     }
@@ -318,7 +319,6 @@ public class Sorter implements Subsystem {
     // === Periodic Telemetry ===
     @Override
     public void periodic() {
-
 //        if (isMagnetTriggered() && isAtSetPoint() && getCurrentPos() != 0) {
 //            resetCurrentPos();
 //            setTurnPos(0);

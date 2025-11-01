@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode.Commands.vision;
 
 import static org.firstinspires.ftc.teamcode.Constants.MIN_TAG_PIXEL_SIZE;
 import static org.firstinspires.ftc.teamcode.Constants.PATTERN_TAG_IDS;
+import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.patters;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 
@@ -39,7 +41,9 @@ public class GetTagPattern extends CommandBase {
 
             if (!isRightTag) continue;
 //            if (Math.min(block.width, block.height) < MIN_TAG_PIXEL_SIZE) continue;
-
+            TelemetryPacket packet = new TelemetryPacket();
+            packet.put("Right Pattern", patters.get(block.id));
+            dashboard.sendTelemetryPacket(packet);
             RobotState.getInstance().setPattern(patters.get(block.id));
             setPatturn = true;
         }
