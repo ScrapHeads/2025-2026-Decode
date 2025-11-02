@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Commands.vision;
 
-import static org.firstinspires.ftc.teamcode.Constants.MIN_TAG_PIXEL_SIZE;
 import static org.firstinspires.ftc.teamcode.Constants.PATTERN_TAG_IDS;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.patters;
@@ -9,7 +8,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.util.BallColor;
@@ -17,7 +15,7 @@ import org.firstinspires.ftc.teamcode.util.BallColor;
 public class GetTagPattern extends CommandBase {
 
     private final Vision vision;
-    private boolean setPatturn = false;
+    private boolean setPattern = false;
 
     public GetTagPattern (Vision vision) {
         this.vision = vision;
@@ -45,18 +43,18 @@ public class GetTagPattern extends CommandBase {
             packet.put("Right Pattern", patters.get(block.id));
             dashboard.sendTelemetryPacket(packet);
             RobotState.getInstance().setPattern(patters.get(block.id));
-            setPatturn = true;
+            setPattern = true;
         }
     }
 
     @Override
     public boolean isFinished () {
-        return setPatturn;
+        return setPattern;
     }
 
     @Override
     public void end (boolean interrupted) {
-        if (RobotState.getInstance().getPattern() == null) {
+        if (RobotState.getInstance().getPattern() == null && !setPattern) {
             RobotState.getInstance().setPattern(new BallColor[] {
                     BallColor.PURPLE,
                     BallColor.PURPLE,
