@@ -55,7 +55,9 @@ public class Sorter implements Subsystem {
 
     //TODO find these values once the encoder is attached
     public final int TICKS_PER_THIRD_OF_TURN = 8231 / 3;
-    private final int TURN_TOLERANCE_IN_TICKS = 120;
+    private final int PID_TOLERANCE_IN_TICKS = 120;
+    private final int INDEX_TOLERANCE_IN_TICKS = TICKS_PER_THIRD_OF_TURN / 2;
+
     public static Params PARAMS = new Params();
     public final PIDController pidController = new PIDController(PARAMS.kp, PARAMS.ki, PARAMS.kd);
 
@@ -81,7 +83,7 @@ public class Sorter implements Subsystem {
         encoder = new MotorEx(hm, "encoder");
         encoder.resetEncoder();
 
-        pidController.setTolerance(TURN_TOLERANCE_IN_TICKS);
+        pidController.setTolerance(PID_TOLERANCE_IN_TICKS);
 
         // === Initialize magnetic sensor ===
         magneticSensor = hm.get(DigitalChannel.class, "magSensor");
@@ -126,12 +128,33 @@ public class Sorter implements Subsystem {
     public void setTurnPosWithOffset (double offset) {this.turnPos += offset;}
 
     public boolean isAtSetPoint () {
-        return Math.abs(Math.abs(getCurrentPos()) - Math.abs(turnPos)) <= TURN_TOLERANCE_IN_TICKS;
+        return Math.abs(Math.abs(getCurrentPos()) - Math.abs(turnPos)) <= PID_TOLERANCE_IN_TICKS;
     }
 
     public int getIndex () {
         double pos = encoder.getCurrentPosition();
-        return (int) Math.floorMod(Math.round(pos / TICKS_PER_THIRD_OF_TURN), SLOT_COUNT);
+        double ticksPerSlot = TICKS_PER_THIRD_OF_TURN;
+
+        // Compute fractional slot position
+        double slotPosition = pos / ticksPerSlot;
+
+        // Compute nearest integer slot
+        int nearestSlot = (int) Math.round(slotPosition);
+
+        // Compute the difference between actual pos and the nearest slot’s exact tick position
+        double tickError = Math.abs(pos - (nearestSlot * ticksPerSlot));
+
+        // Only snap if we're within tolerance
+        if (tickError <= INDEX_TOLERANCE_IN_TICKS) {
+            return Math.floorMod(nearestSlot, SLOT_COUNT);
+        } else {
+            // Stay at the previous slot if within the "dead zone"
+            int floorSlot = (int) Math.floor(slotPosition);
+            return Math.floorMod(floorSlot, SLOT_COUNT);
+        }
+
+//        double pos = encoder.getCurrentPosition();
+//        return (int) Math.floorMod(Math.round(pos / TICKS_PER_THIRD_OF_TURN), SLOT_COUNT);
     }
 
     public void turnOneSlotDirection (int direction) {
@@ -143,19 +166,6 @@ public class Sorter implements Subsystem {
         }
         setTurnPosWithOffset(offset);
     }
-
-    /**
-     * Advances one slot in the direction given
-     * @param direction 1 increase or -1 decrease
-     */
-//    public void advanceSlot(double direction) {
-//        if (direction > 0) {
-//            direction = 1;
-//        } else if (direction < 0) {
-//            direction = -1;
-//        }
-//        currentIndex = wrapIndex(currentIndex + (int) direction);
-//    }
 
     /**
      * Takes the color you want and gives the closest slot index.

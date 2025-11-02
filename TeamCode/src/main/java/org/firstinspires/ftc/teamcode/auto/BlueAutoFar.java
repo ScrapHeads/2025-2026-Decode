@@ -11,23 +11,20 @@ import com.acmerobotics.roadrunner.AngularVelConstraint;
 import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.TurnConstraints;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
-import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
+import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorter;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
-import org.firstinspires.ftc.teamcode.auto.paths.mockAutoBlueFar;
+import org.firstinspires.ftc.teamcode.auto.paths.blueAutoFar;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
@@ -42,8 +39,8 @@ import org.firstinspires.ftc.teamcode.util.BallColor;
 import java.util.Arrays;
 import java.util.List;
 
-@Autonomous(name = "MockAutoBlueFar", group = "ScrapHeads")
-public class MockAutoBlueFar extends CommandOpMode {
+@Autonomous(name = "BlueAutoFar", group = "ScrapHeads")
+public class BlueAutoFar extends CommandOpMode {
 
     private Drivetrain drivetrain;
 
@@ -56,7 +53,7 @@ public class MockAutoBlueFar extends CommandOpMode {
 
     public boolean isBlue = true;
 
-    public static final List<Pose2d> path = mockAutoBlueFar.PATH;
+    public static final List<Pose2d> path = blueAutoFar.PATH;
 
     public BallColor[] ballColors = new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN};
 
@@ -108,17 +105,25 @@ public class MockAutoBlueFar extends CommandOpMode {
                 new SetFlywheelRpm(launcher, 4400),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
                 new SortedLuanch(launcher, sorter, holdControl, 300),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
+                new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER).raceWith(
+                        new SequentialCommandGroup(
+                                new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
+                                new DynamicStrafeCommand(drivetrain, () -> path.get(4))
+                        )
+                ),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
                 new SortedLuanch(launcher, sorter, holdControl, 300),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
+                new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER).raceWith(
+                        new SequentialCommandGroup(
+                                new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
+                                new DynamicStrafeCommand(drivetrain, () -> path.get(8))
+                        )
+                ),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
                 new SortedLuanch(launcher, sorter, holdControl, 300),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(11))
+                new DynamicStrafeCommand(drivetrain, () -> path.get(10))
+//                new DynamicStrafeCommand(drivetrain, () -> path.get(11))
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(11))
 //                new SortedLuanch(launcher, sorter, holdControl, 300),
         ) {
