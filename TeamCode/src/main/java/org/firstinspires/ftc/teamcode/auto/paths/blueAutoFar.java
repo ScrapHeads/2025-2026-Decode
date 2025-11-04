@@ -15,12 +15,12 @@ public final class blueAutoFar {
     new Pose2d(63.00, -15.00, new Rotation2d(3.141593)),  // #1  x=63.00in, y=-15.00in, θ=180.0°
     new Pose2d(0.00, -15.00, new Rotation2d(3.141593)),  // #2  x=0.00in, y=-15.00in, θ=180.0°
     new Pose2d(53.94, -13.56, new Rotation2d(3.490659)),  // #3  x=53.94in, y=-13.56in, θ=200.0°
-    new Pose2d(36.50, -25.00, new Rotation2d(4.712389)),  // #4  x=36.50in, y=-25.00in, θ=270.0°
-    new Pose2d(36.50, -48.50, new Rotation2d(4.712389)),  // #5  x=36.50in, y=-48.50in, θ=270.0°
+    new Pose2d(35.50, -28.50, new Rotation2d(4.712389)),  // #4  x=35.50in, y=-28.50in, θ=270.0°
+    new Pose2d(35.50, -59.50, new Rotation2d(4.712389)),  // #5  x=35.50in, y=-59.50in, θ=270.0°
     new Pose2d(15.52, -12.34, new Rotation2d(3.839725)),  // #6  x=15.52in, y=-12.34in, θ=220.0°
     new Pose2d(-5.78, -13.80, new Rotation2d(3.839724)),  // #7  x=-5.78in, y=-13.80in, θ=220.0°
-    new Pose2d(11.85, -27.76, new Rotation2d(4.712389)),  // #8  x=11.85in, y=-27.76in, θ=270.0°
-    new Pose2d(12.00, -51.00, new Rotation2d(4.712389)),  // #9  x=12.00in, y=-51.00in, θ=270.0°
+    new Pose2d(13.00, -28.50, new Rotation2d(4.712389)),  // #8  x=13.00in, y=-28.50in, θ=270.0°
+    new Pose2d(13.00, -60.50, new Rotation2d(4.712389)),  // #9  x=13.00in, y=-60.50in, θ=270.0°
     new Pose2d(-11.16, -18.94, new Rotation2d(3.839724)),  // #10  x=-11.16in, y=-18.94in, θ=220.0°
     new Pose2d(-12.38, -30.45, new Rotation2d(4.712389)),  // #11  x=-12.38in, y=-30.45in, θ=270.0°
     new Pose2d(-12.50, -53.00, new Rotation2d(4.712389))  // #12  x=-12.50in, y=-53.00in, θ=270.0°

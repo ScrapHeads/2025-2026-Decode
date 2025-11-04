@@ -41,15 +41,11 @@ public class Vision implements Subsystem {
     private static final int READ_PERIOD = 1; // seconds
     private final Deadline rateLimit = new Deadline(READ_PERIOD, TimeUnit.SECONDS);
 
-    private final Drivetrain drivetrain;
-
     /**
      * Creates a Vision subsystem with HuskyLens and camera calibration parameters.
      *
-     * @param drivetrain drivetrain reference used for motion compensation in vision correction
      */
-    public Vision(HardwareMap hm, Drivetrain drivetrain) {
-        this.drivetrain = drivetrain;
+    public Vision(HardwareMap hm) {
         huskyLens = hm.get(HuskyLens.class, "huskylens");
 
         processor = new VisionProcessor(new CameraParams(

@@ -20,22 +20,28 @@ import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 
 public class ShootAllLoaded extends SequentialCommandGroup {
 
-    public ShootAllLoaded (LauncherBall launcher, Sorter sorter, HoldControl holdControl, long recoveryMs) {
-        final int[] loopCount = {0};  // mutable counter
+    public ShootAllLoaded (LauncherBall launcher, Sorter sorter, HoldControl holdControl) {
 
         addCommands(
-            new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING),
-
-            new RepeatCommand(
-                        new SequentialCommandGroup(
-                                new WaitUntilCommand(launcher::isReadyToLaunch),
-                                new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
-                                new WaitUntilCommand(sorter::isAtSetPoint),
-                                new WaitCommand(recoveryMs),
-                                new InstantCommand(() -> loopCount[0]++) // increment counter
-                        )
-            ).interruptOn(() -> loopCount[0] >= 3) // stop after 3 loops
+                new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING),
+                new WaitCommand(200),
+                new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
+                new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
+                new TurnOneSlot(sorter, Sorter.CCW_DIRECTION)
         );
+//        addCommands(
+//            new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING),
+//
+//            new RepeatCommand(
+//                        new SequentialCommandGroup(
+//                                new WaitUntilCommand(launcher::isReadyToLaunch),
+//                                new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
+//                                new WaitUntilCommand(sorter::isAtSetPoint),
+//                                new WaitCommand(recoveryMs),
+//                                new InstantCommand(() -> loopCount[0]++) // increment counter
+//                        )
+//            ).interruptOn(() -> loopCount[0] >= 3) // stop after 3 loops
+//        );
     }
 
 }

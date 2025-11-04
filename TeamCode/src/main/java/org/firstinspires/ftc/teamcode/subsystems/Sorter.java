@@ -1,13 +1,15 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 import static org.firstinspires.ftc.teamcode.util.BallColor.GREEN;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.Subsystem;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
@@ -34,20 +36,18 @@ import java.util.Arrays;
 @Config
 public class Sorter implements Subsystem {
     public static class Params {
-        public double kp = 0.0001;
-        public double ki = 0.00001;
-        public double kd = 0.00;
+        public double kp = 0.00015;
+        public double ki = 0.0;
+        public double kd = 0.0;
     }
     // === Tuning constants (adjust on-robot) ===
-    public static final int CCW_DIRECTION = -1;   // CCW is negative
-    public static final int CW_DIRECTION = 1;     // CW is positive
-    public static final long STEP_MS = 200;      // time to advance exactly one slot (ms)
+    public static final int CCW_DIRECTION = 1;   // CCW is negative
+    public static final int CW_DIRECTION = -1;     // CW is positive
     public static final int SLOT_COUNT = 3;      // number of slots on the sorter
 
-    private final CRServo sorterRotate;
     private final RevColorSensorV3 colorSensorV3;
     private final DigitalChannel magneticSensor;
-    private final MotorEx encoder;
+    private final MotorEx sorter;
 
     private int currentIndex;
     private BallColor[] slots = new BallColor[SLOT_COUNT];
@@ -55,10 +55,11 @@ public class Sorter implements Subsystem {
 
     //TODO find these values once the encoder is attached
     public final int TICKS_PER_THIRD_OF_TURN = 8231 / 3;
-    private final int PID_TOLERANCE_IN_TICKS = 120;
+    private final int PID_TOLERANCE_IN_TICKS = 50;
     private final int INDEX_TOLERANCE_IN_TICKS = TICKS_PER_THIRD_OF_TURN / 2;
 
     public static Params PARAMS = new Params();
+
     public final PIDController pidController = new PIDController(PARAMS.kp, PARAMS.ki, PARAMS.kd);
 
     private double turnPos = 0;
@@ -71,19 +72,18 @@ public class Sorter implements Subsystem {
      * @param hm           The HardwareMap used for device lookup
      */
     public Sorter(HardwareMap hm) {
-        this.sorterRotate = hm.get(CRServo.class, "sorter");
-
-        sorterRotate.setPower(0);
-
         // === Initialize color sensor ===
         colorSensorV3 = hm.get(RevColorSensorV3.class, "colorSensor");
         colorSensorV3.setGain(2); // Gain range 1–60 depending on ambient light
         setLed(true);
 
-        encoder = new MotorEx(hm, "encoder");
-        encoder.resetEncoder();
+        sorter = new MotorEx(hm, "sorter");
+        sorter.stopAndResetEncoder();
+        sorter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        sorter.setInverted(false);
 
         pidController.setTolerance(PID_TOLERANCE_IN_TICKS);
+        pidController.reset();
 
         // === Initialize magnetic sensor ===
         magneticSensor = hm.get(DigitalChannel.class, "magSensor");
@@ -108,10 +108,10 @@ public class Sorter implements Subsystem {
     public void setSlotCurrent(BallColor color) { slots[currentIndex] = color; }
 
     /** @return current power level applied to the sorting servo */
-    public double getPower() { return sorterRotate.getPower(); }
+    public double getPower() { return sorter.get(); }
 
     /** Sets the servo rotation power. */
-    public void setPower(double power) { sorterRotate.setPower(power); }
+    public void setPower(double power) { sorter.set(power); }
 
     /** Updates the current index (wrapped automatically). */
     public void setCurrentIndex(int index) { currentIndex = wrapIndex(index); }
@@ -119,8 +119,9 @@ public class Sorter implements Subsystem {
     /** Sets the slot array. */
     public void setSlots(BallColor[] newSlots) { slots = newSlots; }
 
-    public double getCurrentPos() {return encoder.getCurrentPosition();}
-    public void resetCurrentPos() {encoder.resetEncoder();}
+    public double getCurrentPos() {return sorter.getCurrentPosition();}
+    public void resetCurrentPos() {
+        sorter.resetEncoder();}
 
     public double getTurnPos () {return turnPos;}
     public void setTurnPos (double turnPos) {this.turnPos = turnPos;}
@@ -128,11 +129,11 @@ public class Sorter implements Subsystem {
     public void setTurnPosWithOffset (double offset) {this.turnPos += offset;}
 
     public boolean isAtSetPoint () {
-        return Math.abs(Math.abs(getCurrentPos()) - Math.abs(turnPos)) <= PID_TOLERANCE_IN_TICKS;
+        return Math.abs(Math.abs(getCurrentPos()) - Math.abs(turnPos)) <= INDEX_TOLERANCE_IN_TICKS;
     }
 
     public int getIndex () {
-        double pos = encoder.getCurrentPosition();
+        double pos = sorter.getCurrentPosition();
         double ticksPerSlot = TICKS_PER_THIRD_OF_TURN;
 
         // Compute fractional slot position
@@ -158,13 +159,15 @@ public class Sorter implements Subsystem {
     }
 
     public void turnOneSlotDirection (int direction) {
-        int offset = 0;
-        if (direction > 0) {
-            offset = TICKS_PER_THIRD_OF_TURN;
-        } else if (direction < 0) {
-            offset = -TICKS_PER_THIRD_OF_TURN;
-        }
-        setTurnPosWithOffset(offset);
+        // Only move if direction is non-zero
+        if (direction == 0) return;
+
+        // Determine new target position
+        int offset = (int) (Math.signum(direction) * TICKS_PER_THIRD_OF_TURN);
+        double newTarget = getTurnPos() + offset;
+
+        // Update our internal goal
+        setTurnPos(newTarget);
     }
 
     /**
@@ -185,32 +188,33 @@ public class Sorter implements Subsystem {
         return -1;
     }
 
-    public int findStartIndex (BallColor[] pattern, BallColor[] stored) {
-        if (Arrays.equals(pattern, stored)) {
-            return 0;
+    public int findStartOffset(BallColor[] pattern, BallColor[] stored) {
+        if (pattern == null || stored == null) return 0;
+        int n = 3;
+
+        // Compare pattern to each possible rotation of stored
+        boolean match0 = true, matchForward = true, matchBackward = true;
+        int ci = currentIndex;
+        for (int i = 0; i < n; i++) {
+            // no rotation
+            if (pattern[i] != stored[(i + ci) % n]) match0 = false;
+            // rotated forward (+1)
+            if (pattern[i] != stored[(i + ci + 1) % n]) matchForward = false;
+            // rotated backward (-1)
+            if (pattern[i] != stored[(i + ci - 1 + n) % n]) matchBackward = false;
         }
 
-        int patternsGreen = 0;
-        int storedGreen = 0;
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Match0", match0);
+        packet.put("MatchForward", matchForward);
+        packet.put("MatchBackward", matchBackward);
+        dashboard.sendTelemetryPacket(packet);
 
-        for (int i = 0; i < pattern.length; i++) {
-            if (pattern[i] == GREEN) {
-                patternsGreen = i;
-            }
-            if (stored[i] == GREEN) {
-                storedGreen = i;
-            }
-        }
+        if (match0) return 0;
+        if (matchForward) return CCW_DIRECTION;
+        if (matchBackward) return CW_DIRECTION;
 
-        int offset = 0;
-
-        if (patternsGreen == 2) {
-            offset = 1;
-        } else if (patternsGreen == 1) {
-            offset = -1;
-        }
-
-        return wrapIndex(storedGreen + offset);
+        return 0; // default if nothing matches
     }
 
     /**
@@ -262,7 +266,7 @@ public class Sorter implements Subsystem {
         double bNorm = b / total;
 
         // --- GREEN detection: strong green dominance ---
-        if (gNorm > rNorm * 3 && gNorm > bNorm * 1.32) {
+        if (gNorm > rNorm * 3 && gNorm > bNorm * 1.2) {
             return GREEN;
         }
 
@@ -315,44 +319,34 @@ public class Sorter implements Subsystem {
     private void writeData () {
         tele.addData("ServoPower", getPower());
         tele.addData("Sorter Index", getCurrentIndex());
-        tele.addData("Sorter pos", getCurrentPos());
-        tele.addData("Turn pos", getTurnPos());
-        tele.addData("LED Enabled", isLedEnabled());
+        tele.addData("Detected Color", detectBallColor());
+//        tele.addData("Sorter pos", getCurrentPos());
+//        tele.addData("Turn pos", getTurnPos());
+//        tele.addData("LED Enabled", isLedEnabled());
         tele.addData("Color Sensor (R,G,B)", "%d, %d, %d",
                 colorSensorV3.red(), colorSensorV3.green(), colorSensorV3.blue());
-        tele.addData("Slots", Arrays.toString(getSlots()));
+        tele.addData("Slots", Arrays.toString(RobotState.getInstance().getBallColors()));
         tele.addData("Pattern", Arrays.toString(RobotState.getInstance().getPattern()));
-        tele.addData("Detected Color", detectBallColor());
-        tele.addData("Mag Sensor Triggered", isMagnetTriggered());
+        tele.addData("StartOffset", findStartOffset(RobotState.getInstance().getPattern(), RobotState.getInstance().getBallColors()));
+//        tele.addData("Mag Sensor Triggered", isMagnetTriggered());
     }
 
     // === Periodic Telemetry ===
     @Override
     public void periodic() {
-//        if (isMagnetTriggered() && isAtSetPoint() && getCurrentPos() != 0) {
-//            resetCurrentPos();
-//            setTurnPos(0);
-//            pidController.reset();
-//            sorterRotate.setPower(0);
-//        }
-
         if (isAtSetPoint() && getCurrentIndex() != getIndex()) {
             setCurrentIndex(getIndex());
         }
+        double output = pidController.calculate(sorter.getCurrentPosition(), turnPos);
 
-        if (detectBallColor() != getCurrentColor() && isAtSetPoint()) {
+        if (detectBallColor() != getCurrentColor() && isAtSetPoint() && Math.abs(output) < .1) {
             setSlotCurrent(detectBallColor());
         }
 
         RobotState.getInstance().setBallColors(slots);
 
         if (enabledPid) {
-            if (isAtSetPoint()) {
-                sorterRotate.setPower(0);
-            } else {
-                double output = pidController.calculate(encoder.getCurrentPosition(), turnPos);
-                sorterRotate.setPower(output);
-            }
+            sorter.set(-output);
         }
 
         writeData();

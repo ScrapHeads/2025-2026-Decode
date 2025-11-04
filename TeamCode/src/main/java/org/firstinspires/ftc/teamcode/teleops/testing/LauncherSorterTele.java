@@ -23,8 +23,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
+import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
+
+import java.util.Arrays;
 
 @Disabled
 @TeleOp(name = "LauncherSorterTele", group = "ScrapHeads")
@@ -56,10 +59,8 @@ public class LauncherSorterTele extends CommandOpMode {
         // Bind controls
         assignControls();
 
-        tele.addLine("LauncherOnly initialized. A=Spin 5000 | B=Stop");
         tele.addData("What index for sorter: ", sorter.getCurrentIndex());
-        tele.addData("What index for sorter: ", sorter.getCurrentColor());
-        tele.addData("Is colored ball: ", sorter.getCurrentColor().isBall());
+        tele.addData("Color for sorter: ", Arrays.toString(RobotState.getInstance().getBallColors()));
         tele.update();
     }
 
@@ -73,7 +74,7 @@ public class LauncherSorterTele extends CommandOpMode {
                 .whenPressed(new StopFlywheel(launcher));
 
         driver.getGamepadButton(X)
-                .whenPressed(shootAllLoaded(launcher, sorter, Sorter.STEP_MS));
+                .whenPressed(shootAllLoaded(launcher, sorter, 300));
     }
 
     public static Command shootAllLoaded(LauncherBall launcher, Sorter sorter, long recoveryMs) {

@@ -38,9 +38,9 @@ public class IntakeSorter extends CommandBase {
     public void execute() {
         if (sorter.detectBallColor() != BallColor.EMPTY &&
                 RobotState.getInstance().getBallColors()[sorter.getCurrentIndex()] != BallColor.EMPTY) {
-//            if (sorter.isAtSetPoint()) {
+            if (sorter.isAtSetPoint()) {
                 sorter.turnOneSlotDirection(Sorter.CW_DIRECTION);
-//            }
+            }
         }
     }
 

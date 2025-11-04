@@ -15,11 +15,13 @@ import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorter;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
+import org.firstinspires.ftc.teamcode.Commands.launcher.ShootAllLoaded;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
@@ -84,7 +86,7 @@ public class BlueAutoFar extends CommandOpMode {
         sorter = new Sorter(hm);
         sorter.register();
 
-        vision = new Vision(hm, drivetrain);
+        vision = new Vision(hm);
         vision.register();
 
         // Custom constraints for some moves
@@ -104,24 +106,26 @@ public class BlueAutoFar extends CommandOpMode {
                 ),
                 new SetFlywheelRpm(launcher, 4400),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
-                new SortedLuanch(launcher, sorter, holdControl, 300),
-                new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER).raceWith(
-                        new SequentialCommandGroup(
-                                new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
-                                new DynamicStrafeCommand(drivetrain, () -> path.get(4))
-                        )
+//                new SortedLuanch(launcher, sorter, holdControl),
+                new ShootAllLoaded(launcher, sorter, holdControl),
+                new WaitUntilCommand(sorter::isAtSetPoint),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
+                new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER)
+                        .raceWith(
+                                new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
+                                new DynamicStrafeCommand(drivetrain, () -> path.get(5))
                 ),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
-                new SortedLuanch(launcher, sorter, holdControl, 300),
-                new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER).raceWith(
-                        new SequentialCommandGroup(
-                                new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
-                                new DynamicStrafeCommand(drivetrain, () -> path.get(8))
-                        )
+//                new SortedLuanch(launcher, sorter, holdControl),
+                new ShootAllLoaded(launcher, sorter, holdControl),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
+                new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER)
+                        .raceWith(
+                                new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
+                                new DynamicStrafeCommand(drivetrain, () -> path.get(9))
                 ),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
-                new SortedLuanch(launcher, sorter, holdControl, 300),
+//                new SortedLuanch(launcher, sorter, holdControl),
+                new ShootAllLoaded(launcher, sorter, holdControl),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(10))
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(11))
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(11))

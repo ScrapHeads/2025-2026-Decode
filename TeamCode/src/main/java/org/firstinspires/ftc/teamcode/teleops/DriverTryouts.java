@@ -180,7 +180,7 @@ public class DriverTryouts extends CommandOpMode {
     }
 
     public static Command shootPattern (LauncherBall launcher, Sorter sorter, long recoveryMs) {
-        int startSlot = sorter.findStartIndex(
+        int startSlot = sorter.findStartOffset(
                 RobotState.getInstance().getPattern(),
                 RobotState.getInstance().getBallColors() );
 

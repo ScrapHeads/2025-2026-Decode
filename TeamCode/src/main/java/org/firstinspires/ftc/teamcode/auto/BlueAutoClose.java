@@ -81,7 +81,7 @@ public class BlueAutoClose extends CommandOpMode {
         sorter = new Sorter(hm);
         sorter.register();
 
-        vision = new Vision(hm, drivetrain);
+        vision = new Vision(hm);
         vision.register();
 
         // Custom constraints for some moves
@@ -101,7 +101,7 @@ public class BlueAutoClose extends CommandOpMode {
                 ),
                 new SetFlywheelRpm(launcher, 4400),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
-                new SortedLuanch(launcher, sorter, holdControl, 300),
+                new SortedLuanch(launcher, sorter, holdControl),
                 new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER).raceWith(
                         new SequentialCommandGroup(
                                 new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
@@ -109,7 +109,7 @@ public class BlueAutoClose extends CommandOpMode {
                         )
                 ),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
-                new SortedLuanch(launcher, sorter, holdControl, 300),
+                new SortedLuanch(launcher, sorter, holdControl),
                 new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER).raceWith(
                         new SequentialCommandGroup(
                                 new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
@@ -117,7 +117,7 @@ public class BlueAutoClose extends CommandOpMode {
                         )
                 ),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
-                new SortedLuanch(launcher, sorter, holdControl, 300),
+                new SortedLuanch(launcher, sorter, holdControl),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(9))
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(10))
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(11))

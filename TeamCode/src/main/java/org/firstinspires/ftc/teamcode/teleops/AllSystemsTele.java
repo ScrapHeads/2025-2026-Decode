@@ -3,29 +3,25 @@ package org.firstinspires.ftc.teamcode.teleops;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.ConditionalCommand;
-import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
-import com.arcrobotics.ftclib.command.WaitUntilCommand;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Commands.HoldControlCommand;
+import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorter;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunIntakeCommand;
@@ -34,6 +30,7 @@ import org.firstinspires.ftc.teamcode.Commands.launcher.ShootAllLoaded;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
+import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
@@ -43,7 +40,10 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
+import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.util.BallColor;
+
+import java.util.Arrays;
 
 @TeleOp(name = "AllSystemsTele", group = "ScrapHeads")
 public class AllSystemsTele extends CommandOpMode {
@@ -58,6 +58,7 @@ public class AllSystemsTele extends CommandOpMode {
     private HoldControl holdControl;
     private Intake intake;
     private LauncherHood hood;
+    private Vision vision;
 
     @Override
     public void initialize() {
@@ -96,13 +97,14 @@ public class AllSystemsTele extends CommandOpMode {
         hood = new LauncherHood(hm);
         hood.register();
 
+        vision = new Vision(hm);
+        vision.register();
+
         // Bind controls
         assignControls();
 
-        tele.addLine("LauncherOnly initialized. A=Spin 5000 | B=Stop");
-        tele.addData("What index for sorter", sorter.getCurrentIndex());
-        tele.addData("What index for sorter", sorter.getCurrentColor());
-        tele.addData("Is colored ball", sorter.getCurrentColor().isBall());
+        tele.addData("What index for sorter: ", sorter.getCurrentIndex());
+        tele.addData("Color for sorter: ", Arrays.toString(RobotState.getInstance().getBallColors()));
         tele.update();
     }
 
@@ -125,16 +127,19 @@ public class AllSystemsTele extends CommandOpMode {
 //                .whenActive(new StopFlywheel(launcher));
 
         driver.getGamepadButton(RIGHT_BUMPER)
-                .whenPressed(new TurnOneSlot(sorter, sorter.TICKS_PER_THIRD_OF_TURN));
+                .whenPressed(new TurnOneSlot(sorter, Sorter.CCW_DIRECTION));
 
         driver.getGamepadButton(LEFT_BUMPER)
-                .whenPressed(new TurnOneSlot(sorter, -sorter.TICKS_PER_THIRD_OF_TURN));
+                .whenPressed(new TurnOneSlot(sorter, Sorter.CW_DIRECTION));
 
         driver.getGamepadButton(A)
-                .whenPressed(new ShootAllLoaded(launcher, sorter, holdControl, 200));
+                .whenPressed(new ShootAllLoaded(launcher, sorter, holdControl));
 
         driver.getGamepadButton(B)
-                .whenPressed(new SortedLuanch(launcher, sorter, holdControl, 200));
+                .whenPressed(new SortedLuanch(launcher, sorter, holdControl));
+
+        driver.getGamepadButton(X)
+                        .whenPressed(new GetTagPattern(vision));
 
 //        driver.getGamepadButton(A)
 //                        .whenPressed(new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING));
@@ -143,8 +148,17 @@ public class AllSystemsTele extends CommandOpMode {
 //                .whenPressed(new HoldControlCommand(holdControl, HoldControl.HoldPosition.TRANSPORT));
 
         driver.getGamepadButton(DPAD_UP)
-                .whenPressed(new SetFlywheelRpm(launcher, 4400));
-//                .whenPressed(new HoldControlCommand(holdControl, LAUNCHING));
+                .whenPressed(new ParallelCommandGroup(
+                        new SetFlywheelRpm(launcher, 4450),
+                        new SetHoodAngleCommand(hood, LauncherHood.HIGH_SHOOT_ANGLE)
+                ))
+                        ;
+
+        driver.getGamepadButton(DPAD_LEFT)
+                        .whenPressed(new ParallelCommandGroup(
+                                new SetFlywheelRpm(launcher, 2800),
+                                new SetHoodAngleCommand(hood, LauncherHood.LOW_SHOOT_ANGLE)
+                        ));
 
         driver.getGamepadButton(DPAD_DOWN)
                 .whenPressed(new StopFlywheel(launcher));
