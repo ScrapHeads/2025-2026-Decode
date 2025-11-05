@@ -24,6 +24,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorter;
+import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.ShootAllLoaded;
@@ -114,7 +115,7 @@ public class AllSystemsTele extends CommandOpMode {
 
         // A: spin up and hold 6000 RPM (command ends only when launcher.disable() is called)
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
-                .whenActive(new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER))
+                .whenActive(new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER))
                 .whenInactive(new RunIntakeCommand(intake, 0));
 //                .whenActive(new SetPowerLauncher(launcher, 1));
 
@@ -156,7 +157,7 @@ public class AllSystemsTele extends CommandOpMode {
 
         driver.getGamepadButton(DPAD_LEFT)
                         .whenPressed(new ParallelCommandGroup(
-                                new SetFlywheelRpm(launcher, 2800),
+                                new SetFlywheelRpm(launcher, 3000),
                                 new SetHoodAngleCommand(hood, LauncherHood.LOW_SHOOT_ANGLE)
                         ));
 

@@ -14,12 +14,15 @@ import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.ParallelDeadlineGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
+import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorter;
+import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.ShootAllLoaded;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
@@ -96,6 +99,13 @@ public class BlueAutoFar extends CommandOpMode {
                 new AngularVelConstraint(Math.PI)));
         AccelConstraint accelConstraintFast = new ProfileAccelConstraint(-40, 80);
 
+        TurnConstraints turnConstraintsPickUp = new TurnConstraints(4, -1, 4);
+        VelConstraint velConstraintPickUp = new MinVelConstraint(Arrays.asList(
+                drivetrain.kinematics.new WheelVelConstraint(15),
+                new AngularVelConstraint(Math.PI)));
+        AccelConstraint accelConstraintPickUp = new ProfileAccelConstraint(-20, 40);
+
+
         // Wait to start the auto path till the play button is pressed
         waitForStart();
 
@@ -104,28 +114,39 @@ public class BlueAutoFar extends CommandOpMode {
                 new GetTagPattern(vision).raceWith(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(1))
                 ),
-                new SetFlywheelRpm(launcher, 4400),
+                new SetFlywheelRpm(launcher, 4450),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
-//                new SortedLuanch(launcher, sorter, holdControl),
-                new ShootAllLoaded(launcher, sorter, holdControl),
-                new WaitUntilCommand(sorter::isAtSetPoint),
+                new SortedLuanch(launcher, sorter, holdControl),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
-                new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER)
-                        .raceWith(
-                                new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
-                                new DynamicStrafeCommand(drivetrain, () -> path.get(5))
+
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(4),
+                                turnConstraintsPickUp, velConstraintPickUp, accelConstraintPickUp),
+                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
+                ),
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
+                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
+                ),
+                new ParallelCommandGroup(
+                        new SetFlywheelRpm(launcher, 3400)
                 ),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
-//                new SortedLuanch(launcher, sorter, holdControl),
-                new ShootAllLoaded(launcher, sorter, holdControl),
+                new SortedLuanch(launcher, sorter, holdControl),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
-                new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER)
-                        .raceWith(
-                                new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
-                                new DynamicStrafeCommand(drivetrain, () -> path.get(9))
+
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(8),
+                                turnConstraintsPickUp, velConstraintPickUp, accelConstraintPickUp),
+                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
                 ),
-//                new SortedLuanch(launcher, sorter, holdControl),
-                new ShootAllLoaded(launcher, sorter, holdControl),
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
+                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
+                ),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
+
+                new SortedLuanch(launcher, sorter, holdControl),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(10))
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(11))
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(11))

@@ -7,6 +7,8 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 
+import java.util.function.Supplier;
+
 /**
  * Command to rotate the sorter exactly one slot using the magnetic sensor
  * for precise rotation detection rather than a fixed timer.
@@ -17,7 +19,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Sorter;
  */
 public class TurnOneSlot extends CommandBase {
     private final Sorter sorter;
-    private final int direction;
+    private int direction;
+    private Supplier<Integer> directionSupplier;
 
     /**
      * @param sorter the sorter subsystem
@@ -30,8 +33,18 @@ public class TurnOneSlot extends CommandBase {
         addRequirements(sorter);
     }
 
+    public TurnOneSlot(Sorter sorter, Supplier<Integer> directionSupplier) {
+        this.sorter = sorter;
+        this.directionSupplier = directionSupplier;
+
+        addRequirements(sorter);
+    }
+
     @Override
-    public void initialize() { sorter.turnOneSlotDirection(direction); }
+    public void initialize() {
+        int dir = (directionSupplier != null) ? directionSupplier.get() : direction;
+        sorter.turnOneSlotDirection(dir);
+    }
 
     @Override
     public void execute() { }

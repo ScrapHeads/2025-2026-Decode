@@ -13,7 +13,9 @@ import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.ParallelDeadlineGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorter;
@@ -37,6 +39,7 @@ import org.firstinspires.ftc.teamcode.util.BallColor;
 import java.util.Arrays;
 import java.util.List;
 
+@Autonomous(name = "BlueAutoClose", group = "ScrapHeads")
 public class BlueAutoClose extends CommandOpMode {
 
     private Drivetrain drivetrain;
@@ -99,23 +102,32 @@ public class BlueAutoClose extends CommandOpMode {
                 new GetTagPattern(vision).raceWith(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(1))
                 ),
-                new SetFlywheelRpm(launcher, 4400),
+                new SetFlywheelRpm(launcher, 3400),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
                 new SortedLuanch(launcher, sorter, holdControl),
-                new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER).raceWith(
-                        new SequentialCommandGroup(
-                                new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
-                                new DynamicStrafeCommand(drivetrain, () -> path.get(4))
-                        )
+
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
+                        new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER)
                 ),
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
+                        new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER)
+                ),
+
                 new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
                 new SortedLuanch(launcher, sorter, holdControl),
-                new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER).raceWith(
-                        new SequentialCommandGroup(
-                                new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
-                                new DynamicStrafeCommand(drivetrain, () -> path.get(7))
-                        )
+                new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
+
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
+                        new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER)
                 ),
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
+                        new IntakeSorter(intake, sorter, holdControl, Intake.INTAKE_POWER)
+                ),
+
                 new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
                 new SortedLuanch(launcher, sorter, holdControl),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(9))
