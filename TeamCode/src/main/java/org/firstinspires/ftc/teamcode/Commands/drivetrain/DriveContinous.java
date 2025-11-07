@@ -49,6 +49,14 @@ public class DriveContinous extends CommandBase {
         yLimiter = new SlewRateLimiter(10, TimeTracker.getTime());
         rotLimiter = new SlewRateLimiter(10, TimeTracker.getTime());
 
+        if (RobotState.getInstance().getTeam()) {
+            // Blue team: field forward at -90 degrees
+            RobotState.getInstance().setHeadingOffset(Rotation2d.fromDegrees(-90));
+        } else {
+            // Red team: field forward at +90 degrees
+            RobotState.getInstance().setHeadingOffset(Rotation2d.fromDegrees(90));
+        }
+
         addRequirements(drivetrain);
     }
 
@@ -61,8 +69,22 @@ public class DriveContinous extends CommandBase {
         double ySpeed = yLimiter.calculate(-driver.getLeftX(), TimeTracker.getTime()) * speed;
         double rotSpeed = rotLimiter.calculate(-driver.getRightX(), TimeTracker.getTime()) * speed;
 
-        Rotation2d rot = RobotState.getInstance().getOdometryPose().getRotation();
-        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, rot);
+        // Get raw gyro heading (rotation from odometry or IMU)
+        Rotation2d rawHeading = RobotState.getInstance().getOdometryPose().getRotation();
+
+        // Apply heading offset
+        Rotation2d correctedHeading = rawHeading.minus(RobotState.getInstance().getHeadingOffset());
+
+        // Field-centric transform using corrected heading
+        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                xSpeed, ySpeed, rotSpeed, correctedHeading);
+
+//        double xSpeed = xLimiter.calculate(driver.getLeftY(), TimeTracker.getTime()) * speed;
+//        double ySpeed = yLimiter.calculate(-driver.getLeftX(), TimeTracker.getTime()) * speed;
+//        double rotSpeed = rotLimiter.calculate(-driver.getRightX(), TimeTracker.getTime()) * speed;
+//
+//        Rotation2d rot = RobotState.getInstance().getOdometryPose().getRotation();
+//        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, rot);
 
         drivetrain.setDrivePowers(robotSpeeds);
     }

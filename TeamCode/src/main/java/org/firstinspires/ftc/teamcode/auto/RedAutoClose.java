@@ -5,8 +5,6 @@ import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.intakePowerOffset;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
-import static org.firstinspires.ftc.teamcode.util.BallColor.GREEN;
-import static org.firstinspires.ftc.teamcode.util.BallColor.PURPLE;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.AccelConstraint;
@@ -16,7 +14,6 @@ import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.ParallelDeadlineGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -25,7 +22,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
 import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
-import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorter;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.ShootAllLoaded;
@@ -35,6 +31,7 @@ import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.auto.paths.blueAutoClose;
+import org.firstinspires.ftc.teamcode.auto.paths.redAutoClose;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
@@ -49,8 +46,8 @@ import org.firstinspires.ftc.teamcode.util.BallColor;
 import java.util.Arrays;
 import java.util.List;
 
-@Autonomous(name = "BlueAutoClose", group = "ScrapHeads")
-public class BlueAutoClose extends CommandOpMode {
+@Autonomous(name = "RedAutoClose", group = "ScrapHeads")
+public class RedAutoClose extends CommandOpMode {
 
     private Drivetrain drivetrain;
 
@@ -61,9 +58,9 @@ public class BlueAutoClose extends CommandOpMode {
     private Sorter sorter;
     private Vision vision;
 
-    public boolean isBlue = true;
+    public boolean isBlue = false;
 
-    public static final List<Pose2d> path = blueAutoClose.PATH;
+    public static final List<Pose2d> path = redAutoClose.PATH;
 
     public BallColor[] ballColors = new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN};
 
@@ -140,6 +137,7 @@ public class BlueAutoClose extends CommandOpMode {
                 ),
 
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
+//                new InstantCommand(() -> RobotState.getInstance().setBallColors(new BallColor[] {GREEN, PURPLE, PURPLE})),
                 new SortedLuanch(launcher, sorter, holdControl),
                 new WaitCommand(150),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(3), 5, 5, 5),
@@ -158,7 +156,7 @@ public class BlueAutoClose extends CommandOpMode {
 
                 new ParallelCommandGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(8)
-                            ,turnConstraintsFast, velConstraintFast, accelConstraintFast),
+                                ,turnConstraintsFast, velConstraintFast, accelConstraintFast),
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset).withTimeout(1000)
                                 .andThen(new TurnToLaunchPattern(sorter))
                 ),

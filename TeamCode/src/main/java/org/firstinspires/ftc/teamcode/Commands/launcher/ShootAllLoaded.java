@@ -24,11 +24,11 @@ public class ShootAllLoaded extends SequentialCommandGroup {
 
         addCommands(
                 new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING),
-                new WaitCommand(200),
-                new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
-                new WaitCommand(200),
-                new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitCommand(300),
+                new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
+                new WaitCommand(400),
+                new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
+                new WaitCommand(500),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint)
         );

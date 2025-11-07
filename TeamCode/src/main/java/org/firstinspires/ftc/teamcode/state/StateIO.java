@@ -46,12 +46,19 @@ public class StateIO {
     public static void save() {
         try {
             File file = getFile();
-            String json = GSON.toJson(RobotState.getInstance());
 
+//            if (!file.exists()) {
+//                file.getParentFile().mkdirs();  // ensure directory exists
+//                file.createNewFile();
+//            }
+
+            tele.addLine("Found file and saved it");
+
+            String json = GSON.toJson(RobotState.getInstance());
             ReadWriteFile.writeFile(file, json);
 
         } catch (Exception e) {
-            tele.addLine("save failed");
+            tele.addLine("StateIO save failed: " + e.getMessage());
             tele.update();
         }
     }
@@ -67,11 +74,15 @@ public class StateIO {
             File file = getFile();
             if (file == null || !file.exists()) return;
 
+            tele.addData("File path", file.getAbsoluteFile());
+
             String json = ReadWriteFile.readFile(file);
             if (json == null || json.isEmpty()) return;
 
             // Create a temp container to transfer data
             RobotState.getInstance().setAll(GSON.fromJson(json, RobotState.class));
+
+            clear();
 
         } catch (Exception e) {
             // Possibly add a mock RobotState file update
@@ -83,7 +94,6 @@ public class StateIO {
             );
 
             tele.addLine("Failed to load");
-            tele.update();
         }
     }
 

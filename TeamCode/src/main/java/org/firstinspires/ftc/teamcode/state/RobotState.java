@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.state;
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Matrix;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N1;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Numbers.N3;
@@ -25,6 +26,8 @@ public class RobotState {
     private int version = 1;
 
     private PoseEstimator poseEstimator = null;
+
+    private Rotation2d headingOffset = new Rotation2d();
 
     private Lock poseLock = new ReentrantLock();
 
@@ -132,6 +135,14 @@ public class RobotState {
         poseEstimator.addVisionMeasurement(visionPose, time, visionStdDevs);
 
         poseLock.unlock();
+    }
+
+    public void setHeadingOffset(Rotation2d offset) {
+        headingOffset = offset;
+    }
+
+    public Rotation2d getHeadingOffset() {
+        return headingOffset;
     }
 
     public void setChassisSpeeds (ChassisSpeeds chassisSpeeds) {this.chassisSpeeds = chassisSpeeds;}

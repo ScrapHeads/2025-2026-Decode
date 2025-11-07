@@ -68,13 +68,14 @@ public class AllSystemsTele extends CommandOpMode {
         tele = telemetry;
         dashboard = FtcDashboard.getInstance();
 
+        StateIO.load();
+
         // Initialize the subsystems declared at the top of the code
-        drivetrain = new Drivetrain(hm, new Pose2d());
+        drivetrain = new Drivetrain(hm, RobotState.getInstance().getOdometryPose());
         drivetrain.register();
 
-        StateIO.load();
-        //TODO REMOVE WHEN DOING DRIVE PRACTICE
-        RobotState.getInstance().setPattern(new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN});
+        //TODO Comment out WHEN DOING Matches
+//        RobotState.getInstance().setPattern(new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN});
 
         // Gamepad
         driver = new GamepadEx(gamepad1);
@@ -106,6 +107,8 @@ public class AllSystemsTele extends CommandOpMode {
 
         tele.addData("What index for sorter: ", sorter.getCurrentIndex());
         tele.addData("Color for sorter: ", Arrays.toString(RobotState.getInstance().getBallColors()));
+        tele.addData("Team isBlue", RobotState.getInstance().getTeam());
+        tele.addData("Heading offset", RobotState.getInstance().getHeadingOffset());
         tele.update();
     }
 

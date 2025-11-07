@@ -36,7 +36,7 @@ import java.util.Arrays;
 @Config
 public class Sorter implements Subsystem {
     public static class Params {
-        public double kp = 0.00015;
+        public double kp = 0.00017;
         public double ki = 0.0;
         public double kd = 0.0;
     }

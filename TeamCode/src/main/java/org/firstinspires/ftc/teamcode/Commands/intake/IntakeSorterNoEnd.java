@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.Commands.intake;
 
+import static org.firstinspires.ftc.teamcode.Constants.dashboard;
+import static org.firstinspires.ftc.teamcode.Constants.tele;
+import static org.firstinspires.ftc.teamcode.subsystems.HoldControl.HoldPosition.LOADING;
+import static org.firstinspires.ftc.teamcode.subsystems.HoldControl.HoldPosition.TRANSPORT;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.state.RobotState;
@@ -34,12 +40,26 @@ public class IntakeSorterNoEnd extends CommandBase {
 
     @Override
     public void execute() {
-        if (sorter.detectBallColor() != BallColor.EMPTY &&
-                RobotState.getInstance().getBallColors()[sorter.getCurrentIndex()] != BallColor.EMPTY) {
-            if (sorter.isAtSetPoint()) {
-                sorter.turnOneSlotDirection(Sorter.CW_DIRECTION);
-            }
+        if (holdControl.getCurrentPosition() == TRANSPORT && sorter.isAtSetPoint()) {
+            holdControl.moveTo(LOADING);
         }
+
+        BallColor detected = sorter.detectBallColor();
+
+        boolean isAtSetPoint = Math.abs(Math.abs(sorter.getCurrentPos()) - Math.abs(sorter.getTurnPos())) <= 800;
+
+        if (detected != BallColor.EMPTY && isAtSetPoint) {
+            holdControl.moveTo(TRANSPORT);
+            sorter.turnOneSlotDirection(Sorter.CW_DIRECTION);
+        }
+//        if (sorter.detectBallColor() != BallColor.EMPTY
+//                &&
+//                RobotState.getInstance().getBallColors()[sorter.getCurrentIndex()] != BallColor.EMPTY
+//        ) {
+//            if (sorter.isAtSetPoint()) {
+//                sorter.turnOneSlotDirection(Sorter.CW_DIRECTION);
+//            }
+//        }
     }
 
     @Override
@@ -51,6 +71,6 @@ public class IntakeSorterNoEnd extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         intake.setPower(0);
-        holdControl.moveTo(HoldControl.HoldPosition.TRANSPORT);
+        holdControl.moveTo(TRANSPORT);
     }
 }

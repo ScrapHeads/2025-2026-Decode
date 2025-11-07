@@ -20,6 +20,8 @@ public class Constants {
     public static Telemetry tele;
     public static FtcDashboard dashboard;
 
+    public static double intakePowerOffset = .25;
+
     // --------------------------
     // Vision system toggles
     // --------------------------

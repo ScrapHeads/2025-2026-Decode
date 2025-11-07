@@ -111,7 +111,7 @@ public class BlueAutoFar extends CommandOpMode {
 
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
-                new GetTagPattern(vision).raceWith(
+                new GetTagPattern(vision) .raceWith(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(1))
                 ),
                 new SetFlywheelRpm(launcher, 4450),
