@@ -49,7 +49,7 @@ public class DriveContinous extends CommandBase {
         yLimiter = new SlewRateLimiter(10, TimeTracker.getTime());
         rotLimiter = new SlewRateLimiter(10, TimeTracker.getTime());
 
-        if (RobotState.getInstance().getTeam()) {
+        if (RobotState.getInstance().getTeam() != null && RobotState.getInstance().getTeam()) {
             // Blue team: field forward at -90 degrees
             RobotState.getInstance().setHeadingOffset(Rotation2d.fromDegrees(-90));
         } else {
