@@ -136,29 +136,28 @@ public class BlueAutoClose extends CommandOpMode {
                 ),
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER )
+                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER).withTimeout(1000)
                 ),
 
-//                new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
                 new SortedLuanch(launcher, sorter, holdControl),
                 new WaitCommand(150),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(3), 5, 5, 5),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(6), 5, 5, 5),
 
-                new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
 
                 new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(7),
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(8),
                                 turnConstraintsPickUp, velConstraintPickUp, accelConstraintPickUp),
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
                 new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
 
                 new ParallelCommandGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(8)
-                            ,turnConstraintsFast, velConstraintFast, accelConstraintFast),
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(10)
+                                ,turnConstraintsFast, velConstraintFast, accelConstraintFast),
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset).withTimeout(1000)
                                 .andThen(new TurnToLaunchPattern(sorter))
                 ),
@@ -166,7 +165,7 @@ public class BlueAutoClose extends CommandOpMode {
                 new WaitCommand(50),
                 new ShootAllLoaded(launcher, sorter, holdControl),
                 new WaitCommand(50),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(9),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(11),
                         turnConstraintsFast, velConstraintFast, accelConstraintFast)
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(10))
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(11))

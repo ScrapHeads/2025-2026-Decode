@@ -72,12 +72,12 @@ public class StateIO {
     public static void load() {
         try {
             File file = getFile();
-            if (file == null || !file.exists()) return;
+            if (file == null || !file.exists()) throw new Exception();
 
             tele.addData("File path", file.getAbsoluteFile());
 
             String json = ReadWriteFile.readFile(file);
-            if (json == null || json.isEmpty()) return;
+            if (json == null || json.isEmpty()) throw new Exception();
 
             // Create a temp container to transfer data
             RobotState.getInstance().setAll(GSON.fromJson(json, RobotState.class));

@@ -4,6 +4,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
@@ -163,6 +164,13 @@ public class AllSystemsTele extends CommandOpMode {
                                 new SetFlywheelRpm(launcher, 3000),
                                 new SetHoodAngleCommand(hood, LauncherHood.LOW_SHOOT_ANGLE - 5)
                         ));
+
+        driver.getGamepadButton(DPAD_RIGHT)
+                        .whenPressed(new ParallelCommandGroup(
+                                new SetFlywheelRpm(launcher, 2950),
+                                new SetHoodAngleCommand(hood, LauncherHood.LOW_SHOOT_ANGLE + 60)
+                        ));
+
 
         driver.getGamepadButton(DPAD_DOWN)
                 .whenPressed(new StopFlywheel(launcher));

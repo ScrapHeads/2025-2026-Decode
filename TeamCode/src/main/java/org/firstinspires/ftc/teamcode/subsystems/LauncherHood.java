@@ -35,8 +35,8 @@ public class LauncherHood implements Subsystem {
     public static final double MIN_ANGLE = 500;
     public static final double MAX_ANGLE = 2500;
 
-    public static final double HIGH_SHOOT_ANGLE = 1384;
-    public static final double LOW_SHOOT_ANGLE = 1551;
+    public static final double HIGH_SHOOT_ANGLE = 1400;
+    public static final double LOW_SHOOT_ANGLE = 1647;
 
     /**
      * Creates a new LauncherHood subsystem.
