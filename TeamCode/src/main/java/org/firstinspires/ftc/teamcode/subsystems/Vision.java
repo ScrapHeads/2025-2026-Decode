@@ -9,12 +9,15 @@ import static org.firstinspires.ftc.teamcode.Constants.TRACKED_TAG_IDS;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.vision.CameraParams;
 import org.firstinspires.ftc.teamcode.vision.VisionProcessor;
 
@@ -33,41 +36,32 @@ import java.util.concurrent.TimeUnit;
  */
 public class Vision implements Subsystem {
 
-    private final HuskyLens huskyLens;
-    private final VisionProcessor processor;
-    private Pose2d latestPose = null;
-
-    // Rate limiting for sensor reads
-    private static final int READ_PERIOD = 1; // seconds
-    private final Deadline rateLimit = new Deadline(READ_PERIOD, TimeUnit.SECONDS);
+    private final Limelight3A limelight;
 
     /**
      * Creates a Vision subsystem with HuskyLens and camera calibration parameters.
      *
      */
     public Vision(HardwareMap hm) {
-        huskyLens = hm.get(HuskyLens.class, "huskylens");
-
-        processor = new VisionProcessor(new CameraParams(
-                CAMERA_FORWARD_OFFSET,
-                CAMERA_LATERAL_OFFSET,
-                CAMERA_VERTICAL_OFFSET,
-                CAMERA_YAW_OFFSET
-        ));
-
-        rateLimit.expire();
-
-        // Report connection status
-        TelemetryPacket packet = new TelemetryPacket();
-        if (!huskyLens.knock()) {
-            packet.put("Vision", "Problem communicating with " + huskyLens.getDeviceName());
-        } else {
-            packet.put("Vision", "Connected, waiting for start...");
-        }
-        dashboard.sendTelemetryPacket(packet);
-
-        huskyLens.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION);
+        limelight = hm.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(0);
     }
+
+    public void startLimelight () {limelight.start();}
+    public void stopLimeLight () {limelight.stop();}
+
+
+    public void setPipeline (int index) {
+        limelight.pipelineSwitch(index);
+    }
+
+    public Pose2d getPose () {
+        LLResult limeLightResult = limelight.getLatestResult();
+        //TODO Added pinpoint heading?
+        return new Pose2d(limeLightResult.getTx(), limeLightResult.getTy(), new Rotation2d(0));
+    }
+
+
 
     /**
      * Called periodically by the scheduler.
@@ -77,32 +71,7 @@ public class Vision implements Subsystem {
      * Updates {@code latestPose} if a valid correction is available.
      */
     @Override
-    public void periodic() {}
+    public void periodic() {
 
-    /**
-     * Manually sets the latest pose estimate from an external source.
-     *
-     * @param pose the new pose to store
-     */
-//    public void setLatestPose(Pose2d pose) {
-//        this.latestPose = pose;
-//    }
-
-    /**
-     * Returns the most recently corrected pose.
-     *
-     * @return last corrected pose, or null if none available
-     */
-//    public Pose2d getLatestPose() {
-//        return latestPose;
-//    }
-
-    /**
-     * Returns raw blocks reported by HuskyLens without correction or filtering.
-     *
-     * @return array of HuskyLens blocks
-     */
-    public HuskyLens.Block[] detectObject() {
-        return huskyLens.blocks();
     }
 }
