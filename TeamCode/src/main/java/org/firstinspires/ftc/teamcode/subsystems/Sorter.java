@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.teamcode.RilLib.Control.PID.PIDController;
+import org.firstinspires.ftc.teamcode.RilLib.Math.SlewRateLimiter;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
@@ -158,6 +159,11 @@ public class Sorter implements Subsystem {
 //        return (int) Math.floorMod(Math.round(pos / TICKS_PER_THIRD_OF_TURN), SLOT_COUNT);
     }
 
+    public int getSetIndex () {
+        return Math.floorMod((int) turnPos, SLOT_COUNT);
+    }
+
+
     public void turnOneSlotDirection (int direction) {
         // Only move if direction is non-zero
         if (direction == 0) return;
@@ -194,7 +200,7 @@ public class Sorter implements Subsystem {
 
         // Compare pattern to each possible rotation of stored
         boolean match0 = true, matchForward = true, matchBackward = true;
-        int ci = currentIndex;
+        int ci = getSetIndex();
         for (int i = 0; i < n; i++) {
             // no rotation
             if (pattern[i] != stored[(i + ci) % n]) match0 = false;
@@ -271,8 +277,8 @@ public class Sorter implements Subsystem {
         }
 
         // --- PURPLE detection: red + blue high, green low ---
-        double avgRB = (rNorm + bNorm) / 2.0;
-        if (avgRB > gNorm * 1.1) {
+        double avgRB = (rNorm + bNorm) / 1.9;
+        if (avgRB > gNorm) {
             return BallColor.PURPLE;
         }
 

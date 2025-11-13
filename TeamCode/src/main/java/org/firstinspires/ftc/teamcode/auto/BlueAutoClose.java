@@ -61,7 +61,7 @@ public class BlueAutoClose extends CommandOpMode {
     private Sorter sorter;
     private Vision vision;
 
-    public boolean isBlue = true;
+    public Boolean isBlue = true;
 
     public static final List<Pose2d> path = blueAutoClose.PATH;
 
@@ -110,6 +110,8 @@ public class BlueAutoClose extends CommandOpMode {
                 new AngularVelConstraint(Math.PI)));
         AccelConstraint accelConstraintPickUp = new ProfileAccelConstraint(-20, 40);
 
+        StateIO.save();
+
         // Wait to start the auto path till the play button is pressed
         waitForStart();
 
@@ -121,11 +123,11 @@ public class BlueAutoClose extends CommandOpMode {
                 ),
 
                 new TurnToLaunchPattern(sorter),
-                new SetFlywheelRpm(launcher, 3000),
+                new SetFlywheelRpm(launcher, 3375),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
-                new SetHoodAngleCommand(hood, LauncherHood.LOW_SHOOT_ANGLE - 5),
+                new SetHoodAngleCommand(hood, LauncherHood.AUTO_CLOSE_ANGLE),
                 new WaitCommand(100),
-                new ShootAllLoaded(launcher, sorter, holdControl),
+                new SortedLuanch(launcher, sorter, holdControl),
                 new WaitCommand(150),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
 
@@ -134,13 +136,16 @@ public class BlueAutoClose extends CommandOpMode {
                                 turnConstraintsPickUp, velConstraintPickUp, accelConstraintPickUp),
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
+
+                new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER).withTimeout(200),
+
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER).withTimeout(1000)
+                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
                 ),
 
                 new SortedLuanch(launcher, sorter, holdControl),
-                new WaitCommand(150),
+                new WaitCommand(200),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(6), 5, 5, 5),
 
                 new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
@@ -155,16 +160,14 @@ public class BlueAutoClose extends CommandOpMode {
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
 
-                new ParallelCommandGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(10)
-                                ,turnConstraintsFast, velConstraintFast, accelConstraintFast),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset).withTimeout(1000)
-                                .andThen(new TurnToLaunchPattern(sorter))
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
+                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
 
                 new WaitCommand(50),
-                new ShootAllLoaded(launcher, sorter, holdControl),
-                new WaitCommand(50),
+                new SortedLuanch(launcher, sorter, holdControl),
+                new WaitCommand(150),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(11),
                         turnConstraintsFast, velConstraintFast, accelConstraintFast)
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(10))

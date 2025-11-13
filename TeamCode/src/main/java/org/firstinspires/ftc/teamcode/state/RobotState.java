@@ -25,11 +25,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class RobotState {
     private int version = 1;
 
-    private PoseEstimator poseEstimator = null;
+    private transient PoseEstimator poseEstimator = null;
 
-    private Rotation2d headingOffset = new Rotation2d();
+    private transient Rotation2d headingOffset = new Rotation2d();
 
-    private Lock poseLock = new ReentrantLock();
+    private transient Lock poseLock = new ReentrantLock();
 
     // Pose on the field
     private Pose2d odometryPose;

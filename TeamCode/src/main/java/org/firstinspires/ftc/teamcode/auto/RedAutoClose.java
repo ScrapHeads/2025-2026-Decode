@@ -58,7 +58,7 @@ public class RedAutoClose extends CommandOpMode {
     private Sorter sorter;
     private Vision vision;
 
-    public boolean isBlue = false;
+    public Boolean isBlue = false;
 
     public static final List<Pose2d> path = redAutoClose.PATH;
 
@@ -103,9 +103,11 @@ public class RedAutoClose extends CommandOpMode {
 
         TurnConstraints turnConstraintsPickUp = new TurnConstraints(4, -2, 4);
         VelConstraint velConstraintPickUp = new MinVelConstraint(Arrays.asList(
-                drivetrain.kinematics.new WheelVelConstraint(25),
+                drivetrain.kinematics.new WheelVelConstraint(23),
                 new AngularVelConstraint(Math.PI)));
         AccelConstraint accelConstraintPickUp = new ProfileAccelConstraint(-20, 40);
+
+        StateIO.save();
 
         // Wait to start the auto path till the play button is pressed
         waitForStart();
@@ -118,11 +120,11 @@ public class RedAutoClose extends CommandOpMode {
                 ),
 
                 new TurnToLaunchPattern(sorter),
-                new SetFlywheelRpm(launcher, 3000),
+                new SetFlywheelRpm(launcher, 3400),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
-                new SetHoodAngleCommand(hood, LauncherHood.LOW_SHOOT_ANGLE - 5),
+                new SetHoodAngleCommand(hood, LauncherHood.AUTO_CLOSE_ANGLE),
                 new WaitCommand(100),
-                new ShootAllLoaded(launcher, sorter, holdControl),
+                new SortedLuanch(launcher, sorter, holdControl),
                 new WaitCommand(150),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
 
@@ -131,18 +133,17 @@ public class RedAutoClose extends CommandOpMode {
                                 turnConstraintsPickUp, velConstraintPickUp, accelConstraintPickUp),
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
+
+                new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER).withTimeout(200),
+
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER )
+                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
                 ),
 
-//                new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
-//                new InstantCommand(() -> RobotState.getInstance().setBallColors(new BallColor[] {GREEN, PURPLE, PURPLE})),
                 new SortedLuanch(launcher, sorter, holdControl),
-                new WaitCommand(150),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(6),
-                        turnConstraintsFast, velConstraintFast, accelConstraintFast,
-                        5, 5, 5),
+                new WaitCommand(200),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(6), 5, 5, 5),
 
                 new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
 
@@ -156,16 +157,14 @@ public class RedAutoClose extends CommandOpMode {
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
 
-                new ParallelCommandGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(10)
-                                ,turnConstraintsFast, velConstraintFast, accelConstraintFast),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset).withTimeout(1000)
-                                .andThen(new TurnToLaunchPattern(sorter))
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
+                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
 
                 new WaitCommand(50),
-                new ShootAllLoaded(launcher, sorter, holdControl),
-                new WaitCommand(50),
+                new SortedLuanch(launcher, sorter, holdControl),
+                new WaitCommand(150),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(11),
                         turnConstraintsFast, velConstraintFast, accelConstraintFast)
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(10))

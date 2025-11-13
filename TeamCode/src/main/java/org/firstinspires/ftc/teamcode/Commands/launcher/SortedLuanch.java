@@ -30,14 +30,14 @@ public class SortedLuanch extends SequentialCommandGroup {
                     dashboard.sendTelemetryPacket(packet);
                 }),
                 new TurnOneSlot(sorter, () -> startOffset),
-                new WaitCommand(400),
+                new WaitCommand(500),
 
                 new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING),
                 new WaitCommand(200),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitCommand(600),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
-                new WaitCommand(700),
+                new WaitCommand(800),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint)
         );

@@ -47,12 +47,13 @@ public class StateIO {
         try {
             File file = getFile();
 
-//            if (!file.exists()) {
-//                file.getParentFile().mkdirs();  // ensure directory exists
-//                file.createNewFile();
-//            }
+            if (!file.exists()) {
+                file.getParentFile().mkdirs();  // ensure directory exists
+                file.createNewFile();
+            }
 
             tele.addLine("Found file and saved it");
+            tele.update();
 
             String json = GSON.toJson(RobotState.getInstance());
             ReadWriteFile.writeFile(file, json);
@@ -72,7 +73,7 @@ public class StateIO {
     public static void load() {
         try {
             File file = getFile();
-            if (file == null || !file.exists()) throw new Exception();
+            if (file == null || !file.exists()) throw new RuntimeException();
 
             tele.addData("File path", file.getAbsoluteFile());
 
@@ -84,8 +85,7 @@ public class StateIO {
 
             clear();
 
-        } catch (Exception e) {
-            // Possibly add a mock RobotState file update
+        } catch (RuntimeException e) {
             RobotState.getInstance().setAll(
                     new Pose2d(0, 0, new Rotation2d(0)),
                     null,
@@ -94,6 +94,16 @@ public class StateIO {
             );
 
             tele.addLine("Failed to load");
+            tele.addLine("File doesn't exist");
+        } catch (Exception e) {
+            RobotState.getInstance().setAll(
+                    new Pose2d(0, 0, new Rotation2d(0)),
+                    null,
+                    new BallColor[] {BallColor.EMPTY, BallColor.EMPTY, BallColor.EMPTY},
+                    new ChassisSpeeds()
+            );
+            tele.addLine("Failed to load");
+            tele.addLine("JSON is empty");
         }
     }
 
