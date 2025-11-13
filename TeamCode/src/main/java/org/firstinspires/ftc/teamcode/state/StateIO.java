@@ -78,7 +78,7 @@ public class StateIO {
             tele.addData("File path", file.getAbsoluteFile());
 
             String json = ReadWriteFile.readFile(file);
-            if (json == null || json.isEmpty()) throw new Exception();
+            if (json == null || json.contentEquals("{}")) throw new Exception();
 
             // Create a temp container to transfer data
             RobotState.getInstance().setAll(GSON.fromJson(json, RobotState.class));
@@ -92,7 +92,6 @@ public class StateIO {
                     new BallColor[] {BallColor.EMPTY, BallColor.EMPTY, BallColor.EMPTY},
                     new ChassisSpeeds()
             );
-
             tele.addLine("Failed to load");
             tele.addLine("File doesn't exist");
         } catch (Exception e) {

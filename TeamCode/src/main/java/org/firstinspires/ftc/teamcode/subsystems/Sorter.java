@@ -323,7 +323,7 @@ public class Sorter implements Subsystem {
     }
 
     private void writeData () {
-        tele.addData("ServoPower", getPower());
+//        tele.addData("ServoPower", getPower());
         tele.addData("Sorter Index", getCurrentIndex());
         tele.addData("Detected Color", detectBallColor());
 //        tele.addData("Sorter pos", getCurrentPos());
