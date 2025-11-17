@@ -44,7 +44,7 @@ public class IntakeSorterNoEnd extends CommandBase {
             holdControl.moveTo(LOADING);
         }
 
-        BallColor detected = sorter.detectBallColor();
+        BallColor detected = sorter.getCurrentColor();
 
         boolean isAtSetPoint = Math.abs(Math.abs(sorter.getCurrentPos()) - Math.abs(sorter.getTurnPos())) <= 800;
 

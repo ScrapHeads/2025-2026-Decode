@@ -120,10 +120,10 @@ public class RedAutoClose extends CommandOpMode {
                 ),
 
                 new TurnToLaunchPattern(sorter),
-                new SetFlywheelRpm(launcher, 3400),
+                new SetFlywheelRpm(launcher, 3385),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
                 new SetHoodAngleCommand(hood, LauncherHood.AUTO_CLOSE_ANGLE),
-                new WaitCommand(100),
+                new WaitCommand(300),
                 new SortedLuanch(launcher, sorter, holdControl),
                 new WaitCommand(150),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
@@ -134,7 +134,7 @@ public class RedAutoClose extends CommandOpMode {
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
 
-                new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER).withTimeout(200),
+                new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER).withTimeout(500),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(5)),

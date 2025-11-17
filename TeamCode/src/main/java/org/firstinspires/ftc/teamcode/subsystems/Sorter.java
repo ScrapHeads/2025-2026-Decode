@@ -271,13 +271,17 @@ public class Sorter implements Subsystem {
         double gNorm = g / total;
         double bNorm = b / total;
 
+        tele.addData("rNorm", rNorm);
+        tele.addData("gNorm", gNorm);
+        tele.addData("bNorm", bNorm);
+
         // --- GREEN detection: strong green dominance ---
-        if (gNorm > rNorm * 3 && gNorm > bNorm * 1.2) {
+        if (gNorm > rNorm * 2.5 && gNorm > bNorm * 1.1) {
             return GREEN;
         }
 
         // --- PURPLE detection: red + blue high, green low ---
-        double avgRB = (rNorm + bNorm) / 1.9;
+        double avgRB = (rNorm + bNorm) / 1.8;
         if (avgRB > gNorm) {
             return BallColor.PURPLE;
         }
@@ -323,7 +327,7 @@ public class Sorter implements Subsystem {
     }
 
     private void writeData () {
-//        tele.addData("ServoPower", getPower());
+        tele.addData("ServoPower", getPower());
         tele.addData("Sorter Index", getCurrentIndex());
         tele.addData("Detected Color", detectBallColor());
 //        tele.addData("Sorter pos", getCurrentPos());
@@ -345,7 +349,7 @@ public class Sorter implements Subsystem {
         }
         double output = pidController.calculate(sorter.getCurrentPosition(), turnPos);
 
-        if (detectBallColor() != getCurrentColor() && isAtSetPoint() && Math.abs(output) < .1) {
+        if (detectBallColor() != getCurrentColor() && isAtSetPoint() && Math.abs(output) < .07) {
             setSlotCurrent(detectBallColor());
         }
 

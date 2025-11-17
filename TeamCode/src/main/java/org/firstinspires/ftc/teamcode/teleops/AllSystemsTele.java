@@ -161,7 +161,7 @@ public class AllSystemsTele extends CommandOpMode {
 
         driver.getGamepadButton(DPAD_LEFT)
                         .whenPressed(new ParallelCommandGroup(
-                                new SetFlywheelRpm(launcher, 3000),
+                                new SetFlywheelRpm(launcher, 3100),
                                 new SetHoodAngleCommand(hood, LauncherHood.MID_SHOOT_ANGLE)
                         ));
 

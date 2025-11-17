@@ -106,7 +106,7 @@ public class BlueAutoClose extends CommandOpMode {
 
         TurnConstraints turnConstraintsPickUp = new TurnConstraints(4, -2, 4);
         VelConstraint velConstraintPickUp = new MinVelConstraint(Arrays.asList(
-                drivetrain.kinematics.new WheelVelConstraint(25),
+                drivetrain.kinematics.new WheelVelConstraint(23),
                 new AngularVelConstraint(Math.PI)));
         AccelConstraint accelConstraintPickUp = new ProfileAccelConstraint(-20, 40);
 
@@ -116,6 +116,8 @@ public class BlueAutoClose extends CommandOpMode {
         waitForStart();
 
         // Create the dive path the the robot follows in order
+
+        // Scheduled the sequential command group
         SequentialCommandGroup followPath = new SequentialCommandGroup(
                 new ParallelCommandGroup(
                         new GetTagPattern(vision).withTimeout(7000),
@@ -126,7 +128,7 @@ public class BlueAutoClose extends CommandOpMode {
                 new SetFlywheelRpm(launcher, 3375),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
                 new SetHoodAngleCommand(hood, LauncherHood.AUTO_CLOSE_ANGLE),
-                new WaitCommand(100),
+                new WaitCommand(300),
                 new SortedLuanch(launcher, sorter, holdControl),
                 new WaitCommand(150),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
@@ -137,7 +139,7 @@ public class BlueAutoClose extends CommandOpMode {
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
 
-                new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER).withTimeout(200),
+                new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER).withTimeout(500),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
@@ -188,8 +190,6 @@ public class BlueAutoClose extends CommandOpMode {
                 tele.update();
             }
         };
-
-        // Scheduled the sequential command group
         schedule(followPath);
     }
 
