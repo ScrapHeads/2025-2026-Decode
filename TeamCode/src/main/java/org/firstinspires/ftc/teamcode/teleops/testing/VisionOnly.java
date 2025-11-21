@@ -17,20 +17,20 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Commands.vision.VisionDetection;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.state.RobotState;
+import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.vision.CameraParams;
 import org.firstinspires.ftc.teamcode.vision.VisionProcessor;
 
-@Disabled
+//@Disabled
 @TeleOp(name = "VisionOnly", group = "ScrapHeads")
 public class VisionOnly extends CommandOpMode {
     private GamepadEx driver;
     private Vision vision;
     private Drivetrain drivetrain;
-    private VisionProcessor processor;
 
     private final Pose2d startPose = new Pose2d();
 
@@ -41,6 +41,8 @@ public class VisionOnly extends CommandOpMode {
         tele = telemetry;
         dashboard = FtcDashboard.getInstance();
 
+        StateIO.load();
+
         driver = new GamepadEx(gamepad1);
 
         // Create drivetrain + vision subsystem
@@ -48,21 +50,13 @@ public class VisionOnly extends CommandOpMode {
         vision = new Vision(hm);
         vision.register();
 
-        // Create processor using Constants
-        processor = new VisionProcessor(new CameraParams(
-                CAMERA_FORWARD_OFFSET,
-                CAMERA_LATERAL_OFFSET,
-                CAMERA_VERTICAL_OFFSET,
-                CAMERA_YAW_OFFSET
-        ));
-
         assignControls();
     }
 
     public void assignControls() {
         // Run passive vision detection (pose correction ON)
-        driver.getGamepadButton(A)
-                .whenPressed(new VisionDetection(vision, processor, drivetrain, true));
+//        driver.getGamepadButton(A)
+//                .whenPressed(new VisionDetection(vision, processor, drivetrain, true));
 
         // Toggle pose correction ON/OFF globally
         driver.getGamepadButton(GamepadKeys.Button.X)

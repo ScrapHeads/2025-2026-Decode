@@ -25,26 +25,6 @@ public class GetTagPattern extends CommandBase {
 
     @Override
     public void execute () {
-        HuskyLens.Block[] blocks = vision.detectObject();
-
-        for (HuskyLens.Block block : blocks) {
-            boolean isRightTag = false;
-
-            for (int id : PATTERN_TAG_IDS) {
-                if (block.id == id) {
-                    isRightTag = true;
-                    break;
-                }
-            }
-
-            if (!isRightTag) continue;
-//            if (Math.min(block.width, block.height) < MIN_TAG_PIXEL_SIZE) continue;
-            TelemetryPacket packet = new TelemetryPacket();
-            packet.put("Right Pattern", patters.get(block.id));
-            dashboard.sendTelemetryPacket(packet);
-            RobotState.getInstance().setPattern(patters.get(block.id));
-            setPattern = true;
-        }
     }
 
     @Override

@@ -2,11 +2,11 @@ package org.firstinspires.ftc.teamcode.Commands.launcher;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 
 public class SetPowerLauncher extends CommandBase {
     /** Shooter subsystem providing PID control and readiness logic. */
-    private final LauncherBall launcher;
+    private final Launcher launcher;
 
     /** Target RPM to hold while this command is active. */
     private final double power;
@@ -17,7 +17,7 @@ public class SetPowerLauncher extends CommandBase {
      * @param launcher the launcher subsystem
      * @param power      target speed in RPM -1 to 1
      */
-    public SetPowerLauncher(LauncherBall launcher, double power) {
+    public SetPowerLauncher(Launcher launcher, double power) {
         this.launcher = launcher;
         this.power = power;
         addRequirements(launcher);

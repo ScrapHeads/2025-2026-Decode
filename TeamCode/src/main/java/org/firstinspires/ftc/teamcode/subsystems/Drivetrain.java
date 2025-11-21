@@ -558,7 +558,7 @@ public final class Drivetrain implements Subsystem {
     @Override
     public void periodic() {
         ChassisSpeeds vel = updatePoseEstimate();
-        Pose2d pose = RobotState.getInstance().getOdometryPose();
+        Pose2d pose = RobotState.getInstance().getEstimatedPose();
 
         TelemetryPacket packet = new TelemetryPacket();
         // Use this when changing pos tracking to meters

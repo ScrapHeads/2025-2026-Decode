@@ -24,20 +24,18 @@ import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCom
 import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
-import org.firstinspires.ftc.teamcode.Commands.launcher.ShootAllLoaded;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnToLaunchPattern;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.auto.paths.blueAutoClose;
 import org.firstinspires.ftc.teamcode.auto.paths.redAutoClose;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
@@ -51,7 +49,7 @@ public class RedAutoClose extends CommandOpMode {
 
     private Drivetrain drivetrain;
 
-    private LauncherBall launcher;
+    private Launcher launcher;
     private LauncherHood hood;
     private Intake intake;
     private HoldControl holdControl;
@@ -76,7 +74,7 @@ public class RedAutoClose extends CommandOpMode {
         drivetrain = new Drivetrain(hm, path.get(0));
         drivetrain.register();
 
-        launcher = new LauncherBall(hm);
+        launcher = new Launcher(hm);
         launcher.register();
 
         hood = new LauncherHood(hm);

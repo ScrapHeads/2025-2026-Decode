@@ -24,7 +24,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
-import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorter;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
@@ -33,17 +32,15 @@ import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
-import org.firstinspires.ftc.teamcode.util.BallColor;
 
 import java.util.Arrays;
 
@@ -54,7 +51,7 @@ public class AllSystemsTele extends CommandOpMode {
 
     // Subsystem
     private Drivetrain drivetrain;
-    private LauncherBall launcher;
+    private Launcher launcher;
     private Sorter sorter;
 //    private FeederRail feederRail;
     private HoldControl holdControl;
@@ -82,7 +79,7 @@ public class AllSystemsTele extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
 
         // Subsystem
-        launcher = new LauncherBall(hm);
+        launcher = new Launcher(hm);
         launcher.register();
 
         sorter = new Sorter(hm);

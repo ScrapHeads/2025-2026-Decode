@@ -11,6 +11,11 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.Interpolatable;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.InterpolatingDoubleTreeMap;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.InterpolatingTreeMap;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.Interpolator;
+
 /**
  * Subsystem representing a single-motor flywheel launcher.
  * <p>
@@ -20,7 +25,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * parameters via the {@link Params} inner class.
  */
 @Config
-public final class LauncherBall implements Subsystem {
+public final class Launcher implements Subsystem {
 
     /**
      * Holds all tunable parameters and control state for the launcher.
@@ -70,6 +75,8 @@ public final class LauncherBall implements Subsystem {
     /** Motor driving the shooter flywheel. */
     private final MotorEx shooter;
 
+    private InterpolatingDoubleTreeMap treeMap = new InterpolatingDoubleTreeMap();
+
     // Encoder resolution calculations
     public static final double MOTOR_TPR   = 28;   // ticks per motor rev
     public static final double GEAR_RATIO  = 1;  // motor:wheel upgear
@@ -80,7 +87,7 @@ public final class LauncherBall implements Subsystem {
      *
      * @param hm Hardware map from OpMode
      */
-    public LauncherBall(HardwareMap hm) {
+    public Launcher(HardwareMap hm) {
         shooter = new MotorEx(hm, "shooter"); // name must match configuration
 
         shooterPid.setTolerance(100);
@@ -112,6 +119,32 @@ public final class LauncherBall implements Subsystem {
         PARAMS.enabledPid = false;
         stop();
     }
+
+    public void createLaunchTable () {
+        // All in cm from front of robot for right now
+        //Hood angle 1430, 3600 rpm, distance 200cm
+        //Hood angle 1430, 3500 rpm, distance 170cm
+        //Hood angle 1430, 3350 rpm, distance 120cm
+        //Hood angle 1430, 3300 rpm, distance 100cm
+        //Hood angle 1430, 3250 rpm, distance 80cm
+        //Hood angle 1430, 3200 rpm, distance 70cm
+        treeMap.put(70.0, 3200.0);
+        treeMap.put(80.0, 3250.0);
+        treeMap.put(90.0, 3275.0);
+        treeMap.put(100.0, 3300.0);
+        treeMap.put(110.0, 3325.0);
+        treeMap.put(120.0, 3350.0);
+        treeMap.put(130.0, 3400.0);
+        treeMap.put(140.0, 3425.0);
+        treeMap.put(150.0, 3450.0);
+        treeMap.put(160.0, 3475.0);
+        treeMap.put(170.0, 3500.0);
+        treeMap.put(180.0, 0.0);
+        treeMap.put(190.0, 0.0);
+        treeMap.put(200.0, 3600.0);
+
+    }
+
 
     /** @return true if PID control is enabled. */
     public boolean isEnabled() {

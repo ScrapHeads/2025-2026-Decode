@@ -12,12 +12,12 @@ import org.firstinspires.ftc.teamcode.Commands.HoldControlCommand;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
-import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 
 public class SortedLuanch extends SequentialCommandGroup {
     private int startOffset;
-    public SortedLuanch (LauncherBall launcher, Sorter sorter, HoldControl holdControl) {
+    public SortedLuanch (Launcher launcher, Sorter sorter, HoldControl holdControl) {
 
         addCommands (
                 new InstantCommand(() -> {

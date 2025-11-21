@@ -5,8 +5,6 @@ import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.intakePowerOffset;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
-import static org.firstinspires.ftc.teamcode.util.BallColor.GREEN;
-import static org.firstinspires.ftc.teamcode.util.BallColor.PURPLE;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.AccelConstraint;
@@ -16,7 +14,6 @@ import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.ParallelDeadlineGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -25,10 +22,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
 import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
-import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorter;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
-import org.firstinspires.ftc.teamcode.Commands.launcher.ShootAllLoaded;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnToLaunchPattern;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
@@ -40,7 +35,7 @@ import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
@@ -54,7 +49,7 @@ public class BlueAutoClose extends CommandOpMode {
 
     private Drivetrain drivetrain;
 
-    private LauncherBall launcher;
+    private Launcher launcher;
     private LauncherHood hood;
     private Intake intake;
     private HoldControl holdControl;
@@ -79,7 +74,7 @@ public class BlueAutoClose extends CommandOpMode {
         drivetrain = new Drivetrain(hm, path.get(0));
         drivetrain.register();
 
-        launcher = new LauncherBall(hm);
+        launcher = new Launcher(hm);
         launcher.register();
 
         hood = new LauncherHood(hm);

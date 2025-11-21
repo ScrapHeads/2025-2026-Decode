@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
-import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 
 /**
  * Minimal TeleOp to test the LauncherBall PID/FF flywheel control.
@@ -30,7 +30,7 @@ public class LauncherOnly extends CommandOpMode {
     private GamepadEx driver;
 
     // Subsystem
-    private LauncherBall launcher;
+    private Launcher launcher;
 
     @Override
     public void initialize() {
@@ -43,7 +43,7 @@ public class LauncherOnly extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
 
         // Subsystem
-        launcher = new LauncherBall(hm);
+        launcher = new Launcher(hm);
         launcher.register();
 
         // Bind controls

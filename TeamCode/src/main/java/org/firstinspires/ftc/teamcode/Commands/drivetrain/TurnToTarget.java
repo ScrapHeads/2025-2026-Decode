@@ -53,7 +53,7 @@ public class TurnToTarget extends CommandBase {
 
         double rotSpeed = 0; // PID.calculate
 
-        Rotation2d rot = RobotState.getInstance().getOdometryPose().getRotation();
+        Rotation2d rot = RobotState.getInstance().getEstimatedPose().getRotation();
         ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, rot);
 
         drivetrain.setDrivePowers(robotSpeeds);

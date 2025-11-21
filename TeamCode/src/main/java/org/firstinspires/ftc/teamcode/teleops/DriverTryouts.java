@@ -36,7 +36,7 @@ import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 
@@ -48,7 +48,7 @@ public class DriverTryouts extends CommandOpMode {
 
     // Subsystem
     private Drivetrain drivetrain;
-    private LauncherBall launcher;
+    private Launcher launcher;
     private Sorter sorter;
 //    private FeederRail feederRail;
     private HoldControl holdControl;
@@ -71,7 +71,7 @@ public class DriverTryouts extends CommandOpMode {
         driver2 = new GamepadEx(gamepad2);
 
         // Subsystem
-        launcher = new LauncherBall(hm);
+        launcher = new Launcher(hm);
         launcher.register();
 
         sorter = new Sorter(hm);
@@ -153,7 +153,7 @@ public class DriverTryouts extends CommandOpMode {
                 .whenReleased(new DriveContinous(drivetrain, driver, 1));
     }
 
-    public static Command shootAllLoaded(LauncherBall launcher, Sorter sorter, long recoveryMs) {
+    public static Command shootAllLoaded(Launcher launcher, Sorter sorter, long recoveryMs) {
         TelemetryPacket packet = new TelemetryPacket();
         SequentialCommandGroup command = new SequentialCommandGroup();
 
@@ -179,7 +179,7 @@ public class DriverTryouts extends CommandOpMode {
         return command;
     }
 
-    public static Command shootPattern (LauncherBall launcher, Sorter sorter, long recoveryMs) {
+    public static Command shootPattern (Launcher launcher, Sorter sorter, long recoveryMs) {
         int startSlot = sorter.findStartOffset(
                 RobotState.getInstance().getPattern(),
                 RobotState.getInstance().getBallColors() );

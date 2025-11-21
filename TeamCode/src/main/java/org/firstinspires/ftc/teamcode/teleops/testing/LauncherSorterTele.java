@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
 import org.firstinspires.ftc.teamcode.state.RobotState;
-import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 
 import java.util.Arrays;
@@ -36,7 +36,7 @@ public class LauncherSorterTele extends CommandOpMode {
     private GamepadEx driver;
 
     // Subsystem
-    private LauncherBall launcher;
+    private Launcher launcher;
     private Sorter sorter;
 
     @Override
@@ -50,7 +50,7 @@ public class LauncherSorterTele extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
 
         // Subsystem
-        launcher = new LauncherBall(hm);
+        launcher = new Launcher(hm);
         launcher.register();
 
         sorter = new Sorter(hm);
@@ -77,7 +77,7 @@ public class LauncherSorterTele extends CommandOpMode {
                 .whenPressed(shootAllLoaded(launcher, sorter, 300));
     }
 
-    public static Command shootAllLoaded(LauncherBall launcher, Sorter sorter, long recoveryMs) {
+    public static Command shootAllLoaded(Launcher launcher, Sorter sorter, long recoveryMs) {
         TelemetryPacket packet = new TelemetryPacket();
         SequentialCommandGroup command = new SequentialCommandGroup();
 

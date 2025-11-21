@@ -2,17 +2,17 @@ package org.firstinspires.ftc.teamcode.Commands.launcher;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 
 public class BallLauncher extends CommandBase {
-    public final LauncherBall launcherBall;
+    public final Launcher launcherBall;
 
     private final double power;
 
 
 
-    public BallLauncher(LauncherBall launcherBall, double power) {
-        this.launcherBall = launcherBall;
+    public BallLauncher(Launcher launcher, double power) {
+        this.launcherBall = launcher;
         this.power = power;
     }
 

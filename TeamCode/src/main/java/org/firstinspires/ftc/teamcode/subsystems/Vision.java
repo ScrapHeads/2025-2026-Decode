@@ -8,6 +8,8 @@ import static org.firstinspires.ftc.teamcode.Constants.MIN_TAG_PIXEL_SIZE;
 import static org.firstinspires.ftc.teamcode.Constants.TRACKED_TAG_IDS;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 
+import android.media.midi.MidiDeviceInfo;
+
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
@@ -15,9 +17,14 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.VecBuilder;
+import org.firstinspires.ftc.teamcode.state.RobotState;
+import org.firstinspires.ftc.teamcode.util.TimeTracker;
 import org.firstinspires.ftc.teamcode.vision.CameraParams;
 import org.firstinspires.ftc.teamcode.vision.VisionProcessor;
 
@@ -45,6 +52,7 @@ public class Vision implements Subsystem {
     public Vision(HardwareMap hm) {
         limelight = hm.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
+        startLimelight();
     }
 
     public void startLimelight () {limelight.start();}
@@ -57,8 +65,20 @@ public class Vision implements Subsystem {
 
     public Pose2d getPose () {
         LLResult limeLightResult = limelight.getLatestResult();
-        //TODO Added pinpoint heading?
-        return new Pose2d(limeLightResult.getTx(), limeLightResult.getTy(), new Rotation2d(0));
+        Pose3D robotPose = limeLightResult.getBotpose_MT2();
+
+        Pose2d pose = new Pose2d(
+                robotPose.getPosition().x,
+                robotPose.getPosition().y,
+                new Rotation2d(robotPose.getOrientation().getYaw(AngleUnit.RADIANS)));
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Robot vision pose", pose.toString());
+        packet.put("Limelight Time", limeLightResult.getTimestamp());
+        packet.put("Robot time", TimeTracker.getTime());
+        dashboard.sendTelemetryPacket(packet);
+
+        return pose;
     }
 
 
@@ -72,6 +92,28 @@ public class Vision implements Subsystem {
      */
     @Override
     public void periodic() {
+        Rotation2d curRot = RobotState.getInstance().getOdometryPose().getRotation();
+        limelight.updateRobotOrientation(curRot.getRadians());
 
+        LLResult limeLightResult = limelight.getLatestResult();
+        Pose3D robotPose = limeLightResult.getBotpose_MT2();
+
+        Pose2d pose = new Pose2d(
+                robotPose.getPosition().x,
+                robotPose.getPosition().y,
+                new Rotation2d(robotPose.getOrientation().getYaw(AngleUnit.RADIANS)));
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Robot vision pose", pose.toString());
+        packet.put("Limelight Time", limeLightResult.getTimestamp());
+        packet.put("Robot time", TimeTracker.getTime());
+        packet.put("tag amount", limeLightResult.getFiducialResults().size());
+        dashboard.sendTelemetryPacket(packet);
+
+//        RobotState.getInstance().addVisionObservation(pose, limeLightResult.getTimestamp(),
+//                VecBuilder.fill(
+//                        Math.pow(0.8, limeLightResult.getFiducialResults().size()) * (limeLightResult.getBotposeAvgDist()) * 2,
+//                        Math.pow(0.8, limeLightResult.getFiducialResults().size()) * (limeLightResult.getBotposeAvgDist()) * 2,
+//                        9999999));
     }
 }
