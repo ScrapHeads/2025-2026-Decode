@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.Constants.tele;
 import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.AccelConstraint;
 import com.acmerobotics.roadrunner.AngularVelConstraint;
 import com.acmerobotics.roadrunner.MinVelConstraint;
@@ -14,6 +15,7 @@ import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.ParallelDeadlineGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -164,7 +166,8 @@ public class BlueAutoClose extends CommandOpMode {
                 new SortedLuanch(launcher, sorter, holdControl),
                 new WaitCommand(150),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(11),
-                        turnConstraintsFast, velConstraintFast, accelConstraintFast)
+                        turnConstraintsFast, velConstraintFast, accelConstraintFast),
+                new InstantCommand(StateIO::save)
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(10))
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(11))
 //                new SortedLuanch(launcher, sorter, holdControl, 300),
@@ -177,6 +180,10 @@ public class BlueAutoClose extends CommandOpMode {
 
                 // Write the Auto -> teleop handoff
                 StateIO.save();
+
+                TelemetryPacket p = new TelemetryPacket();
+                p.addLine("Saved the file in end");
+                dashboard.sendTelemetryPacket(p);
 
                 // telemetry/logging
                 tele.addData("Auto ended", interrupted ? "interrupted" : "finished");
