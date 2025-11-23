@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Commands.drivetrain;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 
+import org.firstinspires.ftc.teamcode.RilLib.Control.PID.PIDController;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
@@ -19,6 +20,8 @@ public class TurnToTarget extends CommandBase {
 
     private final SlewRateLimiter xLimiter;
     private final SlewRateLimiter yLimiter;
+
+    private final PIDController pid = new PIDController(Drivetrain.PARAMS.kS, Drivetrain.PARAMS.kV, Drivetrain.PARAMS.kA);
 
     public TurnToTarget (Drivetrain drivetrain, GamepadEx driver, Pose2d targetPose, double speed) {
         this.targetPose = targetPose;

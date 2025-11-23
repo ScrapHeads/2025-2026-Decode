@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.Constants.blueTagPose;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
+import static org.firstinspires.ftc.teamcode.Constants.data;
+import static org.firstinspires.ftc.teamcode.Constants.redTagPose;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -11,10 +14,12 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.Interpolatable;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.InterpolatingDoubleTreeMap;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.InterpolatingTreeMap;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.Interpolator;
+import org.firstinspires.ftc.teamcode.state.RobotState;
 
 /**
  * Subsystem representing a single-motor flywheel launcher.
@@ -99,6 +104,8 @@ public final class Launcher implements Subsystem {
 
         disable();
 
+        createLaunchTable();
+
         // We run our own PIDF, so use raw power mode.
         shooter.setRunMode(Motor.RunMode.RawPower);
     }
@@ -121,28 +128,9 @@ public final class Launcher implements Subsystem {
     }
 
     public void createLaunchTable () {
-        // All in cm from front of robot for right now
-        //Hood angle 1430, 3600 rpm, distance 200cm
-        //Hood angle 1430, 3500 rpm, distance 170cm
-        //Hood angle 1430, 3350 rpm, distance 120cm
-        //Hood angle 1430, 3300 rpm, distance 100cm
-        //Hood angle 1430, 3250 rpm, distance 80cm
-        //Hood angle 1430, 3200 rpm, distance 70cm
-        treeMap.put(70.0, 3200.0);
-        treeMap.put(80.0, 3250.0);
-        treeMap.put(90.0, 3275.0);
-        treeMap.put(100.0, 3300.0);
-        treeMap.put(110.0, 3325.0);
-        treeMap.put(120.0, 3350.0);
-        treeMap.put(130.0, 3400.0);
-        treeMap.put(140.0, 3425.0);
-        treeMap.put(150.0, 3450.0);
-        treeMap.put(160.0, 3475.0);
-        treeMap.put(170.0, 3500.0);
-        treeMap.put(180.0, 0.0);
-        treeMap.put(190.0, 0.0);
-        treeMap.put(200.0, 3600.0);
-
+        for (double[] pair : data) {
+            treeMap.put(pair[0], pair[1]);
+        }
     }
 
 
@@ -168,6 +156,13 @@ public final class Launcher implements Subsystem {
 
     public void setTargetRpm(double rpm) { PARAMS.targetRpm = Math.max(0, rpm); }
     public double getTargetRpm() { return PARAMS.targetRpm; }
+
+    public void getAndSetFlywheelByDistance () {
+        Pose2d tagLocation = RobotState.getInstance().getTeam() ? blueTagPose : redTagPose;
+        double distance = RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(tagLocation.getTranslation());
+        //TODO convert distance to cm
+        setTargetRpm(treeMap.get(distance));
+    }
 
     public void setReadyToleranceRpm(double tol) { PARAMS.readyToleranceRpm = Math.max(0, tol); }
     public double getReadyToleranceRpm() { return PARAMS.readyToleranceRpm; }

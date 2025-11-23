@@ -8,6 +8,8 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 import org.firstinspires.ftc.teamcode.vision.AutoAlignConfig;
 
@@ -22,70 +24,51 @@ public class Constants {
 
     public static double intakePowerOffset = .25;
 
-    // --------------------------
-    // Vision system toggles
-    // --------------------------
-    public static boolean ENABLE_POSE_CORRECTION = false; // if true, vision pose updates localizer
-    // --------------------------
-    // Camera setup (mounting)
-    // --------------------------
-    public static double CAMERA_FORWARD_OFFSET = 0.0;  // inches from robot center forward
-    public static double CAMERA_LATERAL_OFFSET = 0.0;  // inches from robot center left (+)
-    public static double CAMERA_VERTICAL_OFFSET = 0.0; // inches from floor
-    public static double CAMERA_YAW_OFFSET = 0.0;      // radians yaw relative to robot
+//
+//    public static int[] PATTERN_TAG_IDS = {3, 2, 1};
+//    public static Map<Integer, BallColor[]> patters = Map.of(
+//            PATTERN_TAG_IDS[0], new BallColor[] {PURPLE, PURPLE, GREEN},
+//            PATTERN_TAG_IDS[1], new BallColor[] {PURPLE, GREEN, PURPLE},
+//            PATTERN_TAG_IDS[2], new BallColor[] {GREEN, PURPLE, PURPLE}
+//    );
 
-    // --------------------------
-    // Camera properties
-    // --------------------------
-    public static final int IMAGE_WIDTH = 320;                        // HuskyLens QVGA default
-    public static final double CAMERA_HORIZONTAL_FOV = Math.toRadians(60); // ~60° FOV
+    //TODO find the pose of the tags on the field
+    public static Pose2d redTagPose = new Pose2d(0,0, new Rotation2d(0));
+    public static Pose2d blueTagPose = new Pose2d(0,0, new Rotation2d(0));
 
-    // --------------------------
-    // Vision calibration
-    // --------------------------
-    public static double DISTANCE_CONSTANT = 500.0; // forward distance scaling
-    public static double LEFT_SCALING = 12.0;       // left/right scaling
-
-    // --------------------------
-    // Filtering
-    // --------------------------
-    public static double MIN_TAG_PIXEL_SIZE = 20.0; // ignore tiny detections
-    public static int[] TRACKED_TAG_IDS = {1, 2, 3};
-
-    //TODO find what the pattern ids are
-    public static int[] PATTERN_TAG_IDS = {3, 2, 1};
-    public static Map<Integer, BallColor[]> patters = Map.of(
-            PATTERN_TAG_IDS[0], new BallColor[] {PURPLE, PURPLE, GREEN},
-            PATTERN_TAG_IDS[1], new BallColor[] {PURPLE, GREEN, PURPLE},
-            PATTERN_TAG_IDS[2], new BallColor[] {GREEN, PURPLE, PURPLE}
-    );
-
-
-    // --------------------------
-    // Auto-align system
-    // --------------------------
-    public static boolean AUTO_ALIGN_ENABLED = false; // dashboard + driver toggle
-
-    // --------------------------
-    // Auto-align configs per tag
-    // --------------------------
-    public static Map<Integer, AutoAlignConfig> TAG_CONFIGS =
-            new HashMap<>();
-
-    static {
-        // Example tag 1: tight X, looser Y
-        TAG_CONFIGS.put(1, new AutoAlignConfig(
-                IMAGE_WIDTH / 2.0, 120, 40,   // targetX, targetY, minWidth
-                0.01, 0.01, 0.005,           // kP_strafe, kP_forward, kP_heading
-                8, 15                        // toleranceX, toleranceY
-        ));
-
-        // Example tag 2: looser X, tighter Y
-        TAG_CONFIGS.put(2, new AutoAlignConfig(
-                IMAGE_WIDTH / 2.0, 130, 50,
-                0.012, 0.015, 0.006,
-                12, 6
-        ));
-    }
+    // All in cm from front of robot for right now
+    // Hood angle 1430
+    public static double[][] data = {
+            {70.0, 3200.0},
+            {80.0, 3250.0},
+            {90.0, 3275.0},
+            {100.0, 3300.0},
+            {110.0, 3325.0},
+            {120.0, 3350.0},
+            {130.0, 3400.0},
+            {140.0, 3425.0},
+            {150.0, 3450.0},
+            {160.0, 3475.0},
+            {170.0, 3500.0},
+            {180.0, 0.0},
+            {190.0, 0.0},
+            {200.0, 3600.0},
+            {210.0, 0.0},
+            {220.0, 0.0},
+            {230.0, 0.0},
+            {240.0, 0.0},
+            {250.0, 0.0},
+            {260.0, 0.0},
+            {270.0, 0.0},
+            {280.0, 0.0},
+            {290.0, 0.0},
+            {300.0, 0.0},
+            {310.0, 0.0},
+            {320.0, 0.0},
+            {330.0, 0.0},
+            {340.0, 0.0},
+            {350.0, 0.0},
+            {360.0, 0.0}
+    };
 
 }
