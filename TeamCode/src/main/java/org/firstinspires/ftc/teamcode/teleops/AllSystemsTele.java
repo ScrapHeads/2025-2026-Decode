@@ -16,6 +16,7 @@ import static org.firstinspires.ftc.teamcode.Constants.tele;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -26,6 +27,7 @@ import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunIntakeCommand;
+import org.firstinspires.ftc.teamcode.Commands.launcher.AsistedLaunch;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.ShootAllLoaded;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
@@ -67,6 +69,7 @@ public class AllSystemsTele extends CommandOpMode {
         dashboard = FtcDashboard.getInstance();
 
         StateIO.load();
+        RobotState.getInstance().setTeam(false);
 
         // Initialize the subsystems declared at the top of the code
         drivetrain = new Drivetrain(hm, RobotState.getInstance().getOdometryPose());
@@ -157,10 +160,12 @@ public class AllSystemsTele extends CommandOpMode {
                         ;
 
         driver.getGamepadButton(DPAD_LEFT)
-                        .whenPressed(new ParallelCommandGroup(
-                                new SetFlywheelRpm(launcher, 3000),
-                                new SetHoodAngleCommand(hood, LauncherHood.MID_SHOOT_ANGLE)
-                        ));
+                        .whenPressed(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(launcher::getAndSetFlywheelByDistance),
+                                        new SetHoodAngleCommand(hood, 1430)
+                                )
+                        );
 
         driver.getGamepadButton(DPAD_RIGHT)
                         .whenPressed(new ParallelCommandGroup(

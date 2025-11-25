@@ -159,9 +159,13 @@ public final class Launcher implements Subsystem {
 
     public void getAndSetFlywheelByDistance () {
         Pose2d tagLocation = RobotState.getInstance().getTeam() ? blueTagPose : redTagPose;
-        double distance = RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(tagLocation.getTranslation());
+        double distance = 100 * RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(tagLocation.getTranslation());
         //TODO convert distance to cm
-        setTargetRpm(treeMap.get(distance));
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Distance", distance - 17.78);
+        packet.put("Rpm", treeMap.get(distance - 17.78));
+        dashboard.sendTelemetryPacket(packet);
+        setTargetRpm(treeMap.get(distance - 17.78));
     }
 
     public void setReadyToleranceRpm(double tol) { PARAMS.readyToleranceRpm = Math.max(0, tol); }

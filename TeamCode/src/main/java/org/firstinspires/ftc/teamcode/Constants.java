@@ -33,8 +33,8 @@ public class Constants {
 //    );
 
     //TODO find the pose of the tags on the field
-    public static Pose2d redTagPose = new Pose2d(0,0, new Rotation2d(0));
-    public static Pose2d blueTagPose = new Pose2d(0,0, new Rotation2d(0));
+    public static Pose2d redTagPose = new Pose2d(-1.482,1.413, new Rotation2d(-54));
+    public static Pose2d blueTagPose = new Pose2d(-1.482,-1.413, new Rotation2d(54));
 
     // All in cm from front of robot for right now
     // Hood angle 1430
@@ -50,8 +50,8 @@ public class Constants {
             {150.0, 3450.0},
             {160.0, 3475.0},
             {170.0, 3500.0},
-            {180.0, 0.0},
-            {190.0, 0.0},
+            {180.0, 3525.0},
+            {190.0, 3550.0},
             {200.0, 3600.0},
             {210.0, 0.0},
             {220.0, 0.0},
@@ -60,7 +60,7 @@ public class Constants {
             {250.0, 0.0},
             {260.0, 0.0},
             {270.0, 0.0},
-            {280.0, 0.0},
+            {280.0, 4050},
             {290.0, 0.0},
             {300.0, 0.0},
             {310.0, 0.0},

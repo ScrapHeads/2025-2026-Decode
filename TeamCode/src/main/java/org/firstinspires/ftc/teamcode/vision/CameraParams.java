@@ -4,7 +4,7 @@ package org.firstinspires.ftc.teamcode.vision;
  * Container for camera mounting parameters relative to the robot frame.
  * <p>
  * These values describe how the camera is positioned and oriented
- * on the robot, and are used by {@link VisionProcessor} to convert
+ * on the robot, and are used by to convert
  * vision data into robot-relative coordinates.
  */
 public class CameraParams {

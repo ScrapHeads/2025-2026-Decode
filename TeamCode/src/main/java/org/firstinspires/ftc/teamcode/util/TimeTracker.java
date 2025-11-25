@@ -16,4 +16,8 @@ public class TimeTracker {
     public static double getTime() {
         return (System.currentTimeMillis() / 1000.0) - timeOffset;
     }
+
+    public static double convertTime(double time) {
+        return time - timeOffset;
+    }
 }

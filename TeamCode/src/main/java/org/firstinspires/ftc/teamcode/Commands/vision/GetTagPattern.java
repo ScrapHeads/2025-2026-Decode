@@ -1,12 +1,6 @@
 package org.firstinspires.ftc.teamcode.Commands.vision;
 
-import static org.firstinspires.ftc.teamcode.Constants.PATTERN_TAG_IDS;
-import static org.firstinspires.ftc.teamcode.Constants.dashboard;
-import static org.firstinspires.ftc.teamcode.Constants.patters;
-
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandBase;
-import com.qualcomm.hardware.dfrobot.HuskyLens;
 
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
