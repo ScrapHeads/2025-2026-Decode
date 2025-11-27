@@ -2,9 +2,7 @@ package org.firstinspires.ftc.teamcode.Commands.vision;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
-import org.firstinspires.ftc.teamcode.util.BallColor;
 
 public class GetTagPattern extends CommandBase {
 
@@ -13,12 +11,14 @@ public class GetTagPattern extends CommandBase {
 
     public GetTagPattern (Vision vision) {
         this.vision = vision;
+        vision.setPipeline(1);
 
         addRequirements(vision);
     }
 
     @Override
     public void execute () {
+        setPattern = vision.detectPattern();
     }
 
     @Override
@@ -28,13 +28,7 @@ public class GetTagPattern extends CommandBase {
 
     @Override
     public void end (boolean interrupted) {
-        if (RobotState.getInstance().getPattern() == null && !setPattern) {
-            RobotState.getInstance().setPattern(new BallColor[] {
-                    BallColor.PURPLE,
-                    BallColor.PURPLE,
-                    BallColor.GREEN
-            }) ;
-        }
+        vision.setPipeline(0);
     }
 
 }

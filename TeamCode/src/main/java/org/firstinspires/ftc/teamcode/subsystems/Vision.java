@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.Constants.blueTagPose;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
+import static org.firstinspires.ftc.teamcode.Constants.patters;
 import static org.firstinspires.ftc.teamcode.Constants.redTagPose;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -15,6 +17,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Translation2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.MathUtil;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Units;
 import org.firstinspires.ftc.teamcode.RilLib.Math.VecBuilder;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.util.TimeTracker;
@@ -52,32 +57,26 @@ public class Vision implements Subsystem {
         limelight.pipelineSwitch(index);
     }
 
-//    public Pose2d getPose () {
-//        LLResult limeLightResult = limelight.getLatestResult();
-//        Pose3D robotPose = limeLightResult.getBotpose_MT2();
-//
-//        Pose2d pose = new Pose2d(
-//                robotPose.getPosition().x,
-//                robotPose.getPosition().y,
-//                new Rotation2d(robotPose.getOrientation().getYaw(AngleUnit.RADIANS)));
-//
-//        TelemetryPacket packet = new TelemetryPacket();
-//        packet.put("Robot vision pose", pose.toString());
-//        packet.put("Limelight Time", limeLightResult.getTimestamp());
-//        packet.put("Robot time", TimeTracker.getTime());
-//        dashboard.sendTelemetryPacket(packet);
-//
-//        return pose;
-//    }
+    public boolean detectPattern () {
+        setPipeline(1);
+        LLResult llResult = limelight.getLatestResult();
 
+        for (LLResultTypes.FiducialResult r : llResult.getFiducialResults()) {
+            int id = r.getFiducialId();
 
+            if (id >= 21 && id <= 23) {
+                RobotState.getInstance().setPattern(patters.get(id));
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Called periodically by the scheduler.
      * <p>
-     * Performs a rate-limited HuskyLens read, filters blocks by tracked tag IDs
-     * and minimum pixel size, and computes corrected poses using the vision processor.
-     * Updates {@code latestPose} if a valid correction is available.
+     * Gets the pos of the robot based on limelight mega tag 2
      */
     @Override
     public void periodic() {
@@ -109,8 +108,8 @@ public class Vision implements Subsystem {
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("Robot vision pose", pose.toString());
         packet.put("Estimated Pose", RobotState.getInstance().getEstimatedPose());
-        packet.put("Limelight Time", limelightTime);
-        packet.put("Robot time", TimeTracker.getTime());
+//        packet.put("Limelight Time", limelightTime);
+//        packet.put("Robot time", TimeTracker.getTime());
         packet.put("tag amount", limeLightResult.getFiducialResults().size());
         packet.put("Distance away", distance - 17.78);
         dashboard.sendTelemetryPacket(packet);

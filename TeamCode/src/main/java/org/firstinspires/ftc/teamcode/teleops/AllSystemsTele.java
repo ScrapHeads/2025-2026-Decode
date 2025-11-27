@@ -25,6 +25,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
+import org.firstinspires.ftc.teamcode.Commands.drivetrain.TurnToTarget;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunIntakeCommand;
 import org.firstinspires.ftc.teamcode.Commands.launcher.AsistedLaunch;
@@ -162,8 +163,10 @@ public class AllSystemsTele extends CommandOpMode {
         driver.getGamepadButton(DPAD_LEFT)
                         .whenPressed(
                                 new ParallelCommandGroup(
+                                        new InstantCommand(launcher::enable),
                                         new InstantCommand(launcher::getAndSetFlywheelByDistance),
-                                        new SetHoodAngleCommand(hood, 1430)
+                                        new SetHoodAngleCommand(hood, 1430),
+                                        new TurnToTarget(drivetrain, driver, 1, vision)
                                 )
                         );
 
@@ -175,7 +178,11 @@ public class AllSystemsTele extends CommandOpMode {
 
 
         driver.getGamepadButton(DPAD_DOWN)
-                .whenPressed(new StopFlywheel(launcher));
+                .whenPressed(
+                        new ParallelCommandGroup(
+                            new DriveContinous(drivetrain, driver, 1),
+                            new StopFlywheel(launcher)
+                ));
 
 //        driver.getGamepadButton(DPAD_UP)
 //                .whenPressed(new SetHoodAngleCommand(hood, 0));

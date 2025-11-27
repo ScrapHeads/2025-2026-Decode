@@ -565,7 +565,7 @@ public final class Drivetrain implements Subsystem {
         // Units.metersToInches()
         packet.put("X", pose.getX());
         packet.put("Y", pose.getY());
-        packet.put("Localizer pose", localizer.getPose().toString());
+//        packet.put("Localizer pose", localizer.getPose().toString());
         packet.put("rot", pose.getRotation().toString());
         packet.put("xVel", vel.vxMetersPerSecond);
         packet.put("yVel", vel.vyMetersPerSecond);
