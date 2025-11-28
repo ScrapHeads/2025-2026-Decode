@@ -35,7 +35,7 @@ public class SortedLuanch extends SequentialCommandGroup {
                 new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING),
                 new WaitCommand(200),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
-                new WaitCommand(600),
+                new WaitCommand(800),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitCommand(800),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),

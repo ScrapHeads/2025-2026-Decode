@@ -62,9 +62,10 @@ public final class Launcher implements Subsystem {
 
         // --- Control ---
         /** Single PID controller for the shooter motor. */
-        public double PIDKp = 0.02;
-        public double PIDKi = 0.0025;
-        public double PIDKd = 0.0025;
+        public double PIDKp = 0.001;
+        public double PIDKi = 0.0;
+        public double PIDKd = 0.00001;
+        public double PIDKf = 0.000161;
 
         /** Static feedforward to overcome friction. */
         public double feedForwardKS = 0.05;
@@ -75,7 +76,7 @@ public final class Launcher implements Subsystem {
     /** Instance of params for this launcher. */
     public static Params PARAMS = new Params();
 
-    public final PIDController shooterPid = new PIDController(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd);
+    public PIDController shooterPid = new PIDController(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd);
 
     /** Motor driving the shooter flywheel. */
     private final MotorEx shooter;
@@ -95,7 +96,8 @@ public final class Launcher implements Subsystem {
     public Launcher(HardwareMap hm) {
         shooter = new MotorEx(hm, "shooter"); // name must match configuration
 
-        shooterPid.setTolerance(100);
+        shooterPid.setTolerance(25);
+        shooterPid.setIntegrationBounds(-1, 1);
 
         shooter.setInverted(false);
         shooter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
@@ -191,6 +193,11 @@ public final class Launcher implements Subsystem {
         final double dt = (PARAMS.lastLoopNanos == 0L) ? 0.02 : (now - PARAMS.lastLoopNanos) / 1e9;
         PARAMS.lastLoopNanos = now;
 
+        //Comment out when not tuning
+        shooterPid.setPIDF(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd, PARAMS.PIDKf);
+
+        TelemetryPacket packet = new TelemetryPacket();
+
         if (PARAMS.enabledPid) {
             // 1) Ramp target to avoid brownouts
             final double maxStep = PARAMS.maxAccelRpmPerSec * dt;
@@ -208,10 +215,11 @@ public final class Launcher implements Subsystem {
             final double pidOut = shooterPid.calculate(currentRpm, PARAMS.currentTargetRpm);
 
             // 4) Feedforward
-            final double ff = PARAMS.feedForwardKS + PARAMS.feedForwardKV * PARAMS.currentTargetRpm;
+//            final double ff = PARAMS.feedForwardKS + PARAMS.feedForwardKV * PARAMS.currentTargetRpm;
 
             // 5) Apply
-            double output = clamp(ff + pidOut, 0.0, 1.0);
+            double output = clamp(pidOut, 0.0, 1.0);
+            packet.put("PID output", pidOut);
 
             shooter.set(output);
 
@@ -238,7 +246,6 @@ public final class Launcher implements Subsystem {
         tele.addData("Enabled", PARAMS.enabledPid);
         tele.update();
 
-        TelemetryPacket packet = new TelemetryPacket();
         packet.put("TgtRPM", PARAMS.targetRpm);
         packet.put("CurTgt", PARAMS.currentTargetRpm);
         packet.put("RPM", getShooterRPM());

@@ -70,7 +70,7 @@ public class AllSystemsTele extends CommandOpMode {
         dashboard = FtcDashboard.getInstance();
 
         StateIO.load();
-        RobotState.getInstance().setTeam(false);
+        RobotState.getInstance().setTeam(true);
 
         // Initialize the subsystems declared at the top of the code
         drivetrain = new Drivetrain(hm, RobotState.getInstance().getOdometryPose());

@@ -47,7 +47,7 @@ public class TurnToTarget extends CommandBase {
         pid.setTolerance(1);
 
         vision.setPipeline(0);
-//        pid.enableContinuousInput(0, 360);
+        pid.enableContinuousInput(-180, 180);
 
         xLimiter = new SlewRateLimiter(2, TimeTracker.getTime());
         yLimiter = new SlewRateLimiter(2, TimeTracker.getTime());
@@ -108,16 +108,16 @@ public class TurnToTarget extends CommandBase {
                 angle = (newAsinDegrees + 88.75) * .95;
             }
         } else {
-            // Get the distance away from the red conner
+            // Get the distance away from the blue conner
             h = getHypot(-1.7788, -1.8288);
-            // Find the distance on x from the red conner
+            // Find the distance on x from the blue conner
             o = Math.abs(-1.7788 - x);
 
             //Find the angle from asin
             asinDegrees = Units.radiansToDegrees(Math.asin(o / h));
 
             // Set the appropriate offest
-            angle = ((asinDegrees + 88.75) * .95) + 268.75;
+            angle = ((-asinDegrees - 103) * .935);
             newAsinDegrees = 0;
 
             // Conditions for different asin calculations
@@ -125,12 +125,12 @@ public class TurnToTarget extends CommandBase {
                 h = getHypot(-1.8288,-1.7788);
                 o = Math.abs(-1.8288 - x);
                 newAsinDegrees = Units.radiansToDegrees(Math.asin(o / h));
-                angle = ((newAsinDegrees + 88.75) * 1.01) + 268.75;
-            } else if (asinDegrees > 37) {
+                angle = ((-newAsinDegrees - 89) * 1.03);
+            } else if (asinDegrees > 40) {
                 h = getHypot(-1.8288,-1.7788);
                 o = Math.abs(-1.8288 - x);
                 newAsinDegrees = Units.radiansToDegrees(Math.asin(o / h));
-                angle = ((newAsinDegrees + 88.75) * .950) + 268.75;
+                angle = ((-newAsinDegrees - 91.5) * 1.03);
             }
         }
 
