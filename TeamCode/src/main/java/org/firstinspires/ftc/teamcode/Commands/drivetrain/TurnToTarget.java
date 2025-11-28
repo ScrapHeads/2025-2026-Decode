@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 
 import org.firstinspires.ftc.teamcode.RilLib.Control.PID.PIDController;
@@ -71,32 +72,68 @@ public class TurnToTarget extends CommandBase {
         double xSpeed = xLimiter.calculate(driver.getLeftY(), TimeTracker.getTime()) * speed;
         double ySpeed = yLimiter.calculate(-driver.getLeftX(), TimeTracker.getTime()) * speed;
 
+        double h;
+        double o;
+        double angle;
+        double asinDegrees;
+        double newAsinDegrees;
+
         // Get the robot pose on the x axes
         double x = RobotState.getInstance().getEstimatedPose().getX();
 
-        // Get the distance away from the red conner
-        double h = RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(new Translation2d(-1.7788,1.8288));
-        // Find the distance on x from the red conner
-        double o = Math.abs(-1.7788 - x);
+        // If on red team do the first equation set else assume the blue team
+        if (!RobotState.getInstance().getTeam()) {
+            // Get the distance away from the red conner
+            h = getHypot(-1.7788, 1.8288);
+            // Find the distance on x from the red conner
+            o = Math.abs(-1.7788 - x);
 
-        //Find the angle from asin
-        double asinDegrees = Units.radiansToDegrees(Math.asin(o / h));
-        // Set the appropriate offest
-        double angle = (asinDegrees + 88.75) * .95;
-        double newAsinDegrees = 0;
+            //Find the angle from asin
+            asinDegrees = Units.radiansToDegrees(Math.asin(o / h));
+            
+            // Set the appropriate offest
+            angle = (asinDegrees + 88.75) * .95;
+            newAsinDegrees = 0;
 
-        // Conditions for different asin calculations
-        if (x > .5) {
-            h = RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(new Translation2d(-1.8288,1.7788));
-            o = Math.abs(-1.8288 - x);
-            newAsinDegrees = Units.radiansToDegrees(Math.asin(o / h));
-            angle = (newAsinDegrees + 88.75) * 1.01;
-        } else if (asinDegrees > 37) {
-            h = RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(new Translation2d(-1.8288,1.7788));
-            o = Math.abs(-1.8288 - x);
-            newAsinDegrees = Units.radiansToDegrees(Math.asin(o / h));
-            angle = (newAsinDegrees + 88.75) * .95;
+            // Conditions for different asin calculations
+            if (x > .5) {
+                h = getHypot(-1.8288,1.7788);
+                o = Math.abs(-1.8288 - x);
+                newAsinDegrees = Units.radiansToDegrees(Math.asin(o / h));
+                angle = (newAsinDegrees + 88.75) * 1.01;
+            } else if (asinDegrees > 37) {
+                h = getHypot(-1.8288,1.7788);
+                o = Math.abs(-1.8288 - x);
+                newAsinDegrees = Units.radiansToDegrees(Math.asin(o / h));
+                angle = (newAsinDegrees + 88.75) * .95;
+            }
+        } else {
+            // Get the distance away from the red conner
+            h = getHypot(-1.7788, -1.8288);
+            // Find the distance on x from the red conner
+            o = Math.abs(-1.7788 - x);
+
+            //Find the angle from asin
+            asinDegrees = Units.radiansToDegrees(Math.asin(o / h));
+
+            // Set the appropriate offest
+            angle = ((asinDegrees + 88.75) * .95) + 268.75;
+            newAsinDegrees = 0;
+
+            // Conditions for different asin calculations
+            if (x > .5) {
+                h = getHypot(-1.8288,-1.7788);
+                o = Math.abs(-1.8288 - x);
+                newAsinDegrees = Units.radiansToDegrees(Math.asin(o / h));
+                angle = ((newAsinDegrees + 88.75) * 1.01) + 268.75;
+            } else if (asinDegrees > 37) {
+                h = getHypot(-1.8288,-1.7788);
+                o = Math.abs(-1.8288 - x);
+                newAsinDegrees = Units.radiansToDegrees(Math.asin(o / h));
+                angle = ((newAsinDegrees + 88.75) * .950) + 268.75;
+            }
         }
+
 
 
         TelemetryPacket packet = new TelemetryPacket();
@@ -119,6 +156,11 @@ public class TurnToTarget extends CommandBase {
 
         drivetrain.setDrivePowers(robotSpeeds);
     }
+
+    public double getHypot (double x, double y) {
+        return RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(new Translation2d(x, y));
+    }
+
 
     /**
      * Stops the drivetrain when the command ends, whether completed or interrupted.
