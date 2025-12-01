@@ -75,7 +75,7 @@ public class Sorter implements Subsystem {
     public Sorter(HardwareMap hm) {
         // === Initialize color sensor ===
         colorSensorV3 = hm.get(RevColorSensorV3.class, "colorSensor");
-        colorSensorV3.setGain(2); // Gain range 1–60 depending on ambient light
+        colorSensorV3.setGain(10); // Gain range 1–60 depending on ambient light
         setLed(true);
 
         sorter = new MotorEx(hm, "sorter");
@@ -272,7 +272,7 @@ public class Sorter implements Subsystem {
         double bNorm = b / total;
 
         // --- GREEN detection: strong green dominance ---
-        if (gNorm > rNorm * 3 && gNorm > bNorm * 1.2) {
+        if (gNorm > rNorm * 2.8 && gNorm > bNorm * 1.2) {
             return GREEN;
         }
 

@@ -68,6 +68,10 @@ public final class PinpointLocalizer implements Localizer {
         txWorldPinpoint = pose.times(txPinpointRobot.inverse());
     }
 
+    public void setHeading (double heading) {
+        txWorldPinpoint = new Pose2d(txWorldPinpoint.position, heading);
+    }
+
     @Override
     public Pose2d getPose() {
         return txWorldPinpoint.times(txPinpointRobot);

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Commands.AutoPathCommands;
 
+import static org.firstinspires.ftc.teamcode.util.ConversionUtil.convertPose2D;
+
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.AccelConstraint;
 import com.acmerobotics.roadrunner.Action;
@@ -148,14 +150,14 @@ public class DynamicStrafeCommand extends CommandBase {
     @Override
     public void initialize() {
         Pose2d currentPose = RobotState.getInstance().getEstimatedPose();
-        Pose2d targetPose = targetPoseSupplier.get();
+        com.acmerobotics.roadrunner.Pose2d targetPose = convertPose2D(targetPoseSupplier.get());
 
         trajectoryAction = drivetrain.actionBuilder(
                         currentPose,
                         turnConstraints, velConstraints, accelConstraint,
                         posTol, headingTol, velTol
                 )
-                .strafeToLinearHeading(new Vector2d(targetPose.getX(), targetPose.getY()), targetPose.getRotation().getRadians())
+                .strafeToLinearHeading(targetPose.position, targetPose.heading)
                 .build();
     }
 
