@@ -139,7 +139,6 @@ public class AllSystemsTele extends CommandOpMode {
         // Set up continuous drive
         drivetrain.setDefaultCommand(new DriveContinous(drivetrain, driver, 1));
 
-        // A: spin up and hold 6000 RPM (command ends only when launcher.disable() is called)
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
                 .whenActive(new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER))
                 .whenInactive(new RunIntakeCommand(intake, 0));
@@ -203,14 +202,14 @@ public class AllSystemsTele extends CommandOpMode {
                                         new InstantCommand(launcher::enable),
                                         new InstantCommand(launcher::getAndSetFlywheelByDistance),
                                         new SetHoodAngleCommand(hood, 1430),
-                                        new InstantCommand(() -> drivetrain.setDefaultCommand(new TurnToTarget(drivetrain, driver, 1, vision)))
+                                        new TurnToTarget(drivetrain, driver, 1, vision)
                                 )
                         );
 
-        driver.getGamepadButton(DPAD_RIGHT)
-                        .whenPressed(new ParallelCommandGroup(
-                                new InstantCommand(() -> drivetrain.setDefaultCommand(new DriveContinous(drivetrain, driver, 1)))
-                        ));
+//        driver.getGamepadButton(DPAD_RIGHT)
+//                        .whenPressed(new ParallelCommandGroup(
+//                                new InstantCommand(() -> drivetrain.setDefaultCommand(new DriveContinous(drivetrain, driver, 1)))
+//                        ));
 
 
         driver.getGamepadButton(DPAD_DOWN)

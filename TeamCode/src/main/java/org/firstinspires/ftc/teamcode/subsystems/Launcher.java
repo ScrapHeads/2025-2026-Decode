@@ -193,7 +193,6 @@ public final class Launcher implements Subsystem {
         final double dt = (PARAMS.lastLoopNanos == 0L) ? 0.02 : (now - PARAMS.lastLoopNanos) / 1e9;
         PARAMS.lastLoopNanos = now;
 
-        //Comment out when not tuning
         shooterPid.setPIDF(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd, PARAMS.PIDKf);
 
         TelemetryPacket packet = new TelemetryPacket();
@@ -214,15 +213,14 @@ public final class Launcher implements Subsystem {
             // 3) PID correction
             final double pidOut = shooterPid.calculate(currentRpm, PARAMS.currentTargetRpm);
 
-            // 4) Feedforward
-//            final double ff = PARAMS.feedForwardKS + PARAMS.feedForwardKV * PARAMS.currentTargetRpm;
-
             // 5) Apply
             double output = clamp(pidOut, 0.0, 1.0);
             packet.put("PID output", pidOut);
+            packet.put("Output", output);
 
-            shooter.set(output);
-
+            // Set to pidOut needs to be tested what output but motor could never go negative
+            shooter.set(pidOut);
+//            shooter.set(output);
         }
 
         // --- Readiness logic ---

@@ -5,8 +5,10 @@ import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.RilLib.Control.PID.PIDController;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
@@ -161,6 +163,10 @@ public class TurnToTarget extends CommandBase {
         return RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(new Translation2d(x, y));
     }
 
+    @Override
+    public boolean isFinished() {
+        return driver.stateJustChanged(GamepadKeys.Button.A) || driver.stateJustChanged(GamepadKeys.Button.B) || driver.stateJustChanged(GamepadKeys.Button.Y);
+    }
 
     /**
      * Stops the drivetrain when the command ends, whether completed or interrupted.
