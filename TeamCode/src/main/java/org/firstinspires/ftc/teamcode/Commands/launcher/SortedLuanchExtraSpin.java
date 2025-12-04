@@ -18,9 +18,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
-public class SortedLuanch extends SequentialCommandGroup {
+public class SortedLuanchExtraSpin extends SequentialCommandGroup {
     private int startOffset;
-    public SortedLuanch (Launcher launcher, Sorter sorter, HoldControl holdControl) {
+    public SortedLuanchExtraSpin(Launcher launcher, Sorter sorter, HoldControl holdControl) {
 
         addCommands (
                 new InstantCommand(() -> {
@@ -39,10 +39,16 @@ public class SortedLuanch extends SequentialCommandGroup {
                 new WaitCommand(100),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint),
+//                new WaitUntilCommand(launcher::isReadyToLaunch),
                 new WaitCommand(300),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint),
+//                new WaitUntilCommand(launcher::isReadyToLaunch),
                 new WaitCommand(300),
+                new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
+                new WaitUntilCommand(sorter::isAtSetPoint),
+                new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
+                new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint),
                 new ClearSorterSlots(sorter)

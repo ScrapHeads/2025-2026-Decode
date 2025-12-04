@@ -94,7 +94,7 @@ public final class Launcher implements Subsystem {
      * @param hm Hardware map from OpMode
      */
     public Launcher(HardwareMap hm) {
-        shooter = new MotorEx(hm, "shooter"); // name must match configuration
+        shooter = new MotorEx(hm, "launcher"); // name must match configuration
 
         shooterPid.setTolerance(25);
         shooterPid.setIntegrationBounds(-1, 1);

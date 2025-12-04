@@ -118,6 +118,8 @@ public class AllSystemsTele extends CommandOpMode {
         // Bind controls
         assignControls();
 
+        vision.setPipeline(0);
+
         if (!RobotState.getInstance().getTeam()) {
             // Red side
             setLaunchPoint = new Pose2d(1.22, 0, new Rotation2d(2.58309));
@@ -157,13 +159,22 @@ public class AllSystemsTele extends CommandOpMode {
                 .whenPressed(new TurnOneSlot(sorter, Sorter.CW_DIRECTION));
 
         driver.getGamepadButton(A)
-                .whenPressed(new LuanchSetPattern(launcher, sorter, holdControl, patters.get(21)));
+                .whenPressed(new ParallelCommandGroup(
+                                new LuanchSetPattern(launcher, sorter, holdControl, patters.get(21)),
+                                new InstantCommand(launcher::getAndSetFlywheelByDistance)
+                ));
 
         driver.getGamepadButton(B)
-                .whenPressed(new LuanchSetPattern(launcher, sorter, holdControl, patters.get(22)));
+                .whenPressed(
+                        new ParallelCommandGroup(
+                                new InstantCommand(launcher::getAndSetFlywheelByDistance),
+                                new LuanchSetPattern(launcher, sorter, holdControl, patters.get(22))));
 
         driver.getGamepadButton(Y)
-                .whenPressed(new LuanchSetPattern(launcher, sorter, holdControl, patters.get(23)));
+                .whenPressed(
+                        new ParallelCommandGroup(
+                                new InstantCommand(launcher::getAndSetFlywheelByDistance),
+                                new LuanchSetPattern(launcher, sorter, holdControl, patters.get(23))));
 
         driver.getGamepadButton(X)
                         .whenPressed(new DynamicStrafeCommand(drivetrain, () -> setLaunchPoint));
@@ -180,11 +191,11 @@ public class AllSystemsTele extends CommandOpMode {
 //        driver.getGamepadButton(B)
 //                .whenPressed(new HoldControlCommand(holdControl, HoldControl.HoldPosition.TRANSPORT));
 
-//        driver.getGamepadButton(DPAD_UP)
-//                .whenPressed(new ParallelCommandGroup(
-//                        new SetFlywheelRpm(launcher, 4450),
-//                        new SetHoodAngleCommand(hood, LauncherHood.HIGH_SHOOT_ANGLE)
-//                ));
+        driver.getGamepadButton(DPAD_UP)
+                .whenPressed(new ParallelCommandGroup(
+                        new SetFlywheelRpm(launcher, 3460),
+                        new SetHoodAngleCommand(hood, 1430)
+                ));
 
         driver.getGamepadButton(DPAD_LEFT)
                         .whenPressed(
@@ -192,24 +203,21 @@ public class AllSystemsTele extends CommandOpMode {
                                         new InstantCommand(launcher::enable),
                                         new InstantCommand(launcher::getAndSetFlywheelByDistance),
                                         new SetHoodAngleCommand(hood, 1430),
-                                        new TurnToTarget(drivetrain, driver, 1, vision)
+                                        new InstantCommand(() -> drivetrain.setDefaultCommand(new TurnToTarget(drivetrain, driver, 1, vision)))
                                 )
                         );
 
-//        driver.getGamepadButton(DPAD_RIGHT)
-//                        .whenPressed(new ParallelCommandGroup(
-//                                new SetFlywheelRpm(launcher, 2950),
-//                                new SetHoodAngleCommand(hood, LauncherHood.LOW_SHOOT_ANGLE)
-//                        ));
+        driver.getGamepadButton(DPAD_RIGHT)
+                        .whenPressed(new ParallelCommandGroup(
+                                new InstantCommand(() -> drivetrain.setDefaultCommand(new DriveContinous(drivetrain, driver, 1)))
+                        ));
 
 
         driver.getGamepadButton(DPAD_DOWN)
                 .whenPressed(
                         new ParallelCommandGroup(
-                                new StopFlywheel(launcher),
-                                new DriveContinous(drivetrain, driver, 1)
+                                new StopFlywheel(launcher)
                 ));
-
     }
 }
 

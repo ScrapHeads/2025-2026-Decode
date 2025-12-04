@@ -345,9 +345,15 @@ public class Sorter implements Subsystem {
         }
         double output = pidController.calculate(sorter.getCurrentPosition(), turnPos);
 
-        if (detectBallColor() != getCurrentColor() && isAtSetPoint() && Math.abs(output) < .1) {
-            setSlotCurrent(detectBallColor());
+        BallColor seenColor = detectBallColor();
+
+        if (seenColor != getCurrentColor() && isAtSetPoint() && Math.abs(output) < .04) {
+            setSlotCurrent(seenColor);
         }
+
+        TelemetryPacket p = new TelemetryPacket();
+        p.put("Sorter output", output);
+        dashboard.sendTelemetryPacket(p);
 
         RobotState.getInstance().setBallColors(slots);
 

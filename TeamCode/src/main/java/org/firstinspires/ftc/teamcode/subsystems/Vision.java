@@ -37,7 +37,7 @@ import org.firstinspires.ftc.teamcode.util.TimeTracker;
  */
 public class Vision implements Subsystem {
 
-    private final Limelight3A limelight;
+    public final Limelight3A limelight;
 
     /**
      * Creates a Vision subsystem with HuskyLens and camera calibration parameters.
@@ -52,13 +52,20 @@ public class Vision implements Subsystem {
     public void startLimelight () {limelight.start();}
     public void stopLimeLight () {limelight.stop();}
 
+    private int i = 0;
 
     public void setPipeline (int index) {
+        TelemetryPacket p = new TelemetryPacket();
+        p.put("Called amount", i++);
+        p.put("Set index", index);
+        dashboard.sendTelemetryPacket(p);
         limelight.pipelineSwitch(index);
     }
 
     public boolean detectPattern () {
-        setPipeline(1);
+        if (limelight.getStatus().getPipelineIndex() != 1) {
+            setPipeline(1);
+        }
         LLResult llResult = limelight.getLatestResult();
 
         for (LLResultTypes.FiducialResult r : llResult.getFiducialResults()) {
@@ -69,7 +76,6 @@ public class Vision implements Subsystem {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -80,11 +86,20 @@ public class Vision implements Subsystem {
      */
     @Override
     public void periodic() {
+        TelemetryPacket p = new TelemetryPacket();
+        p.put("LimeLight", limelight.toString());
+
         Rotation2d curRot = RobotState.getInstance().getOdometryPose().getRotation();
         limelight.updateRobotOrientation(curRot.getDegrees());
 
         LLResult limeLightResult = limelight.getLatestResult();
         Pose3D robotPose = limeLightResult.getBotpose_MT2();
+
+        p.put("LimeLightResult", limeLightResult.getFiducialResults());
+        p.put("LimeLight robot pose", robotPose.toString());
+        p.put("Limelight pipeline", limelight.getStatus().getPipelineIndex());
+        dashboard.sendTelemetryPacket(p);
+
 
         Pose2d pose = new Pose2d(
                 robotPose.getPosition().x,

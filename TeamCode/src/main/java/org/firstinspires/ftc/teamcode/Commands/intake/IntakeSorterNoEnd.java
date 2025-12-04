@@ -44,22 +44,12 @@ public class IntakeSorterNoEnd extends CommandBase {
             holdControl.moveTo(LOADING);
         }
 
-        BallColor detected = sorter.detectBallColor();
-
         boolean isAtSetPoint = Math.abs(Math.abs(sorter.getCurrentPos()) - Math.abs(sorter.getTurnPos())) <= 800;
 
-        if (detected != BallColor.EMPTY && isAtSetPoint) {
+        if (sorter.getCurrentColor() != BallColor.EMPTY && isAtSetPoint) {
             holdControl.moveTo(TRANSPORT);
             sorter.turnOneSlotDirection(Sorter.CW_DIRECTION);
         }
-//        if (sorter.detectBallColor() != BallColor.EMPTY
-//                &&
-//                RobotState.getInstance().getBallColors()[sorter.getCurrentIndex()] != BallColor.EMPTY
-//        ) {
-//            if (sorter.isAtSetPoint()) {
-//                sorter.turnOneSlotDirection(Sorter.CW_DIRECTION);
-//            }
-//        }
     }
 
     @Override

@@ -22,7 +22,7 @@ public class Constants {
     public static Telemetry tele;
     public static FtcDashboard dashboard;
 
-    public static double intakePowerOffset = .25;
+    public static double intakePowerOffset = 0.0;
 
 
     public static int[] PATTERN_TAG_IDS = {21, 22, 23};

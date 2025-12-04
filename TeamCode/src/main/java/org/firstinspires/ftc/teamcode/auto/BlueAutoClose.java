@@ -27,6 +27,8 @@ import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
+import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanchExtraSpin;
+import org.firstinspires.ftc.teamcode.Commands.sorter.TurnThreeSlot;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnToLaunchPattern;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
@@ -103,11 +105,11 @@ public class BlueAutoClose extends CommandOpMode {
                 new AngularVelConstraint(Math.PI)));
         AccelConstraint accelConstraintFast = new ProfileAccelConstraint(-40, 80);
 
-        TurnConstraints turnConstraintsPickUp = new TurnConstraints(4, -2, 4);
+        TurnConstraints turnConstraintsPickUp = new TurnConstraints(2, -2, 4);
         VelConstraint velConstraintPickUp = new MinVelConstraint(Arrays.asList(
-                drivetrain.kinematics.new WheelVelConstraint(25),
+                drivetrain.kinematics.new WheelVelConstraint(9),
                 new AngularVelConstraint(Math.PI)));
-        AccelConstraint accelConstraintPickUp = new ProfileAccelConstraint(-20, 40);
+        AccelConstraint accelConstraintPickUp = new ProfileAccelConstraint(-10, 10);
 
         StateIO.save();
 
@@ -120,13 +122,15 @@ public class BlueAutoClose extends CommandOpMode {
                         new GetTagPattern(vision).withTimeout(5000).andThen(
                                 new TurnToLaunchPattern(sorter)
                         ),
-                        new SetFlywheelRpm(launcher, 3570),
+                        new SetFlywheelRpm(launcher, 3490),
                         new SetHoodAngleCommand(hood, 1430),
                         new DynamicStrafeCommand(drivetrain, () -> path.get(1))
                 ),
 
                 new WaitCommand(100),
-                new SortedLuanch(launcher, sorter, holdControl),
+                new InstantCommand(launcher::getAndSetFlywheelByDistance),
+                new SortedLuanchExtraSpin(launcher, sorter, holdControl),
+
                 new WaitCommand(100),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
 
@@ -136,14 +140,15 @@ public class BlueAutoClose extends CommandOpMode {
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
 
-                new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER).withTimeout(200),
+                new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER).withTimeout(500),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
                 ),
 
-                new SortedLuanch(launcher, sorter, holdControl),
+                new InstantCommand(launcher::getAndSetFlywheelByDistance),
+                new SortedLuanchExtraSpin(launcher, sorter, holdControl),
                 new WaitCommand(200),
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(5), 5, 5, 5),
 
@@ -165,7 +170,8 @@ public class BlueAutoClose extends CommandOpMode {
                 ),
 
                 new WaitCommand(50),
-                new SortedLuanch(launcher, sorter, holdControl),
+                new InstantCommand(launcher::getAndSetFlywheelByDistance),
+                new SortedLuanchExtraSpin(launcher, sorter, holdControl),
                 new WaitCommand(150),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(9),
                         turnConstraintsFast, velConstraintFast, accelConstraintFast),

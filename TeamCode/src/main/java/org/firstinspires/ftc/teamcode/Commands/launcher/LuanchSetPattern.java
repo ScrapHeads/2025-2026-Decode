@@ -37,10 +37,10 @@ public class LuanchSetPattern extends SequentialCommandGroup {
                 new WaitCommand(200),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint),
-                new WaitCommand(200),
+                new WaitCommand(300),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint),
-                new WaitCommand(200),
+                new WaitCommand(300),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint)
         );
