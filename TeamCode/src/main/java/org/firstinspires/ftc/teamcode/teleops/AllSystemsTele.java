@@ -30,6 +30,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
 import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
+import org.firstinspires.ftc.teamcode.Commands.drivetrain.SetLocalizerHeading;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.TurnToTarget;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunIntakeCommand;
@@ -179,7 +180,7 @@ public class AllSystemsTele extends CommandOpMode {
                         .whenPressed(new DynamicStrafeCommand(drivetrain, () -> setLaunchPoint));
 
         driver.getGamepadButton(START)
-                        .whenPressed(new InstantCommand(() -> drivetrain.localizer.setHeading(0)));
+                        .whenPressed(new SetLocalizerHeading(drivetrain, 0));
 
         driver.getGamepadButton(BACK)
                         .whenPressed(new GetTagPattern(vision));

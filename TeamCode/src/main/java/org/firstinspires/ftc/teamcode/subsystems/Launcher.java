@@ -62,10 +62,10 @@ public final class Launcher implements Subsystem {
 
         // --- Control ---
         /** Single PID controller for the shooter motor. */
-        public double PIDKp = 0.001;
+        public double PIDKp = 0.00024;
         public double PIDKi = 0.0;
-        public double PIDKd = 0.00001;
-        public double PIDKf = 0.000161;
+        public double PIDKd = 0.0;
+        public double PIDKf = 0.000175;
 
         /** Static feedforward to overcome friction. */
         public double feedForwardKS = 0.05;
@@ -140,9 +140,12 @@ public final class Launcher implements Subsystem {
     public boolean isEnabled() {
         return PARAMS.enabledPid;
     }
-
+    public int ticker = 0;
     /** Directly set motor power (bypasses PID). */
     public void setPower(double power) {
+        TelemetryPacket p = new TelemetryPacket();
+        p.put("SetPoser called amount", ++ticker);
+        dashboard.sendTelemetryPacket(p);
         shooter.set(power);
     }
 
@@ -219,9 +222,12 @@ public final class Launcher implements Subsystem {
             packet.put("Output", output);
 
             // Set to pidOut needs to be tested what output but motor could never go negative
-            shooter.set(pidOut);
-//            shooter.set(output);
+//            shooter.set(pidOut);
+//            setPower(output);
+            shooter.set(output);
         }
+
+//        shooter.set(.5);
 
         // --- Readiness logic ---
         double shooterErr = Math.abs(getShooterRPM() - PARAMS.targetRpm);
@@ -249,6 +255,7 @@ public final class Launcher implements Subsystem {
         packet.put("RPM", getShooterRPM());
         packet.put("Ready", PARAMS.isReadyToLaunch);
         packet.put("Enabled", PARAMS.enabledPid);
+        packet.put("Launcher encoder", shooter.getCurrentPosition());
         dashboard.sendTelemetryPacket(packet);
 
     }

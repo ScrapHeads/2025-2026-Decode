@@ -55,6 +55,7 @@ public class TurnToTarget extends CommandBase {
         yLimiter = new SlewRateLimiter(2, TimeTracker.getTime());
 
         addRequirements(drivetrain);
+        addRequirements(vision);
     }
 
     @Override
@@ -165,7 +166,8 @@ public class TurnToTarget extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return driver.stateJustChanged(GamepadKeys.Button.A) || driver.stateJustChanged(GamepadKeys.Button.B) || driver.stateJustChanged(GamepadKeys.Button.Y);
+
+        return driver.isDown(GamepadKeys.Button.A) || driver.isDown(GamepadKeys.Button.B) || driver.isDown(GamepadKeys.Button.Y) || driver.isDown(GamepadKeys.Button.DPAD_RIGHT);
     }
 
     /**
