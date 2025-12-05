@@ -82,14 +82,14 @@ public class AllSystemsTele extends CommandOpMode {
         dashboard = FtcDashboard.getInstance();
 
         StateIO.load();
+
+        //TODO Comment out WHEN DOING Matches
+//        RobotState.getInstance().setPattern(new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN});
         RobotState.getInstance().setTeam(false);
 
         // Initialize the subsystems declared at the top of the code
         drivetrain = new Drivetrain(hm, RobotState.getInstance().getOdometryPose());
         drivetrain.register();
-
-        //TODO Comment out WHEN DOING Matches
-//        RobotState.getInstance().setPattern(new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN});
 
         // Gamepad
         driver = new GamepadEx(gamepad1);
@@ -100,9 +100,6 @@ public class AllSystemsTele extends CommandOpMode {
 
         sorter = new Sorter(hm);
         sorter.register();
-
-//        feederRail = new FeederRail(hm);
-//        feederRail.register();
 
         holdControl = new HoldControl(hm);
         holdControl.register();

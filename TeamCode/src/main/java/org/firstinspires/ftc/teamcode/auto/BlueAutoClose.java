@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.intakePowerOffset;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
+import static org.firstinspires.ftc.teamcode.util.ConversionUtil.convertPose2D;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -31,6 +32,7 @@ import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanchExtraSpin;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnThreeSlot;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnToLaunchPattern;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
+import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
@@ -76,7 +78,7 @@ public class BlueAutoClose extends CommandOpMode {
 
         setUpRobotState();
 
-        drivetrain = new Drivetrain(hm, path.get(0));
+        drivetrain = new Drivetrain(hm, RobotState.getInstance().getEstimatedPose());
 //        drivetrain = new Drivetrain(hm, new Pose2d(-2, -2, new Rotation2d(0.942478)));
         drivetrain.register();
 
@@ -113,6 +115,8 @@ public class BlueAutoClose extends CommandOpMode {
 
         StateIO.save();
 
+        TelemetryPacket p = new TelemetryPacket();
+        Drawing.drawRobot(p.fieldOverlay(), convertPose2D(RobotState.getInstance().getEstimatedPose()));
         // Wait to start the auto path till the play button is pressed
         waitForStart();
 

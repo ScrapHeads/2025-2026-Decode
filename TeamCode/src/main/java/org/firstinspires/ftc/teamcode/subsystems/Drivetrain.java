@@ -195,6 +195,10 @@ public final class Drivetrain implements Subsystem {
 
         localizer = new PinpointLocalizer(hardwareMap, PARAMS.inPerTick, ConversionUtil.convertPose2D(pose));
 
+        TelemetryPacket packet = new TelemetryPacket();
+        Drawing.drawRobot(packet.fieldOverlay(), convertPose2D(pose));
+        dashboard.sendTelemetryPacket(packet);
+
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
 

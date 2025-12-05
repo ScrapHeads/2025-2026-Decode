@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Commands.launcher;
 
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
+import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -21,6 +22,7 @@ public class LuanchSetPattern extends SequentialCommandGroup {
     public LuanchSetPattern(Launcher launcher, Sorter sorter, HoldControl holdControl, BallColor[] pattern) {
 
         addCommands (
+                new InstantCommand(() -> launcher.getAndSetFlywheelByDistance()),
                 new InstantCommand(() -> {
                     startOffset = sorter.findStartOffset(
                             pattern,
@@ -35,14 +37,18 @@ public class LuanchSetPattern extends SequentialCommandGroup {
 
                 new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING),
                 new WaitCommand(200),
+                new WaitUntilCommand(() -> launcher.isReadyToLaunch()),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint),
                 new WaitCommand(300),
+                new WaitUntilCommand(() -> launcher.isReadyToLaunch()),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint),
                 new WaitCommand(300),
+                new WaitUntilCommand(() -> launcher.isReadyToLaunch()),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
-                new WaitUntilCommand(sorter::isAtSetPoint)
+                new WaitUntilCommand(sorter::isAtSetPoint),
+                new InstantCommand(() -> sorter.setSlots(new BallColor[]{EMPTY, EMPTY, EMPTY}))
         );
     }
 

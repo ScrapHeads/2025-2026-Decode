@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.util.TimeTracker;
 
+@TeleOp(name = "DriveOnly", group = "ScrapHeads")
 public class DriveOnly extends CommandOpMode {
     // Create all subsystems references
     GamepadEx driver = null;
