@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.intakePowerOffset;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
+import static org.firstinspires.ftc.teamcode.util.ConversionUtil.convertPose2D;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -27,10 +28,13 @@ import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
+import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanchExtraSpin;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnToLaunchPattern;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
+import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.auto.paths.blueAutoClose;
 import org.firstinspires.ftc.teamcode.auto.paths.redAutoClose;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
@@ -48,7 +52,6 @@ import java.util.List;
 
 @Autonomous(name = "RedAutoClose", group = "ScrapHeads")
 public class RedAutoClose extends CommandOpMode {
-
     private Drivetrain drivetrain;
 
     private Launcher launcher;
@@ -73,7 +76,8 @@ public class RedAutoClose extends CommandOpMode {
 
         setUpRobotState();
 
-        drivetrain = new Drivetrain(hm, path.get(0));
+        drivetrain = new Drivetrain(hm, RobotState.getInstance().getEstimatedPose());
+//        drivetrain = new Drivetrain(hm, new Pose2d(-2, -2, new Rotation2d(0.942478)));
         drivetrain.register();
 
         launcher = new Launcher(hm);
@@ -101,13 +105,17 @@ public class RedAutoClose extends CommandOpMode {
                 new AngularVelConstraint(Math.PI)));
         AccelConstraint accelConstraintFast = new ProfileAccelConstraint(-40, 80);
 
-        TurnConstraints turnConstraintsPickUp = new TurnConstraints(4, -2, 4);
+        TurnConstraints turnConstraintsPickUp = new TurnConstraints(2, -2, 4);
         VelConstraint velConstraintPickUp = new MinVelConstraint(Arrays.asList(
-                drivetrain.kinematics.new WheelVelConstraint(23),
+                drivetrain.kinematics.new WheelVelConstraint(9),
                 new AngularVelConstraint(Math.PI)));
-        AccelConstraint accelConstraintPickUp = new ProfileAccelConstraint(-20, 40);
+        AccelConstraint accelConstraintPickUp = new ProfileAccelConstraint(-10, 10);
 
         StateIO.save();
+
+        TelemetryPacket p = new TelemetryPacket();
+        Drawing.drawRobot(p.fieldOverlay(), convertPose2D(RobotState.getInstance().getEstimatedPose()));
+        dashboard.sendTelemetryPacket(p);
 
         // Wait to start the auto path till the play button is pressed
         waitForStart();
@@ -115,57 +123,61 @@ public class RedAutoClose extends CommandOpMode {
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
                 new ParallelCommandGroup(
-                        new GetTagPattern(vision).withTimeout(7000),
+                        new GetTagPattern(vision).withTimeout(5000).andThen(
+                                new TurnToLaunchPattern(sorter)
+                        ),
+                        new SetFlywheelRpm(launcher, 3490),
+                        new SetHoodAngleCommand(hood, 1430),
                         new DynamicStrafeCommand(drivetrain, () -> path.get(1))
                 ),
 
-                new TurnToLaunchPattern(sorter),
-                new SetFlywheelRpm(launcher, 3400),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
-                new SetHoodAngleCommand(hood, LauncherHood.AUTO_CLOSE_ANGLE),
                 new WaitCommand(100),
-                new SortedLuanch(launcher, sorter, holdControl),
-                new WaitCommand(150),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
+                new InstantCommand(launcher::getAndSetFlywheelByDistance),
+                new SortedLuanchExtraSpin(launcher, sorter, holdControl),
+
+                new WaitCommand(100),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
 
                 new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(4),
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(3),
                                 turnConstraintsPickUp, velConstraintPickUp, accelConstraintPickUp),
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
 
-                new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER).withTimeout(200),
+                new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER).withTimeout(500),
 
                 new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
                 ),
 
-                new SortedLuanch(launcher, sorter, holdControl),
+                new InstantCommand(launcher::getAndSetFlywheelByDistance),
+                new SortedLuanchExtraSpin(launcher, sorter, holdControl),
                 new WaitCommand(200),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(6), 5, 5, 5),
+//                new DynamicStrafeCommand(drivetrain, () -> path.get(5), 5, 5, 5),
 
-                new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
 
                 new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(8),
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(6),
                                 turnConstraintsPickUp, velConstraintPickUp, accelConstraintPickUp),
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
                 new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
 
                 new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
                 ),
 
                 new WaitCommand(50),
-                new SortedLuanch(launcher, sorter, holdControl),
+                new InstantCommand(launcher::getAndSetFlywheelByDistance),
+                new SortedLuanchExtraSpin(launcher, sorter, holdControl),
                 new WaitCommand(150),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(11),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(9),
                         turnConstraintsFast, velConstraintFast, accelConstraintFast),
                 new InstantCommand(StateIO::save)
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(10))
@@ -198,6 +210,7 @@ public class RedAutoClose extends CommandOpMode {
     public void setUpRobotState() {
         RobotState.getInstance().setAll(
                 path.get(0),
+//                new Pose2d(-2, -2, new Rotation2d(0.942478)),
                 isBlue,
                 ballColors,
                 new ChassisSpeeds(0,0, 0)

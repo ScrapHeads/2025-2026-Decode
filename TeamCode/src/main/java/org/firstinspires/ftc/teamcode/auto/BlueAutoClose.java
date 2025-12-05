@@ -117,6 +117,8 @@ public class BlueAutoClose extends CommandOpMode {
 
         TelemetryPacket p = new TelemetryPacket();
         Drawing.drawRobot(p.fieldOverlay(), convertPose2D(RobotState.getInstance().getEstimatedPose()));
+        dashboard.sendTelemetryPacket(p);
+
         // Wait to start the auto path till the play button is pressed
         waitForStart();
 

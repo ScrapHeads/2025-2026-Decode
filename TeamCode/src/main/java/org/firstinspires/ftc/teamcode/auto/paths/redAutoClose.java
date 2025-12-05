@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.auto.paths;
 
-// headingWrapHalf=false
-// fieldInches=144
-// robotLenIn=16
-// robotWidIn=18
+// headingWrapHalf=true
+// fieldSize=3.66
+// robotLen=0.4572
+// robotWid=0.4064
+// measurementUnit=m
 import java.util.*;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
@@ -12,17 +13,15 @@ public final class redAutoClose {
     private redAutoClose() {}
 
     public static final List<Pose2d> PATH = Arrays.asList(
-    new Pose2d(-59.50, 45.00, new Rotation2d(5.358160)),  // #1  x=-59.50in, y=45.00in, θ=307.0°
-    new Pose2d(-29.50, 24.00, new Rotation2d(3.665190)),  // #2  x=-29.50in, y=24.00in, θ=210.0°
-    new Pose2d(-18.50, 16.00, new Rotation2d(2.356194)),  // #3  x=-18.50in, y=16.00in, θ=135.0°
-    new Pose2d(-14.00, 25.00, new Rotation2d(1.570796)),  // #4  x=-14.00in, y=25.00in, θ=90.0°
-    new Pose2d(-14.00, 51.00, new Rotation2d(1.570796)),  // #5  x=-14.00in, y=51.00in, θ=90.0°
-    new Pose2d(-18.50, 16.00, new Rotation2d(2.356194)),  // #6  x=-18.50in, y=16.00in, θ=135.0°
-    new Pose2d(-3.00, 24.50, new Rotation2d(1.570796)),  // #7  x=-3.00in, y=24.50in, θ=90.0°
-    new Pose2d(13.00, 22.50, new Rotation2d(1.570796)),  // #8  x=13.00in, y=22.50in, θ=90.0°
-    new Pose2d(13.00, 59.50, new Rotation2d(1.570796)),  // #9  x=13.00in, y=59.50in, θ=90.0°
-    new Pose2d(13.00, 44.50, new Rotation2d(1.570796)),  // #10  x=13.00in, y=44.50in, θ=90.0°
-    new Pose2d(-18.50, 16.00, new Rotation2d(2.356194)),  // #11  x=-18.50in, y=16.00in, θ=135.0°
-    new Pose2d(36.50, 15.00, new Rotation2d(1.570796))  // #12  x=36.50in, y=15.00in, θ=90.0°
+    new Pose2d(-1.068, 1.434, new Rotation2d(-1.570796)),  // #1  x=-1.068m, y=1.434m, θ=-90.0°
+    new Pose2d(-0.483, 0.513, new Rotation2d(2.356194)),  // #2  x=-0.483m, y=0.513m, θ=135.0°
+    new Pose2d(-0.307, 0.710, new Rotation2d(1.570796)),  // #3  x=-0.307m, y=0.710m, θ=90.0°
+    new Pose2d(-0.313, 1.356, new Rotation2d(1.570796)),  // #4  x=-0.313m, y=1.356m, θ=90.0°
+    new Pose2d(-0.483, 0.513, new Rotation2d(2.356194)),  // #5  x=-0.483m, y=0.513m, θ=135.0°
+    new Pose2d(0.343, 0.710, new Rotation2d(1.570796)),  // #6  x=0.343m, y=0.710m, θ=90.0°
+    new Pose2d(0.340, 1.430, new Rotation2d(1.570796)),  // #7  x=0.340m, y=1.430m, θ=90.0°
+    new Pose2d(0.343, 1.073, new Rotation2d(1.570796)),  // #8  x=0.343m, y=1.073m, θ=90.0°
+    new Pose2d(-0.478, 0.513, new Rotation2d(2.356194)),  // #9  x=-0.478m, y=0.513m, θ=135.0°
+    new Pose2d(-0.089, 1.274, new Rotation2d(-0.000000))  // #10  x=-0.089m, y=1.274m, θ=-0.0°
 );
 }

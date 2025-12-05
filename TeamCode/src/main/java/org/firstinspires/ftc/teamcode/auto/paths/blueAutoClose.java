@@ -22,6 +22,6 @@ public final class blueAutoClose {
     new Pose2d(0.340, -1.430, new Rotation2d(-1.570796)),  // #7  x=0.340m, y=-1.430m, θ=-90.0°
     new Pose2d(0.343, -1.073, new Rotation2d(-1.570796)),  // #8  x=0.343m, y=-1.073m, θ=-90.0°
     new Pose2d(-0.478, -0.513, new Rotation2d(-2.513270)),  // #9  x=-0.478m, y=-0.513m, θ=-144.0°
-    new Pose2d(0.002, -1.222, new Rotation2d(0.000000))  // #10  x=0.002m, y=-1.222m, θ=0.0°
+    new Pose2d(-0.073, -1.217, new Rotation2d(0.000000))  // #10  x=-0.073m, y=-1.217m, θ=0.0°
 );
 }
