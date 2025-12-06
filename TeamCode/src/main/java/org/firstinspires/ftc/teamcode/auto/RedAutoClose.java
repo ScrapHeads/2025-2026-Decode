@@ -132,7 +132,7 @@ public class RedAutoClose extends CommandOpMode {
                 ),
 
                 new WaitCommand(100),
-                new InstantCommand(launcher::getAndSetFlywheelByDistance),
+//                new InstantCommand(launcher::getAndSetFlywheelByDistance),
                 new SortedLuanchExtraSpin(launcher, sorter, holdControl),
 
                 new WaitCommand(100),
@@ -151,10 +151,9 @@ public class RedAutoClose extends CommandOpMode {
                         new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
                 ),
 
-                new InstantCommand(launcher::getAndSetFlywheelByDistance),
+//                new InstantCommand(launcher::getAndSetFlywheelByDistance),
                 new SortedLuanchExtraSpin(launcher, sorter, holdControl),
                 new WaitCommand(200),
-//                new DynamicStrafeCommand(drivetrain, () -> path.get(5), 5, 5, 5),
 
                 new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
 
@@ -174,7 +173,7 @@ public class RedAutoClose extends CommandOpMode {
                 ),
 
                 new WaitCommand(50),
-                new InstantCommand(launcher::getAndSetFlywheelByDistance),
+//                new InstantCommand(launcher::getAndSetFlywheelByDistance),
                 new SortedLuanchExtraSpin(launcher, sorter, holdControl),
                 new WaitCommand(150),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(9),

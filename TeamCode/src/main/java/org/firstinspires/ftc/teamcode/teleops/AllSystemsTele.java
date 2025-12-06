@@ -85,7 +85,8 @@ public class AllSystemsTele extends CommandOpMode {
 
         //TODO Comment out WHEN DOING Matches
 //        RobotState.getInstance().setPattern(new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN});
-        RobotState.getInstance().setTeam(false);
+//        RobotState.getInstance().setTeam(true);
+//        RobotState.getInstance().setTeam(false);
 
         // Initialize the subsystems declared at the top of the code
         drivetrain = new Drivetrain(hm, RobotState.getInstance().getOdometryPose());
@@ -157,20 +158,17 @@ public class AllSystemsTele extends CommandOpMode {
 
         driver.getGamepadButton(A)
                 .whenPressed(new ParallelCommandGroup(
-                                new LuanchSetPattern(launcher, sorter, holdControl, patters.get(21)),
-                                new InstantCommand(launcher::getAndSetFlywheelByDistance)
+                                new LuanchSetPattern(launcher, sorter, holdControl, patters.get(21))
                 ));
 
         driver.getGamepadButton(B)
                 .whenPressed(
                         new ParallelCommandGroup(
-                                new InstantCommand(launcher::getAndSetFlywheelByDistance),
                                 new LuanchSetPattern(launcher, sorter, holdControl, patters.get(22))));
 
         driver.getGamepadButton(Y)
                 .whenPressed(
                         new ParallelCommandGroup(
-                                new InstantCommand(launcher::getAndSetFlywheelByDistance),
                                 new LuanchSetPattern(launcher, sorter, holdControl, patters.get(23))));
 
         driver.getGamepadButton(X)

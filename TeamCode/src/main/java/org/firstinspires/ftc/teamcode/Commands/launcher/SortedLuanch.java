@@ -43,6 +43,7 @@ public class SortedLuanch extends SequentialCommandGroup {
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint),
                 new WaitCommand(300),
+//                new WaitUntilCommand(launcher::isReadyToLaunch),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint),
                 new ClearSorterSlots(sorter)

@@ -277,7 +277,7 @@ public class Sorter implements Subsystem {
         }
 
         // --- PURPLE detection: red + blue high, green low ---
-        double avgRB = (rNorm + bNorm) / 1.9;
+        double avgRB = (rNorm + bNorm) / 1.87;
         if (avgRB > gNorm) {
             return BallColor.PURPLE;
         }
