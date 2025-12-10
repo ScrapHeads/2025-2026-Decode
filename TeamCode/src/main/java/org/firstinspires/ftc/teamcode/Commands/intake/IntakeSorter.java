@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Commands.intake;
 
-import static org.firstinspires.ftc.teamcode.Constants.tele;
-
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.state.RobotState;
@@ -31,7 +29,7 @@ public class IntakeSorter extends CommandBase {
     @Override
     public void initialize() {
         holdControl.moveTo(HoldControl.HoldPosition.LOADING);
-        intake.setPower(power);
+        intake.setBothPower(power);
     }
 
     @Override
@@ -54,7 +52,7 @@ public class IntakeSorter extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        intake.setPower(0);
+        intake.setBothPower(0);
         holdControl.moveTo(HoldControl.HoldPosition.TRANSPORT);
     }
 }

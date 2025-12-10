@@ -27,7 +27,7 @@ public class RunIntakeCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        intake.setPower(power);
+        intake.setBothPower(power);
     }
 
     @Override

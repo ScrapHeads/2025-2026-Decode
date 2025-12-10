@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.Constants.blueTagPose;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
-import static org.firstinspires.ftc.teamcode.Constants.data;
+import static org.firstinspires.ftc.teamcode.Constants.LauncherTable;
 import static org.firstinspires.ftc.teamcode.Constants.redTagPose;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
@@ -14,11 +14,9 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.Interpolatable;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.InterpolatingDoubleTreeMap;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.InterpolatingTreeMap;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.Interpolator;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 
 /**
@@ -79,7 +77,8 @@ public final class Launcher implements Subsystem {
     public PIDController shooterPid = new PIDController(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd);
 
     /** Motor driving the shooter flywheel. */
-    private final MotorEx shooter;
+    private final MotorEx launcherLeft;
+    private final MotorEx launcherRight;
 
     private InterpolatingDoubleTreeMap treeMap = new InterpolatingDoubleTreeMap();
 
@@ -94,22 +93,26 @@ public final class Launcher implements Subsystem {
      * @param hm Hardware map from OpMode
      */
     public Launcher(HardwareMap hm) {
-        shooter = new MotorEx(hm, "launcher"); // name must match configuration
+        launcherLeft = new MotorEx(hm, "launcherL");
+        launcherRight = new MotorEx(hm, "launcherR");
 
         shooterPid.setTolerance(25);
         shooterPid.setIntegrationBounds(-1, 1);
 
-        shooter.setInverted(false);
-        shooter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+        launcherLeft.setInverted(false);
+        launcherRight.setInverted(false);
 
-        shooter.stopAndResetEncoder();
+        launcherLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+        launcherRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+
+        launcherLeft.setRunMode(Motor.RunMode.RawPower);
+        launcherRight.setRunMode(Motor.RunMode.RawPower);
+
+        launcherLeft.stopAndResetEncoder();
 
         disable();
 
         createLaunchTable();
-
-        // We run our own PIDF, so use raw power mode.
-        shooter.setRunMode(Motor.RunMode.RawPower);
     }
 
     // ------------- Public API -------------
@@ -130,7 +133,7 @@ public final class Launcher implements Subsystem {
     }
 
     public void createLaunchTable () {
-        for (double[] pair : data) {
+        for (double[] pair : LauncherTable) {
             treeMap.put(pair[0], pair[1]);
         }
     }
@@ -146,12 +149,12 @@ public final class Launcher implements Subsystem {
         TelemetryPacket p = new TelemetryPacket();
         p.put("SetPoser called amount", ++ticker);
         dashboard.sendTelemetryPacket(p);
-        shooter.set(power);
+        launcherLeft.set(power);
     }
 
     /** Immediately stop the motor and reset ready state. */
     public void stop() {
-        shooter.stopMotor();
+        launcherLeft.stopMotor();
         PARAMS.inTolStartNanos = 0L;
         PARAMS.isReadyToLaunch = false;
         PARAMS.currentTargetRpm = 0;
@@ -165,7 +168,6 @@ public final class Launcher implements Subsystem {
     public void getAndSetFlywheelByDistance () {
         Pose2d tagLocation = RobotState.getInstance().getTeam() ? blueTagPose : redTagPose;
         double distance = 100 * RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(tagLocation.getTranslation());
-        //TODO convert distance to cm
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("Distance", distance - 17.78);
         packet.put("Rpm", treeMap.get(distance - 17.78));
@@ -181,12 +183,9 @@ public final class Launcher implements Subsystem {
 
     // ----------------- Telemetry helpers -----------------
 
-    public double getTicksPerSec()  { return shooter.encoder.getRawVelocity(); }
+    public double getTicksPerSec()  { return launcherLeft.encoder.getRawVelocity(); }
     public double getShooterRPM()  { return (getTicksPerSec() * 60.0) / TICKS_PER_REV; }
-    public boolean isReadyToLaunch() {
-//        return true;
-        return PARAMS.isReadyToLaunch;
-    }
+    public boolean isReadyToLaunch() {return PARAMS.isReadyToLaunch;}
 
     // ------------- Main control loop -------------
 
@@ -224,7 +223,8 @@ public final class Launcher implements Subsystem {
             // Set to pidOut needs to be tested what output but motor could never go negative
 //            shooter.set(pidOut);
 //            setPower(output);
-            shooter.set(output);
+            launcherLeft.set(output);
+            launcherRight.set(output);
         }
 
 //        shooter.set(.5);
@@ -243,6 +243,10 @@ public final class Launcher implements Subsystem {
         }
 
         // Telemetry
+        sendTelemetry(packet);
+    }
+
+    private void sendTelemetry (TelemetryPacket packet) {
         tele.addData("TgtRPM", PARAMS.targetRpm);
         tele.addData("CurTgt", PARAMS.currentTargetRpm);
         tele.addData("RPM", getShooterRPM());
@@ -255,10 +259,10 @@ public final class Launcher implements Subsystem {
         packet.put("RPM", getShooterRPM());
         packet.put("Ready", PARAMS.isReadyToLaunch);
         packet.put("Enabled", PARAMS.enabledPid);
-        packet.put("Launcher encoder", shooter.getCurrentPosition());
+        packet.put("Launcher encoder", launcherLeft.getCurrentPosition());
         dashboard.sendTelemetryPacket(packet);
-
     }
+
 
     private static double clamp(double v, double lo, double hi) {
         return Math.max(lo, Math.min(hi, v));

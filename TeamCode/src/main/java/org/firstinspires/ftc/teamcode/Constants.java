@@ -11,9 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.util.BallColor;
-import org.firstinspires.ftc.teamcode.vision.AutoAlignConfig;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Config
@@ -38,33 +36,33 @@ public class Constants {
 
     // All in cm from front of robot for right now
     // Hood angle 1430
-    public static double[][] data = {
-            {80.0, 3375},
-            {90.0, 3400},
-            {100.0, 3435},
-            {110.0, 3460},
-            {120.0, 3490},
-            {130.0, 3510},
-            {140.0, 3530},
-            {150.0, 3550},
-            {160.0, 3570},
-            {170.0, 3600},
-            {180.0, 3635},
-            {190.0, 3675},
-            {200.0, 3710},
-            {210.0, 3730},
-            {220.0, 3760},
-            {230.0, 3790},
-            {240.0, 3820},
-            {250.0, 3870},
-            {260.0, 3930},
-            {270.0, 4000},
-            {280.0, 4110},
-            {290.0, 4240},
-            {300.0, 4390},
-            {310.0, 4510},
-            {320.0, 4630},
-            {330.0, 4750},
+    public static double[][] LauncherTable = {
+            {80.0, 0},
+            {90.0, 0},
+            {100.0, 0},
+            {110.0, 0},
+            {120.0, 0},
+            {130.0, 0},
+            {140.0, 0},
+            {150.0, 0},
+            {160.0, 0},
+            {170.0, 0},
+            {180.0, 0},
+            {190.0, 0},
+            {200.0, 0},
+            {210.0, 0},
+            {220.0, 0},
+            {230.0, 0},
+            {240.0, 0},
+            {250.0, 0},
+            {260.0, 0},
+            {270.0, 0},
+            {280.0, 0},
+            {290.0, 0},
+            {300.0, 0},
+            {310.0, 0},
+            {320.0, 0},
+            {330.0, 0},
     };
 
 }
