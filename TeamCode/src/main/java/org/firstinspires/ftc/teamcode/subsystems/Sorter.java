@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
+import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
 import static org.firstinspires.ftc.teamcode.util.BallColor.GREEN;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -14,6 +15,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.RilLib.Control.PID.PIDController;
 import org.firstinspires.ftc.teamcode.RilLib.Math.SlewRateLimiter;
 import org.firstinspires.ftc.teamcode.state.RobotState;
@@ -346,13 +348,19 @@ public class Sorter implements Subsystem {
         double output = pidController.calculate(sorter.getCurrentPosition(), turnPos);
 
         BallColor seenColor = detectBallColor();
+        double distance = colorSensorV3.getDistance(DistanceUnit.MM);
 
-        if (seenColor != getCurrentColor() && isAtSetPoint() && Math.abs(output) < .04) {
-            setSlotCurrent(seenColor);
+        if (isAtSetPoint() && Math.abs(output) < .04) {
+            if (distance > 65) {
+                setSlotCurrent(EMPTY);
+            } else { // not moving
+                setSlotCurrent(seenColor);
+            }
         }
 
         TelemetryPacket p = new TelemetryPacket();
         p.put("Sorter output", output);
+        p.put("Distance MM", distance);
         dashboard.sendTelemetryPacket(p);
 
         RobotState.getInstance().setBallColors(slots);

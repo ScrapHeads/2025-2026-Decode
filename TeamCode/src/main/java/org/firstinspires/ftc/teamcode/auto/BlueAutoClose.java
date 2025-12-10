@@ -29,13 +29,11 @@ import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanchExtraSpin;
-import org.firstinspires.ftc.teamcode.Commands.sorter.TurnThreeSlot;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnToLaunchPattern;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.auto.paths.blueAutoClose;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
@@ -119,9 +117,6 @@ public class BlueAutoClose extends CommandOpMode {
         Drawing.drawRobot(p.fieldOverlay(), convertPose2D(RobotState.getInstance().getEstimatedPose()));
         dashboard.sendTelemetryPacket(p);
 
-        // Wait to start the auto path till the play button is pressed
-        waitForStart();
-
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
                 new ParallelCommandGroup(
@@ -203,6 +198,9 @@ public class BlueAutoClose extends CommandOpMode {
                 tele.update();
             }
         };
+
+        // Wait to start the auto path till the play button is pressed
+        waitForStart();
 
         // Scheduled the sequential command group
         schedule(followPath);

@@ -75,65 +75,40 @@ public class TurnToTarget extends CommandBase {
         double xSpeed = xLimiter.calculate(driver.getLeftY(), TimeTracker.getTime()) * speed;
         double ySpeed = yLimiter.calculate(-driver.getLeftX(), TimeTracker.getTime()) * speed;
 
-        double h;
-        double o;
-        double angle;
-        double asinDegrees;
-        double newAsinDegrees;
-
         // Get the robot pose on the x axes
         double x = RobotState.getInstance().getEstimatedPose().getX();
 
+        double angle;
         // If on red team do the first equation set else assume the blue team
         if (!RobotState.getInstance().getTeam()) {
-            // Get the distance away from the red conner
-            h = getHypot(-1.7788, 1.8288);
-            // Find the distance on x from the red conner
-            o = Math.abs(-1.7788 - x);
+            double targetX = -1.7788;
+            double targetY = 1.8288;
 
-            //Find the angle from asin
-            asinDegrees = Units.radiansToDegrees(Math.asin(o / h));
+            double asinDegrees = getAsin(targetX, targetY, x);
             
             // Set the appropriate offest
             angle = (asinDegrees + 88.75) * .95;
-            newAsinDegrees = 0;
 
             // Conditions for different asin calculations
             if (x > .5) {
-                h = getHypot(-1.8288,1.7788);
-                o = Math.abs(-1.8288 - x);
-                newAsinDegrees = Units.radiansToDegrees(Math.asin(o / h));
-                angle = (newAsinDegrees + 88.75) * 1.01;
+                angle = (getAsin(-targetY, -targetX, x) + 88.75) * 1.01;
             } else if (asinDegrees > 37) {
-                h = getHypot(-1.8288,1.7788);
-                o = Math.abs(-1.8288 - x);
-                newAsinDegrees = Units.radiansToDegrees(Math.asin(o / h));
-                angle = (newAsinDegrees + 88.75) * .95;
+                angle = (getAsin(-targetY, -targetX, x) + 88.75) * .95;
             }
         } else {
-            // Get the distance away from the blue conner
-            h = getHypot(-1.7788, -1.8288);
-            // Find the distance on x from the blue conner
-            o = Math.abs(-1.7788 - x);
+            double targetX = -1.7788;
+            double targetY = -1.8288;
 
-            //Find the angle from asin
-            asinDegrees = Units.radiansToDegrees(Math.asin(o / h));
+            double asinDegrees = getAsin(targetX, targetY, x);
 
             // Set the appropriate offest
             angle = ((-asinDegrees - 103) * .935);
-            newAsinDegrees = 0;
 
             // Conditions for different asin calculations
             if (x > .5) {
-                h = getHypot(-1.8288,-1.7788);
-                o = Math.abs(-1.8288 - x);
-                newAsinDegrees = Units.radiansToDegrees(Math.asin(o / h));
-                angle = ((-newAsinDegrees - 89) * 1.03);
+                angle = ((-getAsin(targetY, targetX, x) - 89) * 1.03);
             } else if (asinDegrees > 40) {
-                h = getHypot(-1.8288,-1.7788);
-                o = Math.abs(-1.8288 - x);
-                newAsinDegrees = Units.radiansToDegrees(Math.asin(o / h));
-                angle = ((-newAsinDegrees - 91.5) * 1.03);
+                angle = ((-getAsin(targetY, targetX, x) - 91.5) * 1.03);
             }
         }
 
@@ -141,10 +116,6 @@ public class TurnToTarget extends CommandBase {
 
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("Launch angle", angle);
-        packet.put("Hypot", h);
-        packet.put("Opposite", o);
-        packet.put("Asin", asinDegrees);
-        packet.put("newAsine", newAsinDegrees);
         dashboard.sendTelemetryPacket(packet);
 
         // Get raw gyro heading (rotation from odometry or IMU)
@@ -158,6 +129,16 @@ public class TurnToTarget extends CommandBase {
         ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, correctedHeading);
 
         drivetrain.setDrivePowers(robotSpeeds);
+    }
+
+    public double getAsin(double targetX, double targetY, double robotX) {
+        // Get the distance away from the blue conner
+        double h = getHypot(targetX, targetY);
+        // Find the distance on x from the blue conner
+        double o = Math.abs(targetX - robotX);
+
+        //Find the angle from asin
+        return Units.radiansToDegrees(Math.asin(o / h));
     }
 
     public double getHypot (double x, double y) {

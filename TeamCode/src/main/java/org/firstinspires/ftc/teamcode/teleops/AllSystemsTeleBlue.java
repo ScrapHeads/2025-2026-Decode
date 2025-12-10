@@ -5,7 +5,6 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.BACK;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
@@ -17,9 +16,9 @@ import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.patters;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -34,15 +33,11 @@ import org.firstinspires.ftc.teamcode.Commands.drivetrain.SetLocalizerHeading;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.TurnToTarget;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunIntakeCommand;
-import org.firstinspires.ftc.teamcode.Commands.launcher.AsistedLaunch;
 import org.firstinspires.ftc.teamcode.Commands.launcher.LuanchSetPattern;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
-import org.firstinspires.ftc.teamcode.Commands.launcher.ShootAllLoaded;
-import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.state.RobotState;
@@ -57,8 +52,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Vision;
 
 import java.util.Arrays;
 
-@TeleOp(name = "AllSystemsTele", group = "ScrapHeads")
-public class AllSystemsTele extends CommandOpMode {
+@TeleOp(name = "AllSystemsTeleBlue", group = "ScrapHeads")
+public class AllSystemsTeleBlue extends CommandOpMode {
     // Controller
     private GamepadEx driver;
 
@@ -85,7 +80,7 @@ public class AllSystemsTele extends CommandOpMode {
 
         //TODO Comment out WHEN DOING Matches
 //        RobotState.getInstance().setPattern(new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN});
-//        RobotState.getInstance().setTeam(true);
+        RobotState.getInstance().setTeam(true);
 //        RobotState.getInstance().setTeam(false);
 
         // Initialize the subsystems declared at the top of the code
@@ -116,6 +111,8 @@ public class AllSystemsTele extends CommandOpMode {
 
         // Bind controls
         assignControls();
+
+        CommandScheduler.getInstance().cancelAll();
 
         vision.setPipeline(0);
 

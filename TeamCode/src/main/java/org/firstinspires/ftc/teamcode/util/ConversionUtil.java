@@ -25,15 +25,15 @@ public class ConversionUtil {
 
     public static ChassisSpeeds convertChassisSpeeds(PoseVelocity2d speeds) {
         return new ChassisSpeeds(
-                Units.inchesToMeters(speeds.linearVel.x),
-                Units.inchesToMeters(speeds.linearVel.y),
+                speeds.linearVel.x,
+                speeds.linearVel.y,
                 speeds.angVel);
     }
 
     public static PoseVelocity2d convertChassisSpeeds(ChassisSpeeds speeds) {
         Vector2d vec = new Vector2d(
-                Units.metersToInches(speeds.vxMetersPerSecond),
-                Units.metersToInches(speeds.vyMetersPerSecond));
+                speeds.vxMetersPerSecond,
+                speeds.vyMetersPerSecond);
         return new PoseVelocity2d(vec, speeds.omegaRadiansPerSecond);
     }
 }

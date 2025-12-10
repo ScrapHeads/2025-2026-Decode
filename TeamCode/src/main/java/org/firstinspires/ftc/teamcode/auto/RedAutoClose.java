@@ -117,9 +117,6 @@ public class RedAutoClose extends CommandOpMode {
         Drawing.drawRobot(p.fieldOverlay(), convertPose2D(RobotState.getInstance().getEstimatedPose()));
         dashboard.sendTelemetryPacket(p);
 
-        // Wait to start the auto path till the play button is pressed
-        waitForStart();
-
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
                 new ParallelCommandGroup(
@@ -201,6 +198,9 @@ public class RedAutoClose extends CommandOpMode {
                 tele.update();
             }
         };
+
+        // Wait to start the auto path till the play button is pressed
+        waitForStart();
 
         // Scheduled the sequential command group
         schedule(followPath);
