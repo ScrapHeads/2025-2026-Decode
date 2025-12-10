@@ -195,17 +195,22 @@ public final class Drivetrain implements Subsystem {
 
         localizer = new PinpointLocalizer(hardwareMap, PARAMS.inPerTick, ConversionUtil.convertPose2D(pose));
 
+        TelemetryPacket packet = new TelemetryPacket();
+        Drawing.drawRobot(packet.fieldOverlay(), convertPose2D(pose));
+        dashboard.sendTelemetryPacket(packet);
+
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
 
     public void setDrivePowers(ChassisSpeeds speeds) {
         PoseVelocity2d powers = convertChassisSpeeds(speeds);
+
         MecanumKinematics.WheelVelocities<Time> wheelVels = new MecanumKinematics(1).inverse(
                 PoseVelocity2dDual.constant(powers, 1));
 
         double maxPowerMag = 1;
         for (DualNum<Time> power : wheelVels.all()) {
-            maxPowerMag = Math.max(maxPowerMag, power.value());
+            maxPowerMag = Math.max(maxPowerMag, Math.abs(power.value()));
         }
 
         leftFront.setPower(wheelVels.leftFront.get(0) / maxPowerMag);
@@ -558,14 +563,14 @@ public final class Drivetrain implements Subsystem {
     @Override
     public void periodic() {
         ChassisSpeeds vel = updatePoseEstimate();
-        Pose2d pose = RobotState.getInstance().getOdometryPose();
+        Pose2d pose = RobotState.getInstance().getEstimatedPose();
 
         TelemetryPacket packet = new TelemetryPacket();
         // Use this when changing pos tracking to meters
         // Units.metersToInches()
         packet.put("X", pose.getX());
         packet.put("Y", pose.getY());
-        packet.put("Localizer pose", localizer.getPose().toString());
+//        packet.put("Localizer pose", localizer.getPose().toString());
         packet.put("rot", pose.getRotation().toString());
         packet.put("xVel", vel.vxMetersPerSecond);
         packet.put("yVel", vel.vyMetersPerSecond);

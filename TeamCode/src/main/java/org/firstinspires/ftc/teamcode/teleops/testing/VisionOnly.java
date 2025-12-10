@@ -1,11 +1,5 @@
 package org.firstinspires.ftc.teamcode.teleops.testing;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
-import static org.firstinspires.ftc.teamcode.Constants.CAMERA_FORWARD_OFFSET;
-import static org.firstinspires.ftc.teamcode.Constants.CAMERA_LATERAL_OFFSET;
-import static org.firstinspires.ftc.teamcode.Constants.CAMERA_VERTICAL_OFFSET;
-import static org.firstinspires.ftc.teamcode.Constants.CAMERA_YAW_OFFSET;
-import static org.firstinspires.ftc.teamcode.Constants.ENABLE_POSE_CORRECTION;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
@@ -14,25 +8,26 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Commands.vision.VisionDetection;
+import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
+import org.firstinspires.ftc.teamcode.state.RobotState;
+import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
-import org.firstinspires.ftc.teamcode.vision.CameraParams;
-import org.firstinspires.ftc.teamcode.vision.VisionProcessor;
+import org.firstinspires.ftc.teamcode.util.BallColor;
+import org.firstinspires.ftc.teamcode.util.TimeTracker;
 
-@Disabled
+//@Disabled
 @TeleOp(name = "VisionOnly", group = "ScrapHeads")
 public class VisionOnly extends CommandOpMode {
     private GamepadEx driver;
     private Vision vision;
     private Drivetrain drivetrain;
-    private VisionProcessor processor;
 
-    private final Pose2d startPose = new Pose2d();
+    private final Pose2d startPose = new Pose2d(0,0, new Rotation2d());
 
     @Override
     public void initialize() {
@@ -41,35 +36,26 @@ public class VisionOnly extends CommandOpMode {
         tele = telemetry;
         dashboard = FtcDashboard.getInstance();
 
+        RobotState.getInstance().setAll(startPose, false, new BallColor[3], new ChassisSpeeds());
+
         driver = new GamepadEx(gamepad1);
 
         // Create drivetrain + vision subsystem
         drivetrain = new Drivetrain(hm, startPose);
+        drivetrain.register();
+
         vision = new Vision(hm);
         vision.register();
 
-        // Create processor using Constants
-        processor = new VisionProcessor(new CameraParams(
-                CAMERA_FORWARD_OFFSET,
-                CAMERA_LATERAL_OFFSET,
-                CAMERA_VERTICAL_OFFSET,
-                CAMERA_YAW_OFFSET
-        ));
+        TimeTracker.setOffset();
 
         assignControls();
     }
 
     public void assignControls() {
         // Run passive vision detection (pose correction ON)
-        driver.getGamepadButton(A)
-                .whenPressed(new VisionDetection(vision, processor, drivetrain, true));
+//        driver.getGamepadButton(A)
+//                .whenPressed(new VisionDetection(vision, processor, drivetrain, true));
 
-        // Toggle pose correction ON/OFF globally
-        driver.getGamepadButton(GamepadKeys.Button.X)
-                .whenPressed(() -> {
-                    ENABLE_POSE_CORRECTION = !ENABLE_POSE_CORRECTION;
-                    tele.addData("PoseCorrection", ENABLE_POSE_CORRECTION ? "ENABLED" : "DISABLED");
-                    tele.update();
-                });
     }
 }

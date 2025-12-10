@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.Constants.blueTagPose;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
+import static org.firstinspires.ftc.teamcode.Constants.data;
+import static org.firstinspires.ftc.teamcode.Constants.redTagPose;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -11,6 +14,13 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.Interpolatable;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.InterpolatingDoubleTreeMap;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.InterpolatingTreeMap;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.Interpolator;
+import org.firstinspires.ftc.teamcode.state.RobotState;
+
 /**
  * Subsystem representing a single-motor flywheel launcher.
  * <p>
@@ -20,7 +30,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * parameters via the {@link Params} inner class.
  */
 @Config
-public final class LauncherBall implements Subsystem {
+public final class Launcher implements Subsystem {
 
     /**
      * Holds all tunable parameters and control state for the launcher.
@@ -52,9 +62,10 @@ public final class LauncherBall implements Subsystem {
 
         // --- Control ---
         /** Single PID controller for the shooter motor. */
-        public double PIDKp = 0.02;
-        public double PIDKi = 0.0025;
-        public double PIDKd = 0.0025;
+        public double PIDKp = 0.00024;
+        public double PIDKi = 0.0;
+        public double PIDKd = 0.0;
+        public double PIDKf = 0.000175;
 
         /** Static feedforward to overcome friction. */
         public double feedForwardKS = 0.05;
@@ -65,10 +76,12 @@ public final class LauncherBall implements Subsystem {
     /** Instance of params for this launcher. */
     public static Params PARAMS = new Params();
 
-    public final PIDController shooterPid = new PIDController(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd);
+    public PIDController shooterPid = new PIDController(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd);
 
     /** Motor driving the shooter flywheel. */
     private final MotorEx shooter;
+
+    private InterpolatingDoubleTreeMap treeMap = new InterpolatingDoubleTreeMap();
 
     // Encoder resolution calculations
     public static final double MOTOR_TPR   = 28;   // ticks per motor rev
@@ -80,10 +93,11 @@ public final class LauncherBall implements Subsystem {
      *
      * @param hm Hardware map from OpMode
      */
-    public LauncherBall(HardwareMap hm) {
-        shooter = new MotorEx(hm, "shooter"); // name must match configuration
+    public Launcher(HardwareMap hm) {
+        shooter = new MotorEx(hm, "launcher"); // name must match configuration
 
-        shooterPid.setTolerance(100);
+        shooterPid.setTolerance(25);
+        shooterPid.setIntegrationBounds(-1, 1);
 
         shooter.setInverted(false);
         shooter.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
@@ -91,6 +105,8 @@ public final class LauncherBall implements Subsystem {
         shooter.stopAndResetEncoder();
 
         disable();
+
+        createLaunchTable();
 
         // We run our own PIDF, so use raw power mode.
         shooter.setRunMode(Motor.RunMode.RawPower);
@@ -113,13 +129,23 @@ public final class LauncherBall implements Subsystem {
         stop();
     }
 
+    public void createLaunchTable () {
+        for (double[] pair : data) {
+            treeMap.put(pair[0], pair[1]);
+        }
+    }
+
+
     /** @return true if PID control is enabled. */
     public boolean isEnabled() {
         return PARAMS.enabledPid;
     }
-
+    public int ticker = 0;
     /** Directly set motor power (bypasses PID). */
     public void setPower(double power) {
+        TelemetryPacket p = new TelemetryPacket();
+        p.put("SetPoser called amount", ++ticker);
+        dashboard.sendTelemetryPacket(p);
         shooter.set(power);
     }
 
@@ -135,6 +161,17 @@ public final class LauncherBall implements Subsystem {
 
     public void setTargetRpm(double rpm) { PARAMS.targetRpm = Math.max(0, rpm); }
     public double getTargetRpm() { return PARAMS.targetRpm; }
+
+    public void getAndSetFlywheelByDistance () {
+        Pose2d tagLocation = RobotState.getInstance().getTeam() ? blueTagPose : redTagPose;
+        double distance = 100 * RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(tagLocation.getTranslation());
+        //TODO convert distance to cm
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Distance", distance - 17.78);
+        packet.put("Rpm", treeMap.get(distance - 17.78));
+        dashboard.sendTelemetryPacket(packet);
+        setTargetRpm(treeMap.get(distance - 17.78));
+    }
 
     public void setReadyToleranceRpm(double tol) { PARAMS.readyToleranceRpm = Math.max(0, tol); }
     public double getReadyToleranceRpm() { return PARAMS.readyToleranceRpm; }
@@ -159,6 +196,10 @@ public final class LauncherBall implements Subsystem {
         final double dt = (PARAMS.lastLoopNanos == 0L) ? 0.02 : (now - PARAMS.lastLoopNanos) / 1e9;
         PARAMS.lastLoopNanos = now;
 
+        shooterPid.setPIDF(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd, PARAMS.PIDKf);
+
+        TelemetryPacket packet = new TelemetryPacket();
+
         if (PARAMS.enabledPid) {
             // 1) Ramp target to avoid brownouts
             final double maxStep = PARAMS.maxAccelRpmPerSec * dt;
@@ -175,15 +216,18 @@ public final class LauncherBall implements Subsystem {
             // 3) PID correction
             final double pidOut = shooterPid.calculate(currentRpm, PARAMS.currentTargetRpm);
 
-            // 4) Feedforward
-            final double ff = PARAMS.feedForwardKS + PARAMS.feedForwardKV * PARAMS.currentTargetRpm;
-
             // 5) Apply
-            double output = clamp(ff + pidOut, 0.0, 1.0);
+            double output = clamp(pidOut, 0.0, 1.0);
+            packet.put("PID output", pidOut);
+            packet.put("Output", output);
 
+            // Set to pidOut needs to be tested what output but motor could never go negative
+//            shooter.set(pidOut);
+//            setPower(output);
             shooter.set(output);
-
         }
+
+//        shooter.set(.5);
 
         // --- Readiness logic ---
         double shooterErr = Math.abs(getShooterRPM() - PARAMS.targetRpm);
@@ -206,12 +250,12 @@ public final class LauncherBall implements Subsystem {
         tele.addData("Enabled", PARAMS.enabledPid);
         tele.update();
 
-        TelemetryPacket packet = new TelemetryPacket();
         packet.put("TgtRPM", PARAMS.targetRpm);
         packet.put("CurTgt", PARAMS.currentTargetRpm);
         packet.put("RPM", getShooterRPM());
         packet.put("Ready", PARAMS.isReadyToLaunch);
         packet.put("Enabled", PARAMS.enabledPid);
+        packet.put("Launcher encoder", shooter.getCurrentPosition());
         dashboard.sendTelemetryPacket(packet);
 
     }

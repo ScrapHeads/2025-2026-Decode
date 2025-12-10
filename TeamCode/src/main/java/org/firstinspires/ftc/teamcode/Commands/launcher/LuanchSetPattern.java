@@ -10,7 +10,6 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 
 import org.firstinspires.ftc.teamcode.Commands.HoldControlCommand;
-import org.firstinspires.ftc.teamcode.Commands.sorter.ClearSorterSlots;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
@@ -18,14 +17,15 @@ import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
-public class SortedLuanch extends SequentialCommandGroup {
+public class LuanchSetPattern extends SequentialCommandGroup {
     private int startOffset;
-    public SortedLuanch (Launcher launcher, Sorter sorter, HoldControl holdControl) {
+    public LuanchSetPattern(Launcher launcher, Sorter sorter, HoldControl holdControl, BallColor[] pattern) {
 
         addCommands (
+                new InstantCommand(() -> launcher.getAndSetFlywheelByDistance()),
                 new InstantCommand(() -> {
                     startOffset = sorter.findStartOffset(
-                            RobotState.getInstance().getPattern(),
+                            pattern,
                             RobotState.getInstance().getBallColors()
                     );
                     TelemetryPacket packet = new TelemetryPacket();
@@ -36,17 +36,19 @@ public class SortedLuanch extends SequentialCommandGroup {
                 new WaitCommand(500),
 
                 new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING),
-                new WaitCommand(100),
+                new WaitCommand(200),
+                new WaitUntilCommand(() -> launcher.isReadyToLaunch()),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint),
                 new WaitCommand(300),
+                new WaitUntilCommand(() -> launcher.isReadyToLaunch()),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint),
                 new WaitCommand(300),
-//                new WaitUntilCommand(launcher::isReadyToLaunch),
+                new WaitUntilCommand(() -> launcher.isReadyToLaunch()),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint),
-                new ClearSorterSlots(sorter)
+                new InstantCommand(() -> sorter.setSlots(new BallColor[]{EMPTY, EMPTY, EMPTY}))
         );
     }
 

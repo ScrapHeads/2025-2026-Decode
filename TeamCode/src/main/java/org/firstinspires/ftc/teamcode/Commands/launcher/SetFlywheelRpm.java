@@ -1,20 +1,20 @@
 package org.firstinspires.ftc.teamcode.Commands.launcher;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import org.firstinspires.ftc.teamcode.subsystems.LauncherBall;
+import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 
 /**
  * Command that spins the flywheel to a target RPM and keeps it there
  * using the subsystem's internal PID + feedforward loop.
  * <p>
  * This command does NOT end when the shooter is "ready." It only ends
- * when the subsystem is explicitly disabled via {@link LauncherBall#disable()}.
+ * when the subsystem is explicitly disabled via {@link Launcher#disable()}.
  * That lets you hold speed across multiple shots until you decide to stop.
  */
 public class SetFlywheelRpm extends CommandBase {
 
     /** Shooter subsystem providing PID control and readiness logic. */
-    private final LauncherBall launcher;
+    private final Launcher launcher;
 
     /** Target RPM to hold while this command is active. */
     private final double rpm;
@@ -25,7 +25,7 @@ public class SetFlywheelRpm extends CommandBase {
      * @param launcher the launcher subsystem
      * @param rpm      target speed in RPM (e.g., 6000)
      */
-    public SetFlywheelRpm(final LauncherBall launcher, final double rpm) {
+    public SetFlywheelRpm(final Launcher launcher, final double rpm) {
         this.launcher = launcher;
         this.rpm = rpm;
         addRequirements(launcher);

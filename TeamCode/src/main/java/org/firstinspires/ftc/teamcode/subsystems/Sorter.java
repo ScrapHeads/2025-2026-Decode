@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
+import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
 import static org.firstinspires.ftc.teamcode.util.BallColor.GREEN;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -14,6 +15,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.SwitchableLight;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.RilLib.Control.PID.PIDController;
 import org.firstinspires.ftc.teamcode.RilLib.Math.SlewRateLimiter;
 import org.firstinspires.ftc.teamcode.state.RobotState;
@@ -75,7 +77,7 @@ public class Sorter implements Subsystem {
     public Sorter(HardwareMap hm) {
         // === Initialize color sensor ===
         colorSensorV3 = hm.get(RevColorSensorV3.class, "colorSensor");
-        colorSensorV3.setGain(2); // Gain range 1–60 depending on ambient light
+        colorSensorV3.setGain(10); // Gain range 1–60 depending on ambient light
         setLed(true);
 
         sorter = new MotorEx(hm, "sorter");
@@ -271,17 +273,13 @@ public class Sorter implements Subsystem {
         double gNorm = g / total;
         double bNorm = b / total;
 
-        tele.addData("rNorm", rNorm);
-        tele.addData("gNorm", gNorm);
-        tele.addData("bNorm", bNorm);
-
         // --- GREEN detection: strong green dominance ---
-        if (gNorm > rNorm * 2.5 && gNorm > bNorm * 1.1) {
+        if (gNorm > rNorm * 2.8 && gNorm > bNorm * 1.2) {
             return GREEN;
         }
 
         // --- PURPLE detection: red + blue high, green low ---
-        double avgRB = (rNorm + bNorm) / 1.8;
+        double avgRB = (rNorm + bNorm) / 1.87;
         if (avgRB > gNorm) {
             return BallColor.PURPLE;
         }
@@ -327,7 +325,7 @@ public class Sorter implements Subsystem {
     }
 
     private void writeData () {
-        tele.addData("ServoPower", getPower());
+//        tele.addData("ServoPower", getPower());
         tele.addData("Sorter Index", getCurrentIndex());
         tele.addData("Detected Color", detectBallColor());
 //        tele.addData("Sorter pos", getCurrentPos());
@@ -349,9 +347,21 @@ public class Sorter implements Subsystem {
         }
         double output = pidController.calculate(sorter.getCurrentPosition(), turnPos);
 
-        if (detectBallColor() != getCurrentColor() && isAtSetPoint() && Math.abs(output) < .07) {
-            setSlotCurrent(detectBallColor());
+        BallColor seenColor = detectBallColor();
+        double distance = colorSensorV3.getDistance(DistanceUnit.MM);
+
+        if (isAtSetPoint() && Math.abs(output) < .04) {
+            if (distance > 65) {
+                setSlotCurrent(EMPTY);
+            } else { // not moving
+                setSlotCurrent(seenColor);
+            }
         }
+
+        TelemetryPacket p = new TelemetryPacket();
+        p.put("Sorter output", output);
+        p.put("Distance MM", distance);
+        dashboard.sendTelemetryPacket(p);
 
         RobotState.getInstance().setBallColors(slots);
 

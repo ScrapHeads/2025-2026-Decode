@@ -14,6 +14,10 @@ public class TimeTracker {
      * @return The robot time in seconds
      */
     public static double getTime() {
-        return System.nanoTime() * 10e-10 - timeOffset;
+        return (System.currentTimeMillis() / 1000.0) - timeOffset;
+    }
+
+    public static double convertTime(double time) {
+        return time - timeOffset;
     }
 }

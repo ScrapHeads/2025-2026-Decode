@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
  */
 public interface Localizer {
     void setPose(Pose2d pose);
+    void setHeading(double heading);
 
     /**
      * Returns the current pose estimate.

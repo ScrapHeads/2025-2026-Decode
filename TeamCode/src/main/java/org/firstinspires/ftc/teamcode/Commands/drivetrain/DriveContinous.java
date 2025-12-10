@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.Commands.drivetrain;
 
+import static org.firstinspires.ftc.teamcode.Constants.dashboard;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -80,6 +83,12 @@ public class DriveContinous extends CommandBase {
         // Field-centric transform using corrected heading
         ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 xSpeed, ySpeed, rotSpeed, correctedHeading);
+
+        TelemetryPacket p = new TelemetryPacket();
+        p.put("Driver rot speed", -driver.getRightX());
+        p.put("Rot speed", robotSpeeds);
+        p.put("Robot Speeds rot", robotSpeeds.omegaRadiansPerSecond);
+        dashboard.sendTelemetryPacket(p);
 
 //        double xSpeed = xLimiter.calculate(driver.getLeftY(), TimeTracker.getTime()) * speed;
 //        double ySpeed = yLimiter.calculate(-driver.getLeftX(), TimeTracker.getTime()) * speed;
