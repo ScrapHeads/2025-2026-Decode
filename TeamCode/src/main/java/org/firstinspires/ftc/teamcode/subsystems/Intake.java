@@ -31,8 +31,8 @@ public class Intake implements Subsystem  {
      * @param hm The HardwareMap used to retrieve the motor device.
      */
     public Intake(HardwareMap hm) {
-        intakeMotorLeft = new MotorEx(hm, "intakeL"); // name must match configuration
-        intakeMotorRight = new MotorEx(hm, "intakeR");
+        intakeMotorLeft = new MotorEx(hm, "intakeLeft"); // name must match configuration
+        intakeMotorRight = new MotorEx(hm, "intakeRight");
 
         intakeMotorLeft.setZeroPowerBehavior(BRAKE);
         intakeMotorRight.setZeroPowerBehavior(BRAKE);

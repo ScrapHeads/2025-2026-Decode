@@ -8,15 +8,15 @@ Control hub
         3. rightBack
 
     Servos
-        0. N.A.
-        1. hood
-        2. holdControl
-        3. N.A.
-        4. N.A.
-        5. N.A.
+        0. turretHood
+        1. turretRotate
+        2. feederBack
+        3. feederFront
+        4. ballStopperLeft
+        5. ballStopperRight
 
     Digital Devices
-        0. magSensor
+        0. N.A.
         1. N.A.
         2. N.A.
         3. N.A.
@@ -40,14 +40,14 @@ Control hub
 Expansion hub
 
     Motors
-        0. N.A.
-        1. sorter
-        2. intake
-        3. launcher
+        0. launcher
+        1. feeder
+        2. intakeRight
+        3. intakeLeft
 
     Servos
-        0. N.A.
-        1. N.A.
+        0. liftBack
+        1. liftFront
         2. N.A.
         3. N.A.
         4. N.A.
