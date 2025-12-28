@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.state;
 
+import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.qualcomm.robotcore.util.ReadWriteFile;
@@ -13,6 +15,7 @@ import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  * Utility class for saving and loading {@link RobotState} objects
@@ -52,15 +55,23 @@ public class StateIO {
                 file.createNewFile();
             }
 
+            String json = GSON.toJson(RobotState.getInstance());
+            ReadWriteFile.writeFile(file, json);
+
             tele.addLine("Found file and saved it");
             tele.update();
 
-            String json = GSON.toJson(RobotState.getInstance());
-            ReadWriteFile.writeFile(file, json);
+            TelemetryPacket packet = new TelemetryPacket();
+            packet.addLine("Found file and saved it");
+            dashboard.sendTelemetryPacket(packet);
 
         } catch (Exception e) {
             tele.addLine("StateIO save failed: " + e.getMessage());
             tele.update();
+
+            TelemetryPacket packet = new TelemetryPacket();
+            packet.addLine("File failed to save");
+            dashboard.sendTelemetryPacket(packet);
         }
     }
 
@@ -73,38 +84,38 @@ public class StateIO {
     public static void load() {
         try {
             File file = getFile();
-            if (file == null || !file.exists()) throw new RuntimeException();
+            if (file == null || !file.exists()) throw new FileNotFoundException();
 
             tele.addData("File path", file.getAbsoluteFile());
 
             String json = ReadWriteFile.readFile(file);
-            if (json == null || json.contentEquals("{}")) throw new Exception();
+            if (json == null || json.contentEquals("{}")) throw new NullPointerException();
 
             // Create a temp container to transfer data
             RobotState.getInstance().setAll(GSON.fromJson(json, RobotState.class));
 
             clear();
 
-        } catch (RuntimeException e) {
-            RobotState.getInstance().setAll(
-                    new Pose2d(0, 0, new Rotation2d(0)),
-                    null,
-                    new BallColor[] {BallColor.EMPTY, BallColor.EMPTY, BallColor.EMPTY},
-                    new ChassisSpeeds()
-            );
+        } catch (FileNotFoundException e) {
+            setFakeRobotState();
             tele.addLine("Failed to load");
             tele.addLine("File doesn't exist");
-        } catch (Exception e) {
-            RobotState.getInstance().setAll(
-                    new Pose2d(0, 0, new Rotation2d(0)),
-                    null,
-                    new BallColor[] {BallColor.EMPTY, BallColor.EMPTY, BallColor.EMPTY},
-                    new ChassisSpeeds()
-            );
+        } catch (NullPointerException e) {
+            setFakeRobotState();
             tele.addLine("Failed to load");
             tele.addLine("JSON is empty");
         }
     }
+
+    private static void setFakeRobotState () {
+        RobotState.getInstance().setAll(
+                new Pose2d(0, 0, new Rotation2d(0)),
+                null,
+                new BallColor[] {BallColor.EMPTY, BallColor.EMPTY, BallColor.EMPTY},
+                new ChassisSpeeds()
+        );
+    }
+
 
     /**
      * Clears the saved RobotState so it cannot be reused accidentally.
