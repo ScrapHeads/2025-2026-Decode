@@ -66,11 +66,6 @@ public final class Launcher implements Subsystem {
         public double PIDKi = 0.0;
         public double PIDKd = 0.0;
         public double PIDKf = 0.000175;
-
-        /** Static feedforward to overcome friction. */
-        public double feedForwardKS = 0.05;
-        /** Velocity feedforward (power per RPM). */
-        public double feedForwardKV = 1.0 / 6000.0;  // ~full power near 6000 RPM
     }
 
     /** Instance of params for this launcher. */
