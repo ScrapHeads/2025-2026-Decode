@@ -31,14 +31,12 @@ public class LauncherHood implements Subsystem {
 
     private final ServoEx hoodServo;
 
-    // === Physical range of the servo (degrees) ===
-    public static final double MIN_ANGLE = 500;
-    public static final double MAX_ANGLE = 2500;
+    // Physical range of the servo
+    public static final double MIN_ANGLE_SERVO = 500;
+    public static final double MAX_ANGLE_SERVO = 2500;
 
-    public static final double HIGH_SHOOT_ANGLE = 1400;
-    public static final double MID_SHOOT_ANGLE = 1620;
-    public static final double AUTO_CLOSE_ANGLE = 1600;
-    public static final double LOW_SHOOT_ANGLE = 1670;
+    public static final double MAX_SHOOT_ANGLE = 2329;
+    public static final double MIN_SHOOT_ANGLE = 744;
 
     /**
      * Creates a new LauncherHood subsystem.
@@ -46,10 +44,9 @@ public class LauncherHood implements Subsystem {
      * @param hm HardwareMap for accessing the servo
      */
     public LauncherHood(HardwareMap hm) {
-        // Axon MAX M2 compatible (270° travel range)
-        hoodServo = new SimpleServo(hm, "hood", MIN_ANGLE, MAX_ANGLE);
-//        hoodServo.turnToAngle(1540); // Start at LOW_SHOOT_ANGLE (lowest hood position)
-        setAngle(1430);
+        // Axon MAX M2
+        hoodServo = new SimpleServo(hm, "hood", MIN_ANGLE_SERVO, MAX_ANGLE_SERVO);
+        setAngle(MIN_SHOOT_ANGLE);
     }
 
 
@@ -60,7 +57,7 @@ public class LauncherHood implements Subsystem {
      */
     public void setAngle(double angle) {
         // Clamp angle to physical servo limits
-        double safeAngle = Math.min(LOW_SHOOT_ANGLE, Math.max(HIGH_SHOOT_ANGLE, angle));
+        double safeAngle = Math.min(MIN_SHOOT_ANGLE, Math.max(MAX_SHOOT_ANGLE, angle));
         hoodServo.turnToAngle(safeAngle);
         PARAMS.currentAngle = safeAngle;
     }
@@ -72,6 +69,7 @@ public class LauncherHood implements Subsystem {
 
     @Override
     public void periodic() {
+        // For testing only not normally not needed
         setAngle(getCurrentAngle());
         tele.addData("Launcher Hood Angle", "%.1f°", hoodServo.getAngle());
     }
