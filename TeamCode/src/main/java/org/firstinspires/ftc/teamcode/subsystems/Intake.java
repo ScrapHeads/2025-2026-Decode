@@ -7,8 +7,6 @@ import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import java.util.Locale;
-
 /**
  * The IntakeSubsystem controls the intake motor responsible for
  * collecting and feeding game elements.
@@ -25,6 +23,10 @@ public class Intake implements Subsystem  {
     public static final double OUTTAKE_POWER = 1.0;
     public static final double REST_POWER = 0.0;
 
+    public static final double MOTOR_TPR   = 28;   // ticks per motor rev
+    public static final double GEAR_RATIO  = 1;  // motor:wheel upgear
+    public static final double TICKS_PER_REV = MOTOR_TPR / GEAR_RATIO;
+
     /**
      * Constructs the IntakeSubsystem.
      *
@@ -38,7 +40,7 @@ public class Intake implements Subsystem  {
         intakeMotorRight.setZeroPowerBehavior(BRAKE);
 
         // ensure stopped at init
-        stop();
+        stopBoth();
     }
 
     /**
@@ -59,26 +61,34 @@ public class Intake implements Subsystem  {
     /**
      * Stops the both intake motor immediately.
      */
-    public void stop() {
+    public void stopBoth() {
         intakeMotorLeft.stopMotor();
         intakeMotorRight.stopMotor();
     }
 
+    public void stopLeft () {intakeMotorLeft.stopMotor();}
+    public void stopRight () {intakeMotorRight.stopMotor();}
+
     /**
      * @return The current power being applied to the intake motor.
      */
-    public double getPower() {
+    public double getPowerLeft() {
         return intakeMotorLeft.get();
     }
+    public double getPowerRight() {return intakeMotorRight.get();}
+
+    public double getTicksPerSec()  { return intakeMotorLeft.encoder.getRawVelocity(); }
+    public double getShooterRPM()  { return (getTicksPerSec() * 60.0) / TICKS_PER_REV; }
 
     @Override
     public void periodic() {
         tele.addData("Intake Power", toString());
+        tele.update();
     }
 
     @Override
     public String toString () {
-        return "Left: " + intakeMotorLeft.get() + ", Right: " + intakeMotorRight.get();
+        return "Left: " + intakeMotorLeft.get() + ", Right: " + getShooterRPM();
     }
 
 }

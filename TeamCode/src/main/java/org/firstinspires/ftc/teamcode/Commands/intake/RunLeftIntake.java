@@ -1,15 +1,10 @@
 package org.firstinspires.ftc.teamcode.Commands.intake;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
-/**
- * Command to run the Intake subsystem motor at a specific power.
- *
- * <p>Runs continuously until interrupted or canceled.
- */
-public class RunIntakeCommand extends CommandBase {
-
+public class RunLeftIntake extends CommandBase {
     private final Intake intake;
     private final double power;
 
@@ -19,7 +14,7 @@ public class RunIntakeCommand extends CommandBase {
      * @param intake the Intake subsystem instance
      * @param power the desired motor power (-1.0 to 1.0)
      */
-    public RunIntakeCommand(Intake intake, double power) {
+    public RunLeftIntake(Intake intake, double power) {
         this.intake = intake;
         this.power = power;
         addRequirements(intake);
@@ -27,12 +22,12 @@ public class RunIntakeCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        intake.setBothPower(power);
+        intake.setLeftPower(power);
     }
 
     @Override
     public void end(boolean interrupted) {
-        intake.stop();
+        intake.stopLeft();
     }
 
     @Override

@@ -27,7 +27,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinousStickOff;
-import org.firstinspires.ftc.teamcode.Commands.intake.RunIntakeCommand;
+import org.firstinspires.ftc.teamcode.Commands.intake.RunBothIntakes;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
@@ -105,8 +105,8 @@ public class DriverTryouts extends CommandOpMode {
 
         // A: spin up and hold 6000 RPM (command ends only when launcher.disable() is called)
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
-                .whenActive(new RunIntakeCommand(intake, Intake.INTAKE_POWER))
-                .whenInactive(new RunIntakeCommand(intake, 0));
+                .whenActive(new RunBothIntakes(intake, Intake.INTAKE_POWER))
+                .whenInactive(new RunBothIntakes(intake, 0));
 //                .whenActive(new SetPowerLauncher(launcher, 1));
 
         // Left Trigger:
@@ -114,10 +114,10 @@ public class DriverTryouts extends CommandOpMode {
 //                .whenActive(new StopFlywheel(launcher));
 
         driver.getGamepadButton(A)
-                .whenPressed(new RunIntakeCommand(intake, Intake.INTAKE_POWER));
+                .whenPressed(new RunBothIntakes(intake, Intake.INTAKE_POWER));
 
         driver.getGamepadButton(B)
-                .whenPressed(new RunIntakeCommand(intake, 0));
+                .whenPressed(new RunBothIntakes(intake, 0));
 
         driver.getGamepadButton(RIGHT_BUMPER)
                         .whenPressed(new TurnOneSlot(sorter, 1));
@@ -146,7 +146,7 @@ public class DriverTryouts extends CommandOpMode {
                 .whenReleased(new InstantCommand(() -> launcher.enable()));
 
         driver2.getGamepadButton(B)
-                .whenHeld(new RunIntakeCommand(intake, 0));
+                .whenHeld(new RunBothIntakes(intake, 0));
 
         driver2.getGamepadButton(Y)
                 .whenPressed(new DriveContinousStickOff(drivetrain, driver, Math.random()))

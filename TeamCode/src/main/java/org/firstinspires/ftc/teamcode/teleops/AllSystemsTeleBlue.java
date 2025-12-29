@@ -32,7 +32,7 @@ import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.SetLocalizerHeading;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.TurnToTarget;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
-import org.firstinspires.ftc.teamcode.Commands.intake.RunIntakeCommand;
+import org.firstinspires.ftc.teamcode.Commands.intake.RunBothIntakes;
 import org.firstinspires.ftc.teamcode.Commands.launcher.LuanchSetPattern;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
@@ -137,11 +137,11 @@ public class AllSystemsTeleBlue extends CommandOpMode {
 
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
                 .whenActive(new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER))
-                .whenInactive(new RunIntakeCommand(intake, 0));
+                .whenInactive(new RunBothIntakes(intake, 0));
 
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
-                .whileActiveOnce(new RunIntakeCommand(intake, Intake.OUTTAKE_POWER))
-                .whenInactive(new RunIntakeCommand(intake, 0));
+                .whileActiveOnce(new RunBothIntakes(intake, Intake.OUTTAKE_POWER))
+                .whenInactive(new RunBothIntakes(intake, 0));
 
         // Left Trigger:
 //        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
