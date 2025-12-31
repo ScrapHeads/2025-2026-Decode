@@ -37,6 +37,7 @@ import org.firstinspires.ftc.teamcode.Commands.intake.RunLeftIntake;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntake;
 import org.firstinspires.ftc.teamcode.Commands.launcher.LuanchSetPattern;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
+import org.firstinspires.ftc.teamcode.Commands.launcher.SetPowerLauncher;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.launcher.TestLaunchSequence;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
@@ -156,7 +157,7 @@ public class AllSystemsTeleRed extends CommandOpMode {
                 .whenReleased(new RunLeftIntake(intake, 0));
 
         driver.getGamepadButton(A)
-                .whenPressed(new TestLaunchSequence(feederServo, feederMotor, launcher)
+                .whenPressed(new TestLaunchSequence(feederServo, feederMotor, intake)
                 );
 //
 //        driver.getGamepadButton(B)
@@ -184,11 +185,10 @@ public class AllSystemsTeleRed extends CommandOpMode {
 //        driver.getGamepadButton(B)
 //                .whenPressed(new HoldControlCommand(holdControl, HoldControl.HoldPosition.TRANSPORT));
 
-//        driver.getGamepadButton(DPAD_UP)
-//                .whenPressed(new ParallelCommandGroup(
-//                        new SetFlywheelRpm(launcher, 3460),
-//                        new SetHoodAngleCommand(hood, 1430)
-//                ));
+        driver.getGamepadButton(DPAD_UP)
+                .whenPressed(new ParallelCommandGroup(
+                        new SetPowerLauncher(launcher, 1)
+                ));
 //
 //        driver.getGamepadButton(DPAD_LEFT)
 //                        .whenPressed(
@@ -206,11 +206,11 @@ public class AllSystemsTeleRed extends CommandOpMode {
 //                        ));
 
 
-//        driver.getGamepadButton(DPAD_DOWN)
-//                .whenPressed(
-//                        new ParallelCommandGroup(
-//                                new StopFlywheel(launcher)
-//                ));
+        driver.getGamepadButton(DPAD_DOWN)
+                .whenPressed(
+                        new ParallelCommandGroup(
+                                new StopFlywheel(launcher)
+                ));
     }
 }
 
