@@ -14,7 +14,6 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.InterpolatingDoubleTreeMap;
 import org.firstinspires.ftc.teamcode.state.RobotState;
@@ -72,8 +71,7 @@ public final class Launcher implements Subsystem {
     public PIDController shooterPid = new PIDController(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd);
 
     /** Motor driving the shooter flywheel. */
-    private final MotorEx launcherLeft;
-    private final MotorEx launcherRight;
+    private final MotorEx launcher;
 
     private InterpolatingDoubleTreeMap treeMap = new InterpolatingDoubleTreeMap();
 
@@ -88,22 +86,18 @@ public final class Launcher implements Subsystem {
      * @param hm Hardware map from OpMode
      */
     public Launcher(HardwareMap hm) {
-        launcherLeft = new MotorEx(hm, "launcherL");
-        launcherRight = new MotorEx(hm, "launcherR");
+        launcher = new MotorEx(hm, "launcher");
 
         shooterPid.setTolerance(25);
         shooterPid.setIntegrationBounds(-1, 1);
 
-        launcherLeft.setInverted(false);
-        launcherRight.setInverted(false);
+        launcher.setInverted(true);
 
-        launcherLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
-        launcherRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
+        launcher.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
 
-        launcherLeft.setRunMode(Motor.RunMode.RawPower);
-        launcherRight.setRunMode(Motor.RunMode.RawPower);
+        launcher.setRunMode(Motor.RunMode.RawPower);
 
-        launcherLeft.stopAndResetEncoder();
+        launcher.stopAndResetEncoder();
 
         disable();
 
@@ -144,12 +138,12 @@ public final class Launcher implements Subsystem {
         TelemetryPacket p = new TelemetryPacket();
         p.put("SetPoser called amount", ++ticker);
         dashboard.sendTelemetryPacket(p);
-        launcherLeft.set(power);
+        launcher.set(power);
     }
 
     /** Immediately stop the motor and reset ready state. */
     public void stop() {
-        launcherLeft.stopMotor();
+        launcher.stopMotor();
         PARAMS.inTolStartNanos = 0L;
         PARAMS.isReadyToLaunch = false;
         PARAMS.currentTargetRpm = 0;
@@ -178,7 +172,7 @@ public final class Launcher implements Subsystem {
 
     // ----------------- Telemetry helpers -----------------
 
-    public double getTicksPerSec()  { return launcherLeft.encoder.getRawVelocity(); }
+    public double getTicksPerSec()  { return launcher.encoder.getRawVelocity(); }
     public double getShooterRPM()  { return (getTicksPerSec() * 60.0) / TICKS_PER_REV; }
     public boolean isReadyToLaunch() {return PARAMS.isReadyToLaunch;}
 
@@ -218,8 +212,7 @@ public final class Launcher implements Subsystem {
             // Set to pidOut needs to be tested what output but motor could never go negative
 //            shooter.set(pidOut);
 //            setPower(output);
-            launcherLeft.set(output);
-            launcherRight.set(output);
+            launcher.set(output);
         }
 
 //        shooter.set(.5);
@@ -254,7 +247,7 @@ public final class Launcher implements Subsystem {
         packet.put("RPM", getShooterRPM());
         packet.put("Ready", PARAMS.isReadyToLaunch);
         packet.put("Enabled", PARAMS.enabledPid);
-        packet.put("Launcher encoder", launcherLeft.getCurrentPosition());
+        packet.put("Launcher encoder", launcher.getCurrentPosition());
         dashboard.sendTelemetryPacket(packet);
     }
 

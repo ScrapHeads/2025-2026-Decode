@@ -38,6 +38,7 @@ import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntake;
 import org.firstinspires.ftc.teamcode.Commands.launcher.LuanchSetPattern;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
+import org.firstinspires.ftc.teamcode.Commands.launcher.TestLaunchSequence;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
@@ -45,6 +46,8 @@ import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.FeederMotor;
+import org.firstinspires.ftc.teamcode.subsystems.FeederServo;
 import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
@@ -61,10 +64,12 @@ public class AllSystemsTeleRed extends CommandOpMode {
 
     // Subsystem
     private Drivetrain drivetrain;
-//    private Launcher launcher;
+    private Launcher launcher;
     private Intake intake;
 //    private LauncherHood hood;
 //    private Vision vision;
+    private FeederServo feederServo;
+    private FeederMotor feederMotor;
 
     private Pose2d setLaunchPoint;
 
@@ -90,11 +95,17 @@ public class AllSystemsTeleRed extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
 
         // Subsystem
-//        launcher = new Launcher(hm);
-//        launcher.register();
+        launcher = new Launcher(hm);
+        launcher.register();
 
         intake = new Intake(hm);
         intake.register();
+
+        feederMotor = new FeederMotor(hm);
+        feederMotor.register();
+
+        feederServo = new FeederServo(hm);
+        feederServo.register();
 
 //        hood = new LauncherHood(hm);
 //        hood.register();
@@ -144,10 +155,9 @@ public class AllSystemsTeleRed extends CommandOpMode {
                 .whenPressed(new RunLeftIntake(intake, Intake.OUTTAKE_POWER))
                 .whenReleased(new RunLeftIntake(intake, 0));
 
-//        driver.getGamepadButton(A)
-//                .whenPressed(new ParallelCommandGroup(
-//                                new LuanchSetPattern(launcher, sorter, holdControl, patters.get(21))
-//                ));
+        driver.getGamepadButton(A)
+                .whenPressed(new TestLaunchSequence(feederServo, feederMotor, launcher)
+                );
 //
 //        driver.getGamepadButton(B)
 //                .whenPressed(

@@ -31,12 +31,12 @@ public class FeederServo implements Subsystem {
         setBackAngle(backAngle);
     }
     public void setFrontAngle(double frontAngle) {
-        double safeAngle = Math.min(OUT_FRONT_ANGLE, Math.max(IN_FRONT_ANGLE, frontAngle));
-        frontFeeder.turnToAngle(safeAngle);
+//        double safeAngle = Math.min(OUT_FRONT_ANGLE, Math.max(IN_FRONT_ANGLE, frontAngle));
+        frontFeeder.turnToAngle(frontAngle);
     }
     public void setBackAngle(double backAngle) {
-        double safeAngle = Math.min(IN_BACK_ANGLE, Math.max(OUT_BACK_ANGLE, backAngle));
-        backFeeder.turnToAngle(safeAngle);
+//        double safeAngle = Math.min(IN_BACK_ANGLE, Math.max(OUT_BACK_ANGLE, backAngle));
+        backFeeder.turnToAngle(backAngle);
     }
 
 

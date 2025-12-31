@@ -22,13 +22,13 @@ public class RunFeederMotor extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        feederMotor.stopMotor();
+//        feederMotor.stopMotor();
     }
 
     @Override
     public boolean isFinished() {
         // Continuous command — runs until canceled
-        return false;
+        return true;
     }
 
 

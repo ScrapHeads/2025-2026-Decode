@@ -30,7 +30,7 @@ public class SetPowerLauncher extends CommandBase {
     @Override
     public void initialize() {
         launcher.setPower(power);
-        launcher.enable();
+//        launcher.enable();
     }
 
     /**
