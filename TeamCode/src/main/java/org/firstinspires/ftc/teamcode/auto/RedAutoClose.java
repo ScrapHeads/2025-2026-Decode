@@ -24,17 +24,15 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
-import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
+import org.firstinspires.ftc.teamcode.Commands.turret.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
-import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanchExtraSpin;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnToLaunchPattern;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.auto.paths.blueAutoClose;
 import org.firstinspires.ftc.teamcode.auto.paths.redAutoClose;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
@@ -42,7 +40,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
-import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
+import org.firstinspires.ftc.teamcode.subsystems.TurretHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.util.BallColor;
@@ -55,7 +53,7 @@ public class RedAutoClose extends CommandOpMode {
     private Drivetrain drivetrain;
 
     private Launcher launcher;
-    private LauncherHood hood;
+    private TurretHood hood;
     private Intake intake;
     private HoldControl holdControl;
     private Sorter sorter;
@@ -83,7 +81,7 @@ public class RedAutoClose extends CommandOpMode {
         launcher = new Launcher(hm);
         launcher.register();
 
-        hood = new LauncherHood(hm);
+        hood = new TurretHood(hm);
         hood.register();
 
         intake = new Intake(hm);

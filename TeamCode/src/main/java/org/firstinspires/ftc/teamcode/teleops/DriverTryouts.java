@@ -37,7 +37,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
-import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
+import org.firstinspires.ftc.teamcode.subsystems.TurretHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 
 @TeleOp(name = "DriverTryouts", group = "ScrapHeads")
@@ -53,7 +53,7 @@ public class DriverTryouts extends CommandOpMode {
 //    private FeederRail feederRail;
     private HoldControl holdControl;
     private Intake intake;
-    private LauncherHood hood;
+    private TurretHood hood;
 
     @Override
     public void initialize() {
@@ -86,7 +86,7 @@ public class DriverTryouts extends CommandOpMode {
         intake = new Intake(hm);
         intake.register();
 
-        hood = new LauncherHood(hm);
+        hood = new TurretHood(hm);
         hood.register();
 
         // Bind controls

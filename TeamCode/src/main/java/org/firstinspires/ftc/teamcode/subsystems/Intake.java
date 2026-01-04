@@ -19,8 +19,8 @@ public class Intake implements Subsystem  {
     private final MotorEx intakeMotorRight;
 
     // Default power constants (adjust as needed)
-    public static final double INTAKE_POWER = -1.0;
-    public static final double OUTTAKE_POWER = 1.0;
+    public static final double INTAKE_POWER = 1.0;
+    public static final double OUTTAKE_POWER = -0.4;
     public static final double REST_POWER = 0.0;
 
     public static final double MOTOR_TPR   = 28;   // ticks per motor rev
@@ -35,6 +35,8 @@ public class Intake implements Subsystem  {
     public Intake(HardwareMap hm) {
         intakeMotorLeft = new MotorEx(hm, "intakeLeft"); // name must match configuration
         intakeMotorRight = new MotorEx(hm, "intakeRight");
+
+        intakeMotorRight.setInverted(true);
 
         intakeMotorLeft.setZeroPowerBehavior(BRAKE);
         intakeMotorRight.setZeroPowerBehavior(BRAKE);

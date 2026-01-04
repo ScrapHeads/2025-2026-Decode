@@ -27,7 +27,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
-import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
+import org.firstinspires.ftc.teamcode.Commands.turret.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.SetLocalizerHeading;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.TurnToTarget;
@@ -46,7 +46,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
-import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
+import org.firstinspires.ftc.teamcode.subsystems.TurretHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 
@@ -64,7 +64,7 @@ public class AllSystemsTeleBlue extends CommandOpMode {
 //    private FeederRail feederRail;
     private HoldControl holdControl;
     private Intake intake;
-    private LauncherHood hood;
+    private TurretHood hood;
     private Vision vision;
 
     private Pose2d setLaunchPoint;
@@ -103,7 +103,7 @@ public class AllSystemsTeleBlue extends CommandOpMode {
         intake = new Intake(hm);
         intake.register();
 
-        hood = new LauncherHood(hm);
+        hood = new TurretHood(hm);
         hood.register();
 
         vision = new Vision(hm);

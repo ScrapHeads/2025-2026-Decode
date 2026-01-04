@@ -108,6 +108,7 @@ public class RobotState {
     public void setPattern(BallColor[] pattern) { this.pattern = pattern; }
     public BallColor[] getPattern () { return pattern; }
 
+    /** returns true if on the blue team */
     public Boolean getTeam() {return isBlue;}
 
     public void setTeam(Boolean isBlue) {this.isBlue = isBlue;}

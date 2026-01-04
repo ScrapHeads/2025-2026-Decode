@@ -89,7 +89,7 @@ public final class Launcher implements Subsystem {
         launcher = new MotorEx(hm, "launcher");
 
         shooterPid.setTolerance(25);
-        shooterPid.setIntegrationBounds(-1, 1);
+        shooterPid.setIntegrationBounds(0, 1);
 
         launcher.setInverted(true);
 
@@ -135,9 +135,6 @@ public final class Launcher implements Subsystem {
     public int ticker = 0;
     /** Directly set motor power (bypasses PID). */
     public void setPower(double power) {
-        TelemetryPacket p = new TelemetryPacket();
-        p.put("SetPoser called amount", ++ticker);
-        dashboard.sendTelemetryPacket(p);
         launcher.set(power);
     }
 
@@ -161,7 +158,7 @@ public final class Launcher implements Subsystem {
         packet.put("Distance", distance - 17.78);
         packet.put("Rpm", treeMap.get(distance - 17.78));
         dashboard.sendTelemetryPacket(packet);
-        setTargetRpm(treeMap.get(distance - 17.78));
+        setPower(treeMap.get(distance - 17.78));
     }
 
     public void setReadyToleranceRpm(double tol) { PARAMS.readyToleranceRpm = Math.max(0, tol); }
@@ -180,57 +177,56 @@ public final class Launcher implements Subsystem {
 
     @Override
     public void periodic() {
-        final long now = System.nanoTime();
-        final double dt = (PARAMS.lastLoopNanos == 0L) ? 0.02 : (now - PARAMS.lastLoopNanos) / 1e9;
-        PARAMS.lastLoopNanos = now;
-
-        shooterPid.setPIDF(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd, PARAMS.PIDKf);
-
-        TelemetryPacket packet = new TelemetryPacket();
-
-        if (PARAMS.enabledPid) {
-            // 1) Ramp target to avoid brownouts
-            final double maxStep = PARAMS.maxAccelRpmPerSec * dt;
-            final double delta = PARAMS.targetRpm - PARAMS.currentTargetRpm;
-            if (Math.abs(delta) > maxStep) {
-                PARAMS.currentTargetRpm += Math.copySign(maxStep, delta);
-            } else {
-                PARAMS.currentTargetRpm = PARAMS.targetRpm;
-            }
-
-            // 2) Measure
-            final double currentRpm = getShooterRPM();
-
-            // 3) PID correction
-            final double pidOut = shooterPid.calculate(currentRpm, PARAMS.currentTargetRpm);
-
-            // 5) Apply
-            double output = clamp(pidOut, 0.0, 1.0);
-            packet.put("PID output", pidOut);
-            packet.put("Output", output);
-
-            // Set to pidOut needs to be tested what output but motor could never go negative
-//            shooter.set(pidOut);
-//            setPower(output);
-            launcher.set(output);
-        }
+//        final long now = System.nanoTime();
+//        final double dt = (PARAMS.lastLoopNanos == 0L) ? 0.02 : (now - PARAMS.lastLoopNanos) / 1e9;
+//        PARAMS.lastLoopNanos = now;
+//
+//        shooterPid.setPIDF(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd, PARAMS.PIDKf);
+//
+//        if (PARAMS.enabledPid) {
+//            // 1) Ramp target to avoid brownouts
+//            final double maxStep = PARAMS.maxAccelRpmPerSec * dt;
+//            final double delta = PARAMS.targetRpm - PARAMS.currentTargetRpm;
+//            if (Math.abs(delta) > maxStep) {
+//                PARAMS.currentTargetRpm += Math.copySign(maxStep, delta);
+//            } else {
+//                PARAMS.currentTargetRpm = PARAMS.targetRpm;
+//            }
+//
+//            // 2) Measure
+//            final double currentRpm = getShooterRPM();
+//
+//            // 3) PID correction
+//            final double pidOut = shooterPid.calculate(currentRpm, PARAMS.currentTargetRpm);
+//
+//            // 5) Apply
+////            double output = clamp(pidOut, 0.0, 1.0);
+//            packet.put("PID output", pidOut);
+//            packet.put("Output", pidOut);
+//
+//            // Set to pidOut needs to be tested what output but motor could never go negative
+////            shooter.set(pidOut);
+////            setPower(output);
+//            launcher.set(pidOut);
+//        }
 
 //        shooter.set(.5);
 
         // --- Readiness logic ---
-        double shooterErr = Math.abs(getShooterRPM() - PARAMS.targetRpm);
-        boolean inTol = shooterErr <= PARAMS.readyToleranceRpm;
-
-        if (inTol) {
-            if (PARAMS.inTolStartNanos == 0L) PARAMS.inTolStartNanos = now;
-            double heldSec = (now - PARAMS.inTolStartNanos) / 1e9;
-            PARAMS.isReadyToLaunch = heldSec >= PARAMS.readyHoldTimeSeconds;
-        } else {
-            PARAMS.inTolStartNanos = 0L;
-            PARAMS.isReadyToLaunch = false;
-        }
+//        double shooterErr = Math.abs(getShooterRPM() - PARAMS.targetRpm);
+//        boolean inTol = shooterErr <= PARAMS.readyToleranceRpm;
+//
+//        if (inTol) {
+//            if (PARAMS.inTolStartNanos == 0L) PARAMS.inTolStartNanos = now;
+//            double heldSec = (now - PARAMS.inTolStartNanos) / 1e9;
+//            PARAMS.isReadyToLaunch = heldSec >= PARAMS.readyHoldTimeSeconds;
+//        } else {
+//            PARAMS.inTolStartNanos = 0L;
+//            PARAMS.isReadyToLaunch = false;
+//        }
 
         // Telemetry
+        TelemetryPacket packet = new TelemetryPacket();
         sendTelemetry(packet);
     }
 
@@ -249,10 +245,5 @@ public final class Launcher implements Subsystem {
         packet.put("Enabled", PARAMS.enabledPid);
         packet.put("Launcher encoder", launcher.getCurrentPosition());
         dashboard.sendTelemetryPacket(packet);
-    }
-
-
-    private static double clamp(double v, double lo, double hi) {
-        return Math.max(lo, Math.min(hi, v));
     }
 }

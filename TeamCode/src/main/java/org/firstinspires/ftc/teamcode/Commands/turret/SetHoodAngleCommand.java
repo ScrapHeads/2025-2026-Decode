@@ -1,7 +1,7 @@
-package org.firstinspires.ftc.teamcode.Commands;
+package org.firstinspires.ftc.teamcode.Commands.turret;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
+import org.firstinspires.ftc.teamcode.subsystems.TurretHood;
 
 /**
  * Command to set the LauncherHood to a specific target angle.
@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
  */
 public class SetHoodAngleCommand extends CommandBase {
 
-    private final LauncherHood hood;
+    private final TurretHood hood;
     private final double targetAngle;
 
     /**
@@ -20,7 +20,7 @@ public class SetHoodAngleCommand extends CommandBase {
      * @param hood The LauncherHood subsystem
      * @param targetAngle The angle (degrees) to turn the hood to
      */
-    public SetHoodAngleCommand(LauncherHood hood, double targetAngle) {
+    public SetHoodAngleCommand(TurretHood hood, double targetAngle) {
         this.hood = hood;
         this.targetAngle = targetAngle;
         addRequirements(hood);

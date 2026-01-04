@@ -4,7 +4,7 @@ import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
-public class RunRightIntake extends CommandBase {
+public class RunLeftIntakeContinuous extends CommandBase {
     private final Intake intake;
     private final double power;
 
@@ -14,7 +14,7 @@ public class RunRightIntake extends CommandBase {
      * @param intake the Intake subsystem instance
      * @param power the desired motor power (-1.0 to 1.0)
      */
-    public RunRightIntake(Intake intake, double power) {
+    public RunLeftIntakeContinuous(Intake intake, double power) {
         this.intake = intake;
         this.power = power;
         addRequirements(intake);
@@ -22,17 +22,11 @@ public class RunRightIntake extends CommandBase {
 
     @Override
     public void initialize() {
-        intake.setRightPower(power);
+        intake.setLeftPower(power);
     }
 
     @Override
     public void end(boolean interrupted) {
-//        intake.stopRight();
-    }
-
-    @Override
-    public boolean isFinished() {
-        // Continuous command — runs until canceled
-        return true;
+        intake.stopLeft();
     }
 }

@@ -32,12 +32,12 @@ public class RunBothIntakes extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        intake.stopBoth();
+//        intake.stopBoth();
     }
 
     @Override
     public boolean isFinished() {
         // Continuous command — runs until canceled
-        return false;
+        return true;
     }
 }

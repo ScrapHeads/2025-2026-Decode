@@ -24,7 +24,7 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
-import org.firstinspires.ftc.teamcode.Commands.SetHoodAngleCommand;
+import org.firstinspires.ftc.teamcode.Commands.turret.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
@@ -41,7 +41,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
-import org.firstinspires.ftc.teamcode.subsystems.LauncherHood;
+import org.firstinspires.ftc.teamcode.subsystems.TurretHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.util.BallColor;
@@ -55,7 +55,7 @@ public class BlueAutoClose extends CommandOpMode {
     private Drivetrain drivetrain;
 
     private Launcher launcher;
-    private LauncherHood hood;
+    private TurretHood hood;
     private Intake intake;
     private HoldControl holdControl;
     private Sorter sorter;
@@ -83,7 +83,7 @@ public class BlueAutoClose extends CommandOpMode {
         launcher = new Launcher(hm);
         launcher.register();
 
-        hood = new LauncherHood(hm);
+        hood = new TurretHood(hm);
         hood.register();
 
         intake = new Intake(hm);

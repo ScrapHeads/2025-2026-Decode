@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * <p>This uses angle-based control via turnToAngle() for precise positioning.
  */
 @Config
-public class LauncherHood implements Subsystem {
+public class TurretHood implements Subsystem {
 
     /**
      * Holds all tunable parameters and control state for the launcher.
@@ -43,7 +43,7 @@ public class LauncherHood implements Subsystem {
      *
      * @param hm HardwareMap for accessing the servo
      */
-    public LauncherHood(HardwareMap hm) {
+    public TurretHood(HardwareMap hm) {
         // Axon MAX M2
         hoodServo = new SimpleServo(hm, "hood", MIN_ANGLE_SERVO, MAX_ANGLE_SERVO);
         setAngle(MIN_SHOOT_ANGLE);
