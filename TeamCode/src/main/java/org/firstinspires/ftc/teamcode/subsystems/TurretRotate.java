@@ -36,14 +36,15 @@ public class TurretRotate implements Subsystem {
     public static final double TICKS_PER_DEGREE = 0;
 
     public TurretRotate (HardwareMap hm) {
-        rotator = new SimpleServo(hm, "rotator", -1, 1);
+        rotator = new SimpleServo(hm, "turretRotate", -1, 1);
         rotator.turnToAngle(0);
 
-        encoder = new MotorEx(hm, "");
+        encoder = new MotorEx(hm, "feeder");
 
         //TODO Find proper Tolerance
         pid.setTolerance(0);
         pid.setIntegratorRange(-1, 1);
+        pid.reset();
     }
 
     /**

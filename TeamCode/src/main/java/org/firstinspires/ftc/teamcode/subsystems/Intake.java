@@ -1,11 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.BRAKE;
+import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
+import static org.firstinspires.ftc.teamcode.util.BallColor.GREEN;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.teamcode.util.BallColor;
 
 /**
  * The IntakeSubsystem controls the intake motor responsible for
@@ -17,6 +24,9 @@ public class Intake implements Subsystem  {
 
     private final MotorEx intakeMotorLeft;
     private final MotorEx intakeMotorRight;
+
+    private final RevColorSensorV3 colorSensorLeft;
+    private final RevColorSensorV3 colorSensorRight;
 
     // Default power constants (adjust as needed)
     public static final double INTAKE_POWER = 1.0;
@@ -40,6 +50,15 @@ public class Intake implements Subsystem  {
 
         intakeMotorLeft.setZeroPowerBehavior(BRAKE);
         intakeMotorRight.setZeroPowerBehavior(BRAKE);
+
+        colorSensorLeft = hm.get(RevColorSensorV3.class, "colorLeft");
+        colorSensorRight = hm.get(RevColorSensorV3.class, "colorRight");
+
+        colorSensorLeft.setGain(10);
+        colorSensorRight.setGain(10);
+
+        colorSensorLeft.enableLed(true);
+        colorSensorRight.enableLed(true);
 
         // ensure stopped at init
         stopBoth();
@@ -82,10 +101,50 @@ public class Intake implements Subsystem  {
     public double getTicksPerSec()  { return intakeMotorLeft.encoder.getRawVelocity(); }
     public double getShooterRPM()  { return (getTicksPerSec() * 60.0) / TICKS_PER_REV; }
 
+    public BallColor detectBallColor (RevColorSensorV3 colorSensor) {
+        int r = colorSensor.red();
+        int g = colorSensor.green();
+        int b = colorSensor.blue();
+
+        // --- Normalize readings to minimize lighting variance ---
+        double total = r + g + b;
+        if (total == 0) return BallColor.EMPTY;
+
+        double rNorm = r / total;
+        double gNorm = g / total;
+        double bNorm = b / total;
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Color Sensor Right", String.format("%.2f, %.2f, %.2f",
+                rNorm, gNorm, bNorm));
+        dashboard.sendTelemetryPacket(packet);
+
+        // --- GREEN detection: strong green dominance ---
+        if (gNorm > rNorm * 2.8 && gNorm > bNorm * 1.2) {
+            return GREEN;
+        }
+
+        // --- PURPLE detection: red + blue high, green low ---
+        double avgRB = (rNorm + bNorm) / 1.87;
+        if (avgRB > gNorm) {
+            return BallColor.PURPLE;
+        }
+
+        // --- None detected ---
+        return BallColor.EMPTY;
+    }
+
     @Override
     public void periodic() {
         tele.addData("Intake Power", toString());
         tele.update();
+
+        TelemetryPacket packet = new TelemetryPacket();
+//        packet.put("Color Left", detectBallColor(colorSensorLeft));
+        packet.put("Color right", detectBallColor(colorSensorRight));
+        packet.put("Color Sensor Right", String.format("%d, %d, %d",
+                colorSensorLeft.red(), colorSensorLeft.green(), colorSensorLeft.blue()));
+        dashboard.sendTelemetryPacket(packet);
     }
 
     @Override

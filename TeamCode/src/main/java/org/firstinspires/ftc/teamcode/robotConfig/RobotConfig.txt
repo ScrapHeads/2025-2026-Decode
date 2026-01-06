@@ -34,8 +34,8 @@ Control hub
     I2C bus
         0. N.A.
         1. pinpoint
-        2. colorSensor
-        3. huskyLens
+        2. colorLeft
+        3. colorRight
 
 Expansion hub
 
