@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Commands.launcher;
 
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
-import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -9,18 +8,16 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 
-import org.firstinspires.ftc.teamcode.Commands.HoldControlCommand;
 import org.firstinspires.ftc.teamcode.Commands.sorter.ClearSorterSlots;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
 import org.firstinspires.ftc.teamcode.state.RobotState;
-import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
+import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
-import org.firstinspires.ftc.teamcode.util.BallColor;
 
 public class SortedLuanch extends SequentialCommandGroup {
     private int startOffset;
-    public SortedLuanch (Launcher launcher, Sorter sorter, HoldControl holdControl) {
+    public SortedLuanch (Launcher launcher, Sorter sorter, BallStoppers ballStoppers) {
 
         addCommands (
                 new InstantCommand(() -> {
@@ -35,7 +32,6 @@ public class SortedLuanch extends SequentialCommandGroup {
                 new TurnOneSlot(sorter, () -> startOffset),
                 new WaitCommand(500),
 
-                new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING),
                 new WaitCommand(100),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),
                 new WaitUntilCommand(sorter::isAtSetPoint),

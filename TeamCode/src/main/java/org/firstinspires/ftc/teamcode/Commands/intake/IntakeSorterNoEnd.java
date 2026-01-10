@@ -1,51 +1,37 @@
 package org.firstinspires.ftc.teamcode.Commands.intake;
 
-import static org.firstinspires.ftc.teamcode.subsystems.HoldControl.HoldPosition.LOADING;
-import static org.firstinspires.ftc.teamcode.subsystems.HoldControl.HoldPosition.TRANSPORT;
-
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
+import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
-import org.firstinspires.ftc.teamcode.util.BallColor;
 
 public class IntakeSorterNoEnd extends CommandBase {
 
-    private final Intake intake;
+    private final IntakeLeft intakeLeft;
     private final Sorter sorter;
-    private final HoldControl holdControl;
+    private final BallStoppers ballStoppers;
 
     private final double power;
 
-    public IntakeSorterNoEnd(Intake intake, Sorter sorter, HoldControl holdControl, double power) {
-        this.intake = intake;
+    public IntakeSorterNoEnd(IntakeLeft intakeLeft, Sorter sorter, BallStoppers ballStoppers, double power) {
+        this.intakeLeft = intakeLeft;
         this.sorter = sorter;
-        this.holdControl = holdControl;
+        this.ballStoppers = ballStoppers;
 
         this.power = power;
-        addRequirements(intake);
+        addRequirements(intakeLeft);
         addRequirements(sorter);
     }
 
     @Override
     public void initialize() {
-        holdControl.moveTo(HoldControl.HoldPosition.LOADING);
-        intake.setBothPower(power);
+//        intakeLeft.setBothPower(power);
     }
 
     @Override
     public void execute() {
-        if (holdControl.getCurrentPosition() == TRANSPORT && sorter.isAtSetPoint()) {
-            holdControl.moveTo(LOADING);
-        }
 
-        boolean isAtSetPoint = Math.abs(Math.abs(sorter.getCurrentPos()) - Math.abs(sorter.getTurnPos())) <= 800;
-
-        if (sorter.getCurrentColor() != BallColor.EMPTY && isAtSetPoint) {
-            holdControl.moveTo(TRANSPORT);
-            sorter.turnOneSlotDirection(Sorter.CW_DIRECTION);
-        }
     }
 
     @Override
@@ -56,7 +42,6 @@ public class IntakeSorterNoEnd extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        intake.setBothPower(0);
-        holdControl.moveTo(TRANSPORT);
+//        intakeLeft.setBothPower(0);
     }
 }

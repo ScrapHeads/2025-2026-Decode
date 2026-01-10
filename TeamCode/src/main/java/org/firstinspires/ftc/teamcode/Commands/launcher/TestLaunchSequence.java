@@ -8,16 +8,17 @@ import org.firstinspires.ftc.teamcode.Commands.feeder.TurnFeederServoBoth;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntake;
 import org.firstinspires.ftc.teamcode.subsystems.FeederMotor;
 import org.firstinspires.ftc.teamcode.subsystems.FeederServo;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
+import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeRight;
 
 public class TestLaunchSequence extends SequentialCommandGroup {
 
-    public TestLaunchSequence (FeederServo feederServo, FeederMotor feederMotor, Intake intake) {
+    public TestLaunchSequence (FeederServo feederServo, FeederMotor feederMotor, IntakeRight intakeRight) {
         addCommands(
                 new RunFeederMotor(feederMotor, -1),
                 new WaitCommand(100),
                 new TurnFeederServoBoth(feederServo, FeederServo.OUT_FRONT_ANGLE, FeederServo.OUT_BACK_ANGLE),
-                new RunRightIntake(intake, .8),
+                new RunRightIntake(intakeRight, .8),
                 new WaitCommand(25),
                 new TurnFeederServoBoth(feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE),
                 new WaitCommand(300),
@@ -29,7 +30,7 @@ public class TestLaunchSequence extends SequentialCommandGroup {
                 new WaitCommand(25),
                 new TurnFeederServoBoth(feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE),
                 new WaitCommand(300),
-                new RunRightIntake(intake, 0),
+                new RunRightIntake(intakeRight, 0),
                 new RunFeederMotor(feederMotor, 0)
         );
     }

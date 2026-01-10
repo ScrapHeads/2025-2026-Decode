@@ -29,8 +29,8 @@ import org.firstinspires.ftc.teamcode.auto.paths.blueAutoFar;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
+import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.TurretHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
@@ -47,8 +47,8 @@ public class BlueAutoFar extends CommandOpMode {
 
     private Launcher launcher;
     private TurretHood hood;
-    private Intake intake;
-    private HoldControl holdControl;
+    private IntakeLeft intakeLeft;
+    private BallStoppers ballStoppers;
     private Sorter sorter;
     private Vision vision;
 
@@ -76,11 +76,11 @@ public class BlueAutoFar extends CommandOpMode {
         hood = new TurretHood(hm);
         hood.register();
 
-        intake = new Intake(hm);
-        intake.register();
+        intakeLeft = new IntakeLeft(hm);
+        intakeLeft.register();
 
-        holdControl = new HoldControl(hm);
-        holdControl.register();
+        ballStoppers = new BallStoppers(hm);
+        ballStoppers.register();
 
         sorter = new Sorter(hm);
         sorter.register();
@@ -112,37 +112,37 @@ public class BlueAutoFar extends CommandOpMode {
                 ),
                 new SetFlywheelRpm(launcher, 4450),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
-                new SortedLuanch(launcher, sorter, holdControl),
+                new SortedLuanch(launcher, sorter, ballStoppers),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(4),
                                 turnConstraintsPickUp, velConstraintPickUp, accelConstraintPickUp),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
+                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER)
                 ),
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
+                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER)
                 ),
                 new ParallelCommandGroup(
                         new SetFlywheelRpm(launcher, 3400)
                 ),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
-                new SortedLuanch(launcher, sorter, holdControl),
+                new SortedLuanch(launcher, sorter, ballStoppers),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(8),
                                 turnConstraintsPickUp, velConstraintPickUp, accelConstraintPickUp),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
+                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER)
                 ),
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
+                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER)
                 ),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
 
-                new SortedLuanch(launcher, sorter, holdControl),
+                new SortedLuanch(launcher, sorter, ballStoppers),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(10))
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(11))
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(11))

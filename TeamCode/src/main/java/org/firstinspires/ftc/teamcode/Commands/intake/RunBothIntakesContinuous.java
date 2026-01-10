@@ -2,7 +2,8 @@ package org.firstinspires.ftc.teamcode.Commands.intake;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
+import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeRight;
 
 /**
  * Command to run the Intake subsystem motor at a specific power.
@@ -11,28 +12,33 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
  */
 public class RunBothIntakesContinuous extends CommandBase {
 
-    private final Intake intake;
+    private final IntakeLeft intakeLeft;
+    private final IntakeRight intakeRight;
     private final double power;
 
     /**
      * Constructs a new RunIntakeCommand.
      *
-     * @param intake the Intake subsystem instance
+     * @param intakeLeft the Intake subsystem instance
      * @param power the desired motor power (-1.0 to 1.0)
      */
-    public RunBothIntakesContinuous(Intake intake, double power) {
-        this.intake = intake;
+    public RunBothIntakesContinuous(IntakeLeft intakeLeft, IntakeRight intakeRight, double power) {
+        this.intakeLeft = intakeLeft;
+        this.intakeRight = intakeRight;
         this.power = power;
-        addRequirements(intake);
+        addRequirements(intakeLeft);
+        addRequirements(intakeRight);
     }
 
     @Override
     public void initialize() {
-        intake.setBothPower(power);
+        intakeLeft.setLeftPower(power);
+        intakeRight.setRightPower(power);
     }
 
     @Override
     public void end(boolean interrupted) {
-        intake.stopBoth();
+        intakeLeft.stopLeft();
+        intakeRight.stopRight();
     }
 }

@@ -9,17 +9,16 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 
-import org.firstinspires.ftc.teamcode.Commands.HoldControlCommand;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
 import org.firstinspires.ftc.teamcode.state.RobotState;
-import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
+import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
 public class LuanchSetPattern extends SequentialCommandGroup {
     private int startOffset;
-    public LuanchSetPattern(Launcher launcher, Sorter sorter, HoldControl holdControl, BallColor[] pattern) {
+    public LuanchSetPattern(Launcher launcher, Sorter sorter, BallStoppers ballStoppers, BallColor[] pattern) {
 
         addCommands (
                 new InstantCommand(() -> launcher.getAndSetFlywheelByDistance()),
@@ -35,7 +34,6 @@ public class LuanchSetPattern extends SequentialCommandGroup {
                 new TurnOneSlot(sorter, () -> startOffset),
                 new WaitCommand(500),
 
-                new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING),
                 new WaitCommand(200),
                 new WaitUntilCommand(() -> launcher.isReadyToLaunch()),
                 new TurnOneSlot(sorter, Sorter.CCW_DIRECTION),

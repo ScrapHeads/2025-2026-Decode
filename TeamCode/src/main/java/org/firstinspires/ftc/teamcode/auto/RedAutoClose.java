@@ -37,8 +37,8 @@ import org.firstinspires.ftc.teamcode.auto.paths.redAutoClose;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.HoldControl;
-import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
+import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.TurretHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
@@ -54,8 +54,8 @@ public class RedAutoClose extends CommandOpMode {
 
     private Launcher launcher;
     private TurretHood hood;
-    private Intake intake;
-    private HoldControl holdControl;
+    private IntakeLeft intakeLeft;
+    private BallStoppers ballStoppers;
     private Sorter sorter;
     private Vision vision;
 
@@ -84,11 +84,11 @@ public class RedAutoClose extends CommandOpMode {
         hood = new TurretHood(hm);
         hood.register();
 
-        intake = new Intake(hm);
-        intake.register();
+        intakeLeft = new IntakeLeft(hm);
+        intakeLeft.register();
 
-        holdControl = new HoldControl(hm);
-        holdControl.register();
+        ballStoppers = new BallStoppers(hm);
+        ballStoppers.register();
 
         sorter = new Sorter(hm);
         sorter.register();
@@ -128,7 +128,7 @@ public class RedAutoClose extends CommandOpMode {
 
                 new WaitCommand(100),
 //                new InstantCommand(launcher::getAndSetFlywheelByDistance),
-                new SortedLuanchExtraSpin(launcher, sorter, holdControl),
+                new SortedLuanchExtraSpin(launcher, sorter, ballStoppers),
 
                 new WaitCommand(100),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
@@ -136,18 +136,18 @@ public class RedAutoClose extends CommandOpMode {
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(3),
                                 turnConstraintsPickUp, velConstraintPickUp, accelConstraintPickUp),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
+                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER + intakePowerOffset)
                 ),
 
-                new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER).withTimeout(500),
+                new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER).withTimeout(500),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER)
+                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER)
                 ),
 
 //                new InstantCommand(launcher::getAndSetFlywheelByDistance),
-                new SortedLuanchExtraSpin(launcher, sorter, holdControl),
+                new SortedLuanchExtraSpin(launcher, sorter, ballStoppers),
                 new WaitCommand(200),
 
                 new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
@@ -155,21 +155,21 @@ public class RedAutoClose extends CommandOpMode {
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(6),
                                 turnConstraintsPickUp, velConstraintPickUp, accelConstraintPickUp),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
+                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER + intakePowerOffset)
                 ),
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
+                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER + intakePowerOffset)
                 ),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
-                        new IntakeSorterNoEnd(intake, sorter, holdControl, Intake.INTAKE_POWER + intakePowerOffset)
+                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER + intakePowerOffset)
                 ),
 
                 new WaitCommand(50),
 //                new InstantCommand(launcher::getAndSetFlywheelByDistance),
-                new SortedLuanchExtraSpin(launcher, sorter, holdControl),
+                new SortedLuanchExtraSpin(launcher, sorter, ballStoppers),
                 new WaitCommand(150),
                 new DynamicStrafeCommand(drivetrain, () -> path.get(9),
                         turnConstraintsFast, velConstraintFast, accelConstraintFast),
