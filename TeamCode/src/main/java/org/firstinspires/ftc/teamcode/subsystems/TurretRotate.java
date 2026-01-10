@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
@@ -10,6 +13,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.RilLib.Control.PID.PIDController;
 
+@Config
 public class TurretRotate implements Subsystem {
     /**
      * Holds all tunable parameters and control state for the launcher.
@@ -20,6 +24,10 @@ public class TurretRotate implements Subsystem {
 
         /** Whether the PID control loop is enabled. */
         public boolean enabledPid = false;
+
+        public double kp = 0.0;
+        public double ki = 0.0;
+        public double kd = 0.0;
     }
 
     public static Params PARAMS = new Params();
@@ -27,13 +35,14 @@ public class TurretRotate implements Subsystem {
     public final ServoEx rotator;
     public final MotorEx encoder;
 
-    public PIDController pid = new PIDController(0,0,0);
+    public PIDController pid = new PIDController(PARAMS.kp, PARAMS.ki, PARAMS.kd);
 
-    //TODO find the correct range
-    public final double MAX_ENCODER_VALUE = 0;
-    public final double MIN_ENCODER_VALUE = 0;
+    // Left Turning
+    public final double MAX_ENCODER_VALUE = 15600;
+    // Right Turning
+    public final double MIN_ENCODER_VALUE = -15600;
 
-    public static final double TICKS_PER_DEGREE = 0;
+    public static final double TICKS_PER_DEGREE = 143.36;
 
     public TurretRotate (HardwareMap hm) {
         rotator = new SimpleServo(hm, "turretRotate", -1, 1);
@@ -42,7 +51,7 @@ public class TurretRotate implements Subsystem {
         encoder = new MotorEx(hm, "feeder");
 
         //TODO Find proper Tolerance
-        pid.setTolerance(0);
+        pid.setTolerance(TICKS_PER_DEGREE);
         pid.setIntegratorRange(-1, 1);
         pid.reset();
     }
@@ -58,8 +67,8 @@ public class TurretRotate implements Subsystem {
     public double getPower () {return rotator.getAngle();}
 
     public void setTargetPos (double targetPos) {
-        double safeAngle = targetPos; // Math.max(MIN_ENCODER_VALUE, Math.min(targetPos, MAX_ENCODER_VALUE));
-        PARAMS.targetPos = safeAngle;
+        double safePos = Math.max(MIN_ENCODER_VALUE, Math.min(targetPos, MAX_ENCODER_VALUE));
+        PARAMS.targetPos = safePos;
     }
 
     public void resetEncoder () {encoder.stopAndResetEncoder();}
@@ -67,13 +76,18 @@ public class TurretRotate implements Subsystem {
 
     @Override
     public void periodic() {
+        pid.setPID(PARAMS.kp, PARAMS.ki, PARAMS.kd);
 
         if (PARAMS.enabledPid) {
-            double output = pid.calculate(encoder.get(), PARAMS.targetPos);
+            double output = -pid.calculate(encoder.getCurrentPosition(), PARAMS.targetPos);
             turnPower(output);
         }
 
-
         tele.addData("Rotator power", "%.1f°", getPower());
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Turret rot Encoder", encoder.getCurrentPosition());
+        packet.put("Turret location", encoder.getCurrentPosition() / TICKS_PER_DEGREE);
+        dashboard.sendTelemetryPacket(packet);
     }
 }

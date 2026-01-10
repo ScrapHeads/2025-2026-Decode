@@ -32,23 +32,25 @@ public class TurretRotateContinuous extends CommandBase {
         double angle;
         // If on blue team do the first equation set else assume the red team
         if (RobotState.getInstance().getTeam()) {
-            double targetY = -1.67;
-
-            //TODO Set the appropriate offest
-            angle = -getAsin(targetX, targetY, y);
-        } else {
-            double targetY = -1.67;
+            double targetY = -1.82;
 
             //TODO Set the appropriate offest
             angle = getAsin(targetX, targetY, y);
+        } else {
+            double targetY = 1.82;
+
+            //TODO Set the appropriate offest
+            angle = -getAsin(targetX, targetY, y);
         }
 
-        double targetPos = angle * TurretRotate.TICKS_PER_DEGREE;
+        double targetAngle = angle - RobotState.getInstance().getEstimatedPose().getRotation().getDegrees();
+
+        double targetPos = targetAngle * TurretRotate.TICKS_PER_DEGREE;
 
         turretRotate.setTargetPos(targetPos);
 
         TelemetryPacket packet = new TelemetryPacket();
-        packet.put("Launch angle", angle);
+        packet.put("Launch angle", targetAngle);
         dashboard.sendTelemetryPacket(packet);
     }
 

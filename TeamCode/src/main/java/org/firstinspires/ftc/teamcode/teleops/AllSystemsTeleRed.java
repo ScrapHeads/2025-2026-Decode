@@ -159,7 +159,7 @@ public class AllSystemsTeleRed extends CommandOpMode {
                 .whenReleased(new RunLeftIntake(intakeLeft, 0));
 
         driver.getGamepadButton(A)
-                .whenPressed(new TestLaunchSequence(feederServo, feederMotor, intakeRight)
+                .whenPressed(new TestLaunchSequence(feederServo, feederMotor, intakeLeft)
                 );
 //
         driver.getGamepadButton(B)

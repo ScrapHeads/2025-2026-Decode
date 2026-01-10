@@ -20,11 +20,11 @@ public class BallStoppers implements Subsystem {
     private final ServoEx ballStopperRight;
 
     // === Servo configuration ===
-    public static final double UP_ANGLE_LEFT = .1;
+    public static final double UP_ANGLE_LEFT = 0;
     public static final double DOWN_ANGLE_LEFT = .6;
 
     public static final double UP_ANGLE_RIGHT = 1;
-    public static final double DOWN_ANGLE_RIGHT = .4;
+    public static final double DOWN_ANGLE_RIGHT = .5;
 
     /**
      * Constructs the HoldControl subsystem.
@@ -33,12 +33,13 @@ public class BallStoppers implements Subsystem {
      */
     public BallStoppers(HardwareMap hm) {
         ballStopperLeft = new SimpleServo(hm, "ballStopperLeft", 0, 1);
-//        ballStopperLeft.turnToAngle(UP_ANGLE_LEFT);
+        ballStopperLeft.turnToAngle(UP_ANGLE_LEFT);
+//        ballStopperLeft.turnToAngle(DOWN_ANGLE_LEFT);
 
         ballStopperRight = new SimpleServo(hm, "ballStopperRight", 0, 1);
 //        ballStopperRight.turnToAngle(UP_ANGLE_RIGHT);
+        ballStopperRight.turnToAngle(DOWN_ANGLE_RIGHT);
 
-        ballStopperLeft.setPosition(DOWN_ANGLE_LEFT);
     }
 
     /** Turns servo to the specified preset angle based on mode. */
