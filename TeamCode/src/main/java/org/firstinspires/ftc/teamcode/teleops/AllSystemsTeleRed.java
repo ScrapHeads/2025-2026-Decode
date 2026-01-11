@@ -16,12 +16,16 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
+import org.firstinspires.ftc.teamcode.Commands.feeder.RunFeederMotor;
+import org.firstinspires.ftc.teamcode.Commands.feeder.TurnFeederServoBoth;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunBothIntakesContinuous;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunLeftIntake;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunLeftIntakeContinuous;
@@ -30,6 +34,7 @@ import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntakeContinuous;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetPowerLauncher;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.launcher.TestLaunchSequence;
+import org.firstinspires.ftc.teamcode.Commands.turret.TurretRotateContinuous;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.state.RobotState;
@@ -38,6 +43,7 @@ import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.FeederMotor;
 import org.firstinspires.ftc.teamcode.subsystems.FeederServo;
+import org.firstinspires.ftc.teamcode.subsystems.TurretHood;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
@@ -54,7 +60,7 @@ public class AllSystemsTeleRed extends CommandOpMode {
     private Launcher launcher;
     private IntakeLeft intakeLeft;
     private IntakeRight intakeRight;
-//    private LauncherHood hood;
+    private TurretHood hood;
     private Vision vision;
     private FeederServo feederServo;
     private FeederMotor feederMotor;
@@ -106,8 +112,8 @@ public class AllSystemsTeleRed extends CommandOpMode {
         ballStoppers = new BallStoppers(hm);
         ballStoppers.register();
 
-//        hood = new LauncherHood(hm);
-//        hood.register();
+        hood = new TurretHood(hm);
+        hood.register();
 
         vision = new Vision(hm);
         vision.register();
@@ -141,7 +147,7 @@ public class AllSystemsTeleRed extends CommandOpMode {
         intakeLeft.setDefaultCommand(new RunLeftIntakeContinuous(intakeLeft, .2));
         intakeRight.setDefaultCommand(new RunRightIntakeContinuous(intakeRight, .2));
 
-//        turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate));
+        turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate));
 
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
                 .whenActive(new RunRightIntakeContinuous(intakeRight, IntakeLeft.INTAKE_POWER))
@@ -160,7 +166,13 @@ public class AllSystemsTeleRed extends CommandOpMode {
                 .whenReleased(new RunLeftIntake(intakeLeft, 0));
 
         driver.getGamepadButton(A)
-                .whenPressed(new TestLaunchSequence(feederServo, feederMotor, intakeLeft)
+                .whenPressed(new TestLaunchSequence(feederServo, feederMotor, ballStoppers, intakeLeft).whenFinished(() ->
+                            new SequentialCommandGroup(
+                                    new TurnFeederServoBoth(feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE),
+                                    new RunLeftIntake(intakeLeft, 0),
+                                    new RunFeederMotor(feederMotor, 0)
+                            )
+                        )
                 );
 //
         driver.getGamepadButton(B)

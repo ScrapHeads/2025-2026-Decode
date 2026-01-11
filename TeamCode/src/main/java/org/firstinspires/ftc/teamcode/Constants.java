@@ -31,12 +31,12 @@ public class Constants {
     );
 
     //TODO find the pose of the tags on the field
-    public static Pose2d redTagPose = new Pose2d(-1.482,1.413, new Rotation2d(-54));
+    public static Pose2d redTagPose = new Pose2d(-1.82,1.413, new Rotation2d(-54));
     public static Pose2d blueTagPose = new Pose2d(-1.482,-1.413, new Rotation2d(54));
 
     // All in cm from front of robot for right now
     // Hood angle 1430
-    public static double[][] LauncherTable = {
+    public static double[][] LauncherRPMTable = {
             {80.0, 0},
             {90.0, 0},
             {100.0, 0},
@@ -64,5 +64,4 @@ public class Constants {
             {320.0, 0},
             {330.0, 0},
     };
-
 }

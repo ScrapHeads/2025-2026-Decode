@@ -45,7 +45,7 @@ public class TurretHood implements Subsystem {
      */
     public TurretHood(HardwareMap hm) {
         // Axon MAX M2
-        hoodServo = new SimpleServo(hm, "hood", MIN_ANGLE_SERVO, MAX_ANGLE_SERVO);
+        hoodServo = new SimpleServo(hm, "turretHood", MIN_ANGLE_SERVO, MAX_ANGLE_SERVO);
         setAngle(MIN_SHOOT_ANGLE);
     }
 
@@ -59,7 +59,7 @@ public class TurretHood implements Subsystem {
         // Clamp angle to physical servo limits
         double safeAngle = Math.min(MIN_SHOOT_ANGLE, Math.max(MAX_SHOOT_ANGLE, angle));
         hoodServo.turnToAngle(safeAngle);
-        PARAMS.currentAngle = safeAngle;
+//        PARAMS.currentAngle = safeAngle;
     }
 
     /** @return The current logical hood angle (degrees). */
@@ -70,7 +70,8 @@ public class TurretHood implements Subsystem {
     @Override
     public void periodic() {
         // For testing only not normally not needed
-        setAngle(getCurrentAngle());
+//        setAngle(PARAMS.currentAngle);
+        hoodServo.turnToAngle(PARAMS.currentAngle);
         tele.addData("Launcher Hood Angle", "%.1f°", hoodServo.getAngle());
     }
 }

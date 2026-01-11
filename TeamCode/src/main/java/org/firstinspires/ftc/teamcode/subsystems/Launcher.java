@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static org.firstinspires.ftc.teamcode.Constants.blueTagPose;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
-import static org.firstinspires.ftc.teamcode.Constants.LauncherTable;
+import static org.firstinspires.ftc.teamcode.Constants.LauncherRPMTable;
 import static org.firstinspires.ftc.teamcode.Constants.redTagPose;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
@@ -37,6 +37,8 @@ public final class Launcher implements Subsystem {
         /** Desired target wheel speed in RPM. */
         public double targetRpm = 0;
 
+        public double targetPower = 0;
+
         /** Allowed RPM error margin to consider launcher "ready". */
         public double readyToleranceRpm = 200;
 
@@ -52,6 +54,7 @@ public final class Launcher implements Subsystem {
         public boolean enabledPid = false;
         /** Ramped setpoint RPM used to avoid sudden current draw. */
         public double currentTargetRpm = 0.0;
+
         /** Max ramp rate in RPM/sec. */
         public double maxAccelRpmPerSec = 3000;
         /** Time of last loop iteration, in ns. */
@@ -59,10 +62,10 @@ public final class Launcher implements Subsystem {
 
         // --- Control ---
         /** Single PID controller for the shooter motor. */
-        public double PIDKp = 0.00024;
+        public double PIDKp = 0.002;
         public double PIDKi = 0.0;
         public double PIDKd = 0.0;
-        public double PIDKf = 0.000175;
+        public double PIDKf = 0.0001;
     }
 
     /** Instance of params for this launcher. */
@@ -77,7 +80,7 @@ public final class Launcher implements Subsystem {
 
     // Encoder resolution calculations
     public static final double MOTOR_TPR   = 28;   // ticks per motor rev
-    public static final double GEAR_RATIO  = 1;  // motor:wheel upgear
+    public static final double GEAR_RATIO  = 3;  // motor:wheel upgear
     public static final double TICKS_PER_REV = MOTOR_TPR / GEAR_RATIO;
 
     /**
@@ -88,8 +91,8 @@ public final class Launcher implements Subsystem {
     public Launcher(HardwareMap hm) {
         launcher = new MotorEx(hm, "launcher");
 
-        shooterPid.setTolerance(25);
-        shooterPid.setIntegrationBounds(0, 1);
+//        shooterPid.setTolerance(25);
+//        shooterPid.setIntegrationBounds(0, 1);
 
         launcher.setInverted(true);
 
@@ -111,7 +114,7 @@ public final class Launcher implements Subsystem {
         PARAMS.enabledPid = true;
         PARAMS.inTolStartNanos = 0L;
         PARAMS.isReadyToLaunch = false;
-        shooterPid.reset();
+//        shooterPid.reset();
         PARAMS.currentTargetRpm = getShooterRPM(); // ramp from current speed
     }
 
@@ -122,11 +125,10 @@ public final class Launcher implements Subsystem {
     }
 
     public void createLaunchTable () {
-        for (double[] pair : LauncherTable) {
+        for (double[] pair : LauncherRPMTable) {
             treeMap.put(pair[0], pair[1]);
         }
     }
-
 
     /** @return true if PID control is enabled. */
     public boolean isEnabled() {
@@ -177,56 +179,57 @@ public final class Launcher implements Subsystem {
 
     @Override
     public void periodic() {
-//        final long now = System.nanoTime();
-//        final double dt = (PARAMS.lastLoopNanos == 0L) ? 0.02 : (now - PARAMS.lastLoopNanos) / 1e9;
-//        PARAMS.lastLoopNanos = now;
-//
-//        shooterPid.setPIDF(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd, PARAMS.PIDKf);
-//
-//        if (PARAMS.enabledPid) {
-//            // 1) Ramp target to avoid brownouts
-//            final double maxStep = PARAMS.maxAccelRpmPerSec * dt;
-//            final double delta = PARAMS.targetRpm - PARAMS.currentTargetRpm;
-//            if (Math.abs(delta) > maxStep) {
-//                PARAMS.currentTargetRpm += Math.copySign(maxStep, delta);
-//            } else {
-//                PARAMS.currentTargetRpm = PARAMS.targetRpm;
-//            }
-//
-//            // 2) Measure
-//            final double currentRpm = getShooterRPM();
-//
-//            // 3) PID correction
-//            final double pidOut = shooterPid.calculate(currentRpm, PARAMS.currentTargetRpm);
-//
-//            // 5) Apply
-////            double output = clamp(pidOut, 0.0, 1.0);
-//            packet.put("PID output", pidOut);
-//            packet.put("Output", pidOut);
-//
-//            // Set to pidOut needs to be tested what output but motor could never go negative
-////            shooter.set(pidOut);
-////            setPower(output);
-//            launcher.set(pidOut);
-//        }
+        final long now = System.nanoTime();
+        final double dt = (PARAMS.lastLoopNanos == 0L) ? 0.02 : (now - PARAMS.lastLoopNanos) / 1e9;
+        PARAMS.lastLoopNanos = now;
 
-//        shooter.set(.5);
+        TelemetryPacket packet = new TelemetryPacket();
 
-        // --- Readiness logic ---
-//        double shooterErr = Math.abs(getShooterRPM() - PARAMS.targetRpm);
-//        boolean inTol = shooterErr <= PARAMS.readyToleranceRpm;
-//
-//        if (inTol) {
-//            if (PARAMS.inTolStartNanos == 0L) PARAMS.inTolStartNanos = now;
-//            double heldSec = (now - PARAMS.inTolStartNanos) / 1e9;
-//            PARAMS.isReadyToLaunch = heldSec >= PARAMS.readyHoldTimeSeconds;
-//        } else {
-//            PARAMS.inTolStartNanos = 0L;
-//            PARAMS.isReadyToLaunch = false;
-//        }
+        shooterPid.setPIDF(PARAMS.PIDKp, PARAMS.PIDKi, PARAMS.PIDKd, PARAMS.PIDKf);
+
+        if (PARAMS.enabledPid) {
+            // 1) Ramp target to avoid brownouts
+            final double maxStep = PARAMS.maxAccelRpmPerSec * dt;
+            final double delta = PARAMS.targetRpm - PARAMS.currentTargetRpm;
+            if (Math.abs(delta) > maxStep) {
+                PARAMS.currentTargetRpm += Math.copySign(maxStep, delta);
+            } else {
+                PARAMS.currentTargetRpm = PARAMS.targetRpm;
+            }
+
+            // 2) Measure
+            final double currentRpm = getShooterRPM();
+
+            // 3) PID correction
+            final double pidOut = shooterPid.calculate(currentRpm, PARAMS.currentTargetRpm);
+
+            // 5) Apply
+//            double output = clamp(pidOut, 0.0, 1.0);
+            packet.put("PID output", pidOut);
+            packet.put("Output", pidOut);
+
+            // Set to pidOut needs to be tested what output but motor could never go negative
+//            setPower(output);
+            launcher.set(pidOut);
+        }
+
+
+//         --- Readiness logic ---
+        double shooterErr = Math.abs(getShooterRPM() - PARAMS.targetRpm);
+        boolean inTol = shooterErr <= PARAMS.readyToleranceRpm;
+
+        if (inTol) {
+            if (PARAMS.inTolStartNanos == 0L) PARAMS.inTolStartNanos = now;
+            double heldSec = (now - PARAMS.inTolStartNanos) / 1e9;
+            PARAMS.isReadyToLaunch = heldSec >= PARAMS.readyHoldTimeSeconds;
+        } else {
+            PARAMS.inTolStartNanos = 0L;
+            PARAMS.isReadyToLaunch = false;
+        }
+
+//        launcher.set(PARAMS.targetPower);
 
         // Telemetry
-        TelemetryPacket packet = new TelemetryPacket();
         sendTelemetry(packet);
     }
 

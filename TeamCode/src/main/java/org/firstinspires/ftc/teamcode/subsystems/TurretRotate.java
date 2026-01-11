@@ -11,7 +11,6 @@ import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.RilLib.Control.PID.PIDController;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 
@@ -27,7 +26,7 @@ public class TurretRotate implements Subsystem {
         /** Whether the PID control loop is enabled. */
         public boolean enabledPid = false;
 
-        public double kp = 0.0;
+        public double kp = 0.0002;
         public double ki = 0.0;
         public double kd = 0.0;
     }
@@ -51,6 +50,7 @@ public class TurretRotate implements Subsystem {
         rotator.turnToAngle(0);
 
         encoder = new MotorEx(hm, "feeder");
+        encoder.stopAndResetEncoder();
 
         //TODO Find proper Tolerance
         pid.setTolerance(TICKS_PER_DEGREE);
@@ -69,23 +69,27 @@ public class TurretRotate implements Subsystem {
     public double getPower () {return rotator.getAngle();}
 
     public void setTargetPos (double targetPos) {
-        double safePos = Math.max(MIN_ENCODER_VALUE, Math.min(targetPos, MAX_ENCODER_VALUE));
-        PARAMS.targetPos = safePos;
+        PARAMS.targetPos = clampIfOutOfRange(MIN_ENCODER_VALUE, MAX_ENCODER_VALUE, targetPos);
     }
 
     public void resetEncoder () {encoder.stopAndResetEncoder();}
 
     public double getTurretAngle () {return encoder.getCurrentPosition() / TICKS_PER_DEGREE;}
 
+    private double clampIfOutOfRange(double min, double max, double value) {
+        return Math.max(min, Math.min(value, max));
+    }
+
     @Override
     public void periodic() {
-        pid.setPID(PARAMS.kp, PARAMS.ki, PARAMS.kd);
+//        pid.setPID(PARAMS.kp, PARAMS.ki, PARAMS.kd);
 
         RobotState.getInstance().setTurretAngle(getTurretAngle());
+        double output = 0;
 
         if (PARAMS.enabledPid) {
-            double output = -pid.calculate(encoder.getCurrentPosition(), PARAMS.targetPos);
-            turnPower(output);
+            output = -pid.calculate(encoder.getCurrentPosition(), PARAMS.targetPos);
+            turnPower(clampIfOutOfRange(-1, 1, output));
         }
 
         tele.addData("Rotator power", "%.1f°", getPower());
@@ -93,6 +97,7 @@ public class TurretRotate implements Subsystem {
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("Turret rot Encoder", encoder.getCurrentPosition());
         packet.put("Turret location", getTurretAngle());
+        packet.put("PID output", output);
         dashboard.sendTelemetryPacket(packet);
     }
 }

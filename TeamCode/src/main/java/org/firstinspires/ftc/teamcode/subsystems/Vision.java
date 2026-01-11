@@ -102,9 +102,9 @@ public class Vision implements Subsystem {
         Pose3D camPose3D = limeLightResult.getBotpose_MT2();
 
 
-        p.put("LimeLightResult", limeLightResult.getFiducialResults());
-        p.put("LimeLight robot pose", camPose3D.toString());
-        p.put("Limelight pipeline", limelight.getStatus().getPipelineIndex());
+//        p.put("LimeLightResult", limeLightResult.getFiducialResults());
+//        p.put("LimeLight robot pose", camPose3D.toString());
+//        p.put("Limelight pipeline", limelight.getStatus().getPipelineIndex());
         p.put("Camera rotation", ConversionUtil.wrapAngleDeg(camRotDegrees));
         dashboard.sendTelemetryPacket(p);
 
@@ -118,7 +118,7 @@ public class Vision implements Subsystem {
 
         double limelightTime = TimeTracker.convertTime(limeLightResult.getControlHubTimeStamp() / 1000.0);
 
-        if (poseRobot.getX() == 0 && poseRobot.getY() == 0) return;
+        if (camPose3D.getPosition().x == 0 && camPose3D.getPosition().y == 0) return;
 //        ChassisSpeeds robotVel = RobotState.getInstance().getChassisSpeeds();
 
         RobotState.getInstance().addVisionObservation(poseRobot, limelightTime,
@@ -131,8 +131,8 @@ public class Vision implements Subsystem {
         double distance = 100 * RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(tagLocation.getTranslation());
 
         TelemetryPacket packet = new TelemetryPacket();
-        packet.put("Cam pos 3D", camPose3D.toString());
-        packet.put("Robot cam pose", poseRobot.toString());
+//        packet.put("Cam pos 3D", camPose3D.toString());
+//        packet.put("Robot cam pose", poseRobot.toString());
         packet.put("Estimated Pose", RobotState.getInstance().getEstimatedPose());
 //        packet.put("Limelight Time", limelightTime);
 //        packet.put("Robot time", TimeTracker.getTime());
