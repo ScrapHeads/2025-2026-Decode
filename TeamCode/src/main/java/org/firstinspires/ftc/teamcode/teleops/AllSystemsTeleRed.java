@@ -38,6 +38,7 @@ import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.FeederMotor;
 import org.firstinspires.ftc.teamcode.subsystems.FeederServo;
+import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.TurretRotate;
@@ -54,7 +55,7 @@ public class AllSystemsTeleRed extends CommandOpMode {
     private IntakeLeft intakeLeft;
     private IntakeRight intakeRight;
 //    private LauncherHood hood;
-//    private Vision vision;
+    private Vision vision;
     private FeederServo feederServo;
     private FeederMotor feederMotor;
     private TurretRotate turretRotate;
@@ -108,8 +109,8 @@ public class AllSystemsTeleRed extends CommandOpMode {
 //        hood = new LauncherHood(hm);
 //        hood.register();
 
-//        vision = new Vision(hm);
-//        vision.register();
+        vision = new Vision(hm);
+        vision.register();
 
         // Bind controls
         assignControls();

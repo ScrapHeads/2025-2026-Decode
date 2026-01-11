@@ -11,7 +11,9 @@ import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.RilLib.Control.PID.PIDController;
+import org.firstinspires.ftc.teamcode.state.RobotState;
 
 @Config
 public class TurretRotate implements Subsystem {
@@ -73,10 +75,13 @@ public class TurretRotate implements Subsystem {
 
     public void resetEncoder () {encoder.stopAndResetEncoder();}
 
+    public double getTurretAngle () {return encoder.getCurrentPosition() / TICKS_PER_DEGREE;}
 
     @Override
     public void periodic() {
         pid.setPID(PARAMS.kp, PARAMS.ki, PARAMS.kd);
+
+        RobotState.getInstance().setTurretAngle(getTurretAngle());
 
         if (PARAMS.enabledPid) {
             double output = -pid.calculate(encoder.getCurrentPosition(), PARAMS.targetPos);
@@ -87,7 +92,7 @@ public class TurretRotate implements Subsystem {
 
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("Turret rot Encoder", encoder.getCurrentPosition());
-        packet.put("Turret location", encoder.getCurrentPosition() / TICKS_PER_DEGREE);
+        packet.put("Turret location", getTurretAngle());
         dashboard.sendTelemetryPacket(packet);
     }
 }

@@ -17,12 +17,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Transform2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Translation2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.MathUtil;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Units;
 import org.firstinspires.ftc.teamcode.RilLib.Math.VecBuilder;
 import org.firstinspires.ftc.teamcode.state.RobotState;
+import org.firstinspires.ftc.teamcode.util.ConversionUtil;
 import org.firstinspires.ftc.teamcode.util.TimeTracker;
+
+import java.text.DecimalFormat;
 
 /**
  * Vision subsystem for HuskyLens integration.
@@ -89,29 +93,35 @@ public class Vision implements Subsystem {
         TelemetryPacket p = new TelemetryPacket();
         p.put("LimeLight", limelight.toString());
 
-        Rotation2d curRot = RobotState.getInstance().getOdometryPose().getRotation();
-        limelight.updateRobotOrientation(curRot.getDegrees());
+        double robotRot = RobotState.getInstance().getOdometryPose().getRotation().getDegrees();
+        double turretAngle = RobotState.getInstance().getTurretAngle();
+        double camRotDegrees = Math.round((robotRot - 90 + turretAngle) * 100) / 100.0;
+        limelight.updateRobotOrientation(ConversionUtil.wrapAngleDeg(camRotDegrees));
 
         LLResult limeLightResult = limelight.getLatestResult();
-        Pose3D robotPose = limeLightResult.getBotpose_MT2();
+        Pose3D camPose3D = limeLightResult.getBotpose_MT2();
+
 
         p.put("LimeLightResult", limeLightResult.getFiducialResults());
-        p.put("LimeLight robot pose", robotPose.toString());
+        p.put("LimeLight robot pose", camPose3D.toString());
         p.put("Limelight pipeline", limelight.getStatus().getPipelineIndex());
+        p.put("Camera rotation", ConversionUtil.wrapAngleDeg(camRotDegrees));
         dashboard.sendTelemetryPacket(p);
 
+        Rotation2d camRot = new Rotation2d(camPose3D.getOrientation().getYaw(AngleUnit.RADIANS));
 
-        Pose2d pose = new Pose2d(
-                robotPose.getPosition().x,
-                robotPose.getPosition().y,
-                new Rotation2d(robotPose.getOrientation().getYaw(AngleUnit.RADIANS)));
+        Pose2d poseRobot = new Pose2d(
+                camPose3D.getPosition().x + ((105*Math.cos(turretAngle + 90)) / 1000),
+                camPose3D.getPosition().y + ((105*Math.sin(turretAngle + 90)) / 1000),
+                camRot
+        );
 
         double limelightTime = TimeTracker.convertTime(limeLightResult.getControlHubTimeStamp() / 1000.0);
 
-        if (pose.getX() == 0 && pose.getY() == 0) return;
+        if (poseRobot.getX() == 0 && poseRobot.getY() == 0) return;
 //        ChassisSpeeds robotVel = RobotState.getInstance().getChassisSpeeds();
 
-        RobotState.getInstance().addVisionObservation(pose, limelightTime,
+        RobotState.getInstance().addVisionObservation(poseRobot, limelightTime,
                 VecBuilder.fill(
                         Math.pow(0.8, limeLightResult.getFiducialResults().size()) * (limeLightResult.getBotposeAvgDist()) * 2,
                         Math.pow(0.8, limeLightResult.getFiducialResults().size()) * (limeLightResult.getBotposeAvgDist()) * 2,
@@ -121,7 +131,8 @@ public class Vision implements Subsystem {
         double distance = 100 * RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(tagLocation.getTranslation());
 
         TelemetryPacket packet = new TelemetryPacket();
-        packet.put("Robot vision pose", pose.toString());
+        packet.put("Cam pos 3D", camPose3D.toString());
+        packet.put("Robot cam pose", poseRobot.toString());
         packet.put("Estimated Pose", RobotState.getInstance().getEstimatedPose());
 //        packet.put("Limelight Time", limelightTime);
 //        packet.put("Robot time", TimeTracker.getTime());

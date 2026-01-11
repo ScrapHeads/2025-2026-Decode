@@ -31,6 +31,8 @@ public class RobotState {
 
     private transient Lock poseLock = new ReentrantLock();
 
+    private transient double turretAngle = 0;
+
     // Pose on the field
     private Pose2d odometryPose;
     private Pose2d estimatedPose;
@@ -176,7 +178,11 @@ public class RobotState {
 
     public void setBallColors (BallColor[] ballColors) {this.ballColors = ballColors;}
 
+    public void setTurretAngle (double turretAngle) {
+        this.turretAngle = turretAngle;
+    }
 
+    public double getTurretAngle () {return turretAngle;}
 
     /**
      * Returns a human-readable string representation of this RobotState.

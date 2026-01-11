@@ -36,4 +36,11 @@ public class ConversionUtil {
                 speeds.vyMetersPerSecond);
         return new PoseVelocity2d(vec, speeds.omegaRadiansPerSecond);
     }
+
+    public static double wrapAngleDeg(double angle) {
+        angle = angle % 360.0;
+        if (angle >= 180.0) angle -= 360.0;
+        if (angle < -180.0) angle += 360.0;
+        return angle;
+    }
 }
