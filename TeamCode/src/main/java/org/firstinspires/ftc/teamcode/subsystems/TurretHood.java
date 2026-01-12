@@ -8,6 +8,8 @@ import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.Constants;
+
 /**
  * The LauncherHood subsystem controls the adjustable hood servo
  * responsible for changing projectile launch angle.
@@ -23,6 +25,8 @@ public class TurretHood implements Subsystem {
      */
     public static class Params {
         public double currentAngle = 0.0;
+
+        public boolean autoAdjust = true;
     }
 
     /** Instance of params for this launcher. */
@@ -49,7 +53,6 @@ public class TurretHood implements Subsystem {
         setAngle(MIN_SHOOT_ANGLE);
     }
 
-
     /**
      * Sets the hood to a specific angle in degrees.
      *
@@ -57,9 +60,10 @@ public class TurretHood implements Subsystem {
      */
     public void setAngle(double angle) {
         // Clamp angle to physical servo limits
-        double safeAngle = Math.min(MIN_SHOOT_ANGLE, Math.max(MAX_SHOOT_ANGLE, angle));
+
+        double safeAngle = Math.max(MIN_SHOOT_ANGLE, Math.min(angle, MAX_SHOOT_ANGLE));
         hoodServo.turnToAngle(safeAngle);
-//        PARAMS.currentAngle = safeAngle;
+        PARAMS.currentAngle = safeAngle;
     }
 
     /** @return The current logical hood angle (degrees). */
@@ -67,11 +71,21 @@ public class TurretHood implements Subsystem {
         return PARAMS.currentAngle;
     }
 
+    public void enableAutoAdjust () {PARAMS.autoAdjust = true;}
+    public void disableAutoAdjust () {PARAMS.autoAdjust = false;}
+
     @Override
     public void periodic() {
         // For testing only not normally not needed
 //        setAngle(PARAMS.currentAngle);
-        hoodServo.turnToAngle(PARAMS.currentAngle);
+
+        if (PARAMS.autoAdjust) {
+            double distance = Constants.turretLookupTable.getDistance();
+            setAngle(Constants.turretLookupTable.get(distance).hoodDeg);
+        } else {
+            hoodServo.turnToAngle(PARAMS.currentAngle);
+        }
+
         tele.addData("Launcher Hood Angle", "%.1f°", hoodServo.getAngle());
     }
 }

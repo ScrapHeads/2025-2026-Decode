@@ -14,6 +14,8 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Const;
+import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.InterpolatingDoubleTreeMap;
 import org.firstinspires.ftc.teamcode.state.RobotState;
@@ -51,7 +53,7 @@ public final class Launcher implements Subsystem {
         /** Timestamp when we first entered tolerance, in ns. */
         public long inTolStartNanos = 0L;
         /** Whether the PID control loop is enabled. */
-        public boolean enabledPid = false;
+        public boolean enabledPid = true;
         /** Ramped setpoint RPM used to avoid sudden current draw. */
         public double currentTargetRpm = 0.0;
 
@@ -154,13 +156,12 @@ public final class Launcher implements Subsystem {
     public double getTargetRpm() { return PARAMS.targetRpm; }
 
     public void getAndSetFlywheelByDistance () {
-        Pose2d tagLocation = RobotState.getInstance().getTeam() ? blueTagPose : redTagPose;
-        double distance = 100 * RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(tagLocation.getTranslation());
+        double distance = Constants.turretLookupTable.getDistance();
         TelemetryPacket packet = new TelemetryPacket();
-        packet.put("Distance", distance - 17.78);
-        packet.put("Rpm", treeMap.get(distance - 17.78));
+        packet.put("Distance", distance);
+        packet.put("Rpm", Constants.turretLookupTable.get(distance - 17.78).rpm);
         dashboard.sendTelemetryPacket(packet);
-        setPower(treeMap.get(distance - 17.78));
+        setTargetRpm(Constants.turretLookupTable.get(distance - 17.78).rpm);
     }
 
     public void setReadyToleranceRpm(double tol) { PARAMS.readyToleranceRpm = Math.max(0, tol); }

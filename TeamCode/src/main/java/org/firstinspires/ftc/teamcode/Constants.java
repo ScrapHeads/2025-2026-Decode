@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
+import org.firstinspires.ftc.teamcode.state.TurretLookupTable;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
 import java.util.Map;
@@ -19,6 +20,9 @@ public class Constants {
     public static HardwareMap hm;
     public static Telemetry tele;
     public static FtcDashboard dashboard;
+    public static TurretLookupTable turretLookupTable;
+
+    public static double CENTER_TO_FRONT_OFFSET_CM = 22.225;
 
     public static double intakePowerOffset = 0.0;
 

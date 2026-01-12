@@ -24,7 +24,7 @@ public class TurretRotate implements Subsystem {
         public double targetPos = 0.0;
 
         /** Whether the PID control loop is enabled. */
-        public boolean enabledPid = false;
+        public boolean enabledPid = true;
 
         public double kp = 0.0002;
         public double ki = 0.0;
@@ -79,6 +79,15 @@ public class TurretRotate implements Subsystem {
     private double clampIfOutOfRange(double min, double max, double value) {
         return Math.max(min, Math.min(value, max));
     }
+
+    public void enablePID () {
+        PARAMS.enabledPid = true;
+    }
+
+    public void disablePID () {
+        PARAMS.enabledPid = false;
+    }
+
 
     @Override
     public void periodic() {

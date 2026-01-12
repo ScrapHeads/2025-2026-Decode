@@ -1,14 +1,10 @@
 package org.firstinspires.ftc.teamcode.teleops;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
+import static org.firstinspires.ftc.teamcode.Constants.turretLookupTable;
 
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -16,8 +12,6 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
@@ -25,20 +19,19 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.feeder.RunFeederMotor;
-import org.firstinspires.ftc.teamcode.Commands.feeder.TurnFeederServoBoth;
-import org.firstinspires.ftc.teamcode.Commands.intake.RunBothIntakesContinuous;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunLeftIntake;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunLeftIntakeContinuous;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntake;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntakeContinuous;
-import org.firstinspires.ftc.teamcode.Commands.launcher.SetPowerLauncher;
+import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceRight;
+import org.firstinspires.ftc.teamcode.Commands.launcher.SetRpmDistanceContinuous;
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
-import org.firstinspires.ftc.teamcode.Commands.launcher.TestLaunchSequence;
+import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceLeft;
+import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperBoth;
 import org.firstinspires.ftc.teamcode.Commands.turret.TurretRotateContinuous;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
+import org.firstinspires.ftc.teamcode.state.TurretLookupTable;
 import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.FeederMotor;
@@ -60,14 +53,12 @@ public class AllSystemsTeleRed extends CommandOpMode {
     private Launcher launcher;
     private IntakeLeft intakeLeft;
     private IntakeRight intakeRight;
-    private TurretHood hood;
+    private TurretHood turretHood;
     private Vision vision;
     private FeederServo feederServo;
     private FeederMotor feederMotor;
     private TurretRotate turretRotate;
     private BallStoppers ballStoppers;
-
-    private Pose2d setLaunchPoint;
 
     @Override
     public void initialize() {
@@ -75,12 +66,10 @@ public class AllSystemsTeleRed extends CommandOpMode {
         hm = hardwareMap;
         tele = telemetry;
         dashboard = FtcDashboard.getInstance();
+        turretLookupTable = new TurretLookupTable();
 
         StateIO.load();
 
-        //TODO Comment out WHEN DOING Matches
-//        RobotState.getInstance().setPattern(new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN});
-//        RobotState.getInstance().setTeam(true);
         RobotState.getInstance().setTeam(false);
 
         // Initialize the subsystems declared at the top of the code
@@ -112,8 +101,8 @@ public class AllSystemsTeleRed extends CommandOpMode {
         ballStoppers = new BallStoppers(hm);
         ballStoppers.register();
 
-        hood = new TurretHood(hm);
-        hood.register();
+        turretHood = new TurretHood(hm);
+        turretHood.register();
 
         vision = new Vision(hm);
         vision.register();
@@ -123,15 +112,7 @@ public class AllSystemsTeleRed extends CommandOpMode {
 
         CommandScheduler.getInstance().cancelAll();
 
-//        vision.setPipeline(0);
-
-        if (!RobotState.getInstance().getTeam()) {
-            // Red side
-            setLaunchPoint = new Pose2d(1.22, 0, new Rotation2d(2.58309));
-        } else {
-            // Blue side
-            setLaunchPoint = new Pose2d(1.22, 0, new Rotation2d(-2.68781));
-        }
+        vision.setPipeline(0);
 
 //        tele.addData("What index for sorter: ", sorter.getCurrentIndex());
 //        tele.addData("Color for sorter: ", Arrays.toString(RobotState.getInstance().getBallColors()));
@@ -149,8 +130,14 @@ public class AllSystemsTeleRed extends CommandOpMode {
 
         turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate));
 
+        launcher.setDefaultCommand(new SetRpmDistanceContinuous(launcher));
+
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
-                .whenActive(new RunRightIntakeContinuous(intakeRight, IntakeLeft.INTAKE_POWER))
+                .whenActive(
+                        new ParallelCommandGroup(
+                            new RunRightIntakeContinuous(intakeRight, IntakeLeft.INTAKE_POWER),
+                            new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.UP_ANGLE_RIGHT)
+                        ))
                 .whenInactive(new RunRightIntake(intakeRight, 0));
 
         driver.getGamepadButton(RIGHT_BUMPER)
@@ -158,7 +145,12 @@ public class AllSystemsTeleRed extends CommandOpMode {
                 .whenReleased(new RunRightIntake(intakeRight, 0));
 
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
-                .whenActive(new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER))
+                .whenActive(
+                        new ParallelCommandGroup (
+                            new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER),
+                            new TurnStopperBoth(ballStoppers, BallStoppers.UP_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT)
+                        )
+                )
                 .whenInactive(new RunLeftIntake(intakeLeft, 0));
 
         driver.getGamepadButton(LEFT_BUMPER)
@@ -166,16 +158,12 @@ public class AllSystemsTeleRed extends CommandOpMode {
                 .whenReleased(new RunLeftIntake(intakeLeft, 0));
 
         driver.getGamepadButton(A)
-                .whenPressed(new TestLaunchSequence(feederServo, feederMotor, ballStoppers, intakeLeft).whenFinished(() ->
-                            new SequentialCommandGroup(
-                                    new TurnFeederServoBoth(feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE),
-                                    new RunLeftIntake(intakeLeft, 0),
-                                    new RunFeederMotor(feederMotor, 0)
-                            )
-                        )
-                );
-//
+                .whenPressed(new LaunchSequenceLeft(feederServo, feederMotor, ballStoppers, intakeLeft));
+
         driver.getGamepadButton(B)
+                .whenPressed(new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight));
+
+        driver.getGamepadButton(START)
                 .whenPressed(
                         new ParallelCommandGroup(
                                 new InstantCommand(() -> turretRotate.resetEncoder())));
@@ -206,19 +194,28 @@ public class AllSystemsTeleRed extends CommandOpMode {
 //                .whenPressed(new HoldControlCommand(holdControl, HoldControl.HoldPosition.TRANSPORT));
 
         driver.getGamepadButton(DPAD_UP)
-                .whenPressed(new ParallelCommandGroup(
-                        new SetPowerLauncher(launcher, 1)
+                .whenPressed(
+                        new ParallelCommandGroup(
+                                new InstantCommand(() -> launcher.enable()),
+                                new InstantCommand(() -> turretRotate.enablePID()),
+                                new InstantCommand(() -> turretHood.enableAutoAdjust())
+                )
+                        );
+
+        driver.getGamepadButton(DPAD_DOWN)
+                .whenPressed(
+                        new ParallelCommandGroup(
+                            new StopFlywheel(launcher),
+                            new InstantCommand(() -> turretRotate.disablePID()),
+                            new InstantCommand(() -> turretHood.disableAutoAdjust())
                 ));
-//
-//        driver.getGamepadButton(DPAD_LEFT)
-//                        .whenPressed(
-//                                new ParallelCommandGroup(
-//                                        new InstantCommand(launcher::enable),
-//                                        new InstantCommand(launcher::getAndSetFlywheelByDistance),
-//                                        new SetHoodAngleCommand(hood, 1430),
-//                                        new TurnToTarget(drivetrain, driver, 1, vision)
-//                                )
-//                        );
+
+        driver.getGamepadButton(DPAD_LEFT)
+                        .whenPressed(
+                                new RunFeederMotor(feederMotor, FeederMotor.DOWN_POWER)
+                        ).whenReleased(
+                                new RunFeederMotor(feederMotor, 0)
+                );
 
 //        driver.getGamepadButton(DPAD_RIGHT)
 //                        .whenPressed(new ParallelCommandGroup(
@@ -226,11 +223,7 @@ public class AllSystemsTeleRed extends CommandOpMode {
 //                        ));
 
 
-        driver.getGamepadButton(DPAD_DOWN)
-                .whenPressed(
-                        new ParallelCommandGroup(
-                                new StopFlywheel(launcher)
-                ));
+
     }
 }
 
