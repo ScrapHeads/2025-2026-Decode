@@ -50,7 +50,7 @@ public class TurretRotate implements Subsystem {
         rotator.turnToAngle(0);
 
         encoder = new MotorEx(hm, "feeder");
-        encoder.stopAndResetEncoder();
+//        encoder.stopAndResetEncoder();
 
         //TODO Find proper Tolerance
         pid.setTolerance(TICKS_PER_DEGREE);
@@ -88,6 +88,9 @@ public class TurretRotate implements Subsystem {
         PARAMS.enabledPid = false;
     }
 
+    public boolean isInRange () {
+        return pid.atSetpoint();
+    }
 
     @Override
     public void periodic() {

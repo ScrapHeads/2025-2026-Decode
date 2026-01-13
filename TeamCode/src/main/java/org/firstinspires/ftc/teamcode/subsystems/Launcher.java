@@ -53,7 +53,7 @@ public final class Launcher implements Subsystem {
         /** Timestamp when we first entered tolerance, in ns. */
         public long inTolStartNanos = 0L;
         /** Whether the PID control loop is enabled. */
-        public boolean enabledPid = true;
+        public boolean enabledPid = false;
         /** Ramped setpoint RPM used to avoid sudden current draw. */
         public double currentTargetRpm = 0.0;
 
@@ -104,7 +104,8 @@ public final class Launcher implements Subsystem {
 
         launcher.stopAndResetEncoder();
 
-        disable();
+//        disable();
+        enable();
 
         createLaunchTable();
     }

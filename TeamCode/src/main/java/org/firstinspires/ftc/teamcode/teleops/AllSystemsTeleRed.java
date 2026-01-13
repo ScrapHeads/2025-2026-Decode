@@ -98,6 +98,9 @@ public class AllSystemsTeleRed extends CommandOpMode {
         turretRotate = new TurretRotate(hm);
         turretRotate.register();
 
+        // Uncomment when testing auto first
+        turretRotate.resetEncoder();
+
         ballStoppers = new BallStoppers(hm);
         ballStoppers.register();
 
@@ -158,10 +161,10 @@ public class AllSystemsTeleRed extends CommandOpMode {
                 .whenReleased(new RunLeftIntake(intakeLeft, 0));
 
         driver.getGamepadButton(A)
-                .whenPressed(new LaunchSequenceLeft(feederServo, feederMotor, ballStoppers, intakeLeft));
+                .whenPressed(new LaunchSequenceLeft(feederServo, feederMotor, ballStoppers, intakeLeft, turretRotate, launcher));
 
         driver.getGamepadButton(B)
-                .whenPressed(new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight));
+                .whenPressed(new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight, turretRotate, launcher));
 
         driver.getGamepadButton(START)
                 .whenPressed(
