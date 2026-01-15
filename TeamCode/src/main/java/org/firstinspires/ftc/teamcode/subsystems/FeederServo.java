@@ -24,8 +24,8 @@ public class FeederServo implements Subsystem {
         frontFeeder = new SimpleServo(hm, "feederFront", MIN_ANGLE_SERVO, MAX_ANGLE_SERVO);
         backFeeder = new SimpleServo(hm, "feederBack", MIN_ANGLE_SERVO, MAX_ANGLE_SERVO);
 
-        frontFeeder.turnToAngle(IN_FRONT_ANGLE);
-        backFeeder.turnToAngle(IN_BACK_ANGLE);
+//        frontFeeder.turnToAngle(IN_FRONT_ANGLE);
+//        backFeeder.turnToAngle(IN_BACK_ANGLE);
     }
 
     public void setBothAngle (double frontAngle, double backAngle) {

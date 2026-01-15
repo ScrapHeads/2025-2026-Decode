@@ -19,6 +19,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.feeder.RunFeederMotor;
+import org.firstinspires.ftc.teamcode.Commands.feeder.RunFeederMotorContinuous;
+import org.firstinspires.ftc.teamcode.Commands.feeder.TurnFeederServoBoth;
+import org.firstinspires.ftc.teamcode.Commands.feeder.TurnFeederServoBothContinuous;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunLeftIntake;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunLeftIntakeContinuous;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntake;
@@ -135,6 +138,10 @@ public class AllSystemsTeleRed extends CommandOpMode {
 
         launcher.setDefaultCommand(new SetRpmDistanceContinuous(launcher));
 
+        feederMotor.setDefaultCommand(new RunFeederMotorContinuous(feederMotor, 0));
+        feederServo.setDefaultCommand(new TurnFeederServoBothContinuous(
+                feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE));
+
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
                 .whenActive(
                         new ParallelCommandGroup(
@@ -142,6 +149,14 @@ public class AllSystemsTeleRed extends CommandOpMode {
                             new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.UP_ANGLE_RIGHT)
                         ))
                 .whenInactive(new RunRightIntake(intakeRight, 0));
+//
+//        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
+//                .whenActive(
+//                        new ParallelCommandGroup(
+//                            new RunRightIntakeContinuous(intakeRight, .8),
+//                            new TurnStopperBoth(ballStoppers, BallStoppers.UP_ANGLE_LEFT, BallStoppers.UP_ANGLE_RIGHT)
+//                        ))
+//                .whenInactive(new RunRightIntake(intakeRight, 0));
 
         driver.getGamepadButton(RIGHT_BUMPER)
                 .whenPressed(new RunRightIntakeContinuous(intakeRight, IntakeLeft.OUTTAKE_POWER))
@@ -155,6 +170,15 @@ public class AllSystemsTeleRed extends CommandOpMode {
                         )
                 )
                 .whenInactive(new RunLeftIntake(intakeLeft, 0));
+
+//        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
+//                .whenActive(
+//                        new ParallelCommandGroup (
+//                            new RunLeftIntakeContinuous(intakeLeft, .4)
+////                            new TurnStopperBoth(ballStoppers, BallStoppers.UP_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT)
+//                        )
+//                )
+//                .whenInactive(new RunLeftIntake(intakeLeft, 0));
 
         driver.getGamepadButton(LEFT_BUMPER)
                 .whenPressed(new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.OUTTAKE_POWER))

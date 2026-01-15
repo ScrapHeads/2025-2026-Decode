@@ -50,7 +50,7 @@ public class TurretHood implements Subsystem {
     public TurretHood(HardwareMap hm) {
         // Axon MAX M2
         hoodServo = new SimpleServo(hm, "turretHood", MIN_ANGLE_SERVO, MAX_ANGLE_SERVO);
-        setAngle(MIN_SHOOT_ANGLE);
+//        setAngle(MIN_SHOOT_ANGLE);
     }
 
     /**

@@ -89,7 +89,7 @@ public class TurretRotate implements Subsystem {
     }
 
     public boolean isInRange () {
-        return pid.atSetpoint();
+        return Math.abs(encoder.getCurrentPosition() - PARAMS.targetPos) < TICKS_PER_DEGREE * 2;
     }
 
     @Override

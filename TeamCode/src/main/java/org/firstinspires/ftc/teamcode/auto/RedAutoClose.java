@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.intakePowerOffset;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
+import static org.firstinspires.ftc.teamcode.Constants.turretLookupTable;
 import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
 import static org.firstinspires.ftc.teamcode.util.ConversionUtil.convertPose2D;
 
@@ -29,6 +30,7 @@ import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanchExtraSpin;
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnToLaunchPattern;
+import org.firstinspires.ftc.teamcode.Commands.turret.TurretRotateContinuous;
 import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
@@ -36,13 +38,18 @@ import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.auto.paths.redAutoClose;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
+import org.firstinspires.ftc.teamcode.state.TurretLookupTable;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
+import org.firstinspires.ftc.teamcode.subsystems.FeederMotor;
+import org.firstinspires.ftc.teamcode.subsystems.FeederServo;
+import org.firstinspires.ftc.teamcode.subsystems.TurretRotate;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.TurretHood;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
+import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeRight;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
 import java.util.Arrays;
@@ -50,14 +57,18 @@ import java.util.List;
 
 @Autonomous(name = "RedAutoClose", group = "ScrapHeads")
 public class RedAutoClose extends CommandOpMode {
-    private Drivetrain drivetrain;
 
+    // Subsystem
+    private Drivetrain drivetrain;
     private Launcher launcher;
-    private TurretHood hood;
     private IntakeLeft intakeLeft;
-    private BallStoppers ballStoppers;
-    private Sorter sorter;
+    private IntakeRight intakeRight;
+    private TurretHood turretHood;
     private Vision vision;
+    private FeederServo feederServo;
+    private FeederMotor feederMotor;
+    private TurretRotate turretRotate;
+    private BallStoppers ballStoppers;
 
     public Boolean isBlue = false;
 
@@ -71,27 +82,40 @@ public class RedAutoClose extends CommandOpMode {
         hm = hardwareMap;
         tele = telemetry;
         dashboard = FtcDashboard.getInstance();
+        turretLookupTable = new TurretLookupTable();
 
         setUpRobotState();
 
+        // Subsystem
         drivetrain = new Drivetrain(hm, RobotState.getInstance().getEstimatedPose());
-//        drivetrain = new Drivetrain(hm, new Pose2d(-2, -2, new Rotation2d(0.942478)));
         drivetrain.register();
 
         launcher = new Launcher(hm);
         launcher.register();
 
-        hood = new TurretHood(hm);
-        hood.register();
-
         intakeLeft = new IntakeLeft(hm);
         intakeLeft.register();
+
+        intakeRight = new IntakeRight(hm);
+        intakeRight.register();
+
+        feederMotor = new FeederMotor(hm);
+        feederMotor.register();
+
+        feederServo = new FeederServo(hm);
+        feederServo.register();
+
+        turretRotate = new TurretRotate(hm);
+        turretRotate.register();
+
+        // Uncomment when testing auto first
+        turretRotate.resetEncoder();
 
         ballStoppers = new BallStoppers(hm);
         ballStoppers.register();
 
-        sorter = new Sorter(hm);
-        sorter.register();
+        turretHood = new TurretHood(hm);
+        turretHood.register();
 
         vision = new Vision(hm);
         vision.register();
@@ -118,65 +142,57 @@ public class RedAutoClose extends CommandOpMode {
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
                 new ParallelCommandGroup(
-                        new GetTagPattern(vision).withTimeout(5000).andThen(
-                                new TurnToLaunchPattern(sorter)
-                        ),
-                        new SetFlywheelRpm(launcher, 3490),
-                        new SetHoodAngleCommand(hood, 1430),
+//                        new GetTagPattern(vision).withTimeout(5000).andThen(
+//                                new TurnToLaunchPattern(sorter)
+//                        ),
+//                        new SetFlywheelRpm(launcher, 3490),
+//                        new SetHoodAngleCommand(turretHood, 1430),
                         new DynamicStrafeCommand(drivetrain, () -> path.get(1))
                 ),
 
-                new WaitCommand(100),
-//                new InstantCommand(launcher::getAndSetFlywheelByDistance),
-                new SortedLuanchExtraSpin(launcher, sorter, ballStoppers),
+                new InstantCommand(() -> turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate))),
 
-                new WaitCommand(100),
+                new WaitCommand(2000),
+
                 new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
 
                 new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(3),
-                                turnConstraintsPickUp, velConstraintPickUp, accelConstraintPickUp),
-                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER + intakePowerOffset)
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(3))
+//                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER + intakePowerOffset)
                 ),
 
-                new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER).withTimeout(500),
 
                 new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
-                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER)
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(4))
+//                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER)
                 ),
 
-//                new InstantCommand(launcher::getAndSetFlywheelByDistance),
-                new SortedLuanchExtraSpin(launcher, sorter, ballStoppers),
-                new WaitCommand(200),
+//                new WaitCommand(200),
 
                 new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
 
-                new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(6),
-                                turnConstraintsPickUp, velConstraintPickUp, accelConstraintPickUp),
-                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER + intakePowerOffset)
-                ),
-                new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
-                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER + intakePowerOffset)
-                ),
+                new WaitCommand(2000),
 
                 new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
-                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER + intakePowerOffset)
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(6))
+//                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER + intakePowerOffset)
+                ),
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(7))
                 ),
 
-                new WaitCommand(50),
-//                new InstantCommand(launcher::getAndSetFlywheelByDistance),
-                new SortedLuanchExtraSpin(launcher, sorter, ballStoppers),
-                new WaitCommand(150),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(9),
-                        turnConstraintsFast, velConstraintFast, accelConstraintFast),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
+                new WaitCommand(2000),
+
+                new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
+
+                new DynamicStrafeCommand(drivetrain, () -> path.get(11)),
+                new WaitCommand(2000),
+
+                new DynamicStrafeCommand(drivetrain, () -> path.get(12)),
+
                 new InstantCommand(StateIO::save)
-//                new DynamicStrafeCommand(drivetrain, () -> path.get(10))
-//                new DynamicStrafeCommand(drivetrain, () -> path.get(11))
-//                new SortedLuanch(launcher, sorter, holdControl, 300),
         ) {
             // When the auto ends or gets interrupted will write to a jason file for auto -> tele data transfer.
             @Override

@@ -114,9 +114,9 @@ public final class Drivetrain implements Subsystem {
         public double lateralGain = 3;
         public double headingGain = 3; // shared with turn
 
-        public double axialVelGain = 0.2;
-        public double lateralVelGain = 0.2;
-        public double headingVelGain = 0.2; // shared with turn
+        public double axialVelGain = 0.15;
+        public double lateralVelGain = 0.15;
+        public double headingVelGain = 0.15; // shared with turn
 
         public double defaultPosTolerance = .1;
         public double defaultHeadingTolerance = Math.toRadians(2);

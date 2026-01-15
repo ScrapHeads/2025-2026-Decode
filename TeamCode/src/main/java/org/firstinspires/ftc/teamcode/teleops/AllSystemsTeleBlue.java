@@ -19,6 +19,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
 import org.firstinspires.ftc.teamcode.Commands.feeder.RunFeederMotor;
+import org.firstinspires.ftc.teamcode.Commands.feeder.RunFeederMotorContinuous;
+import org.firstinspires.ftc.teamcode.Commands.feeder.TurnFeederServoBothContinuous;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunLeftIntake;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunLeftIntakeContinuous;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntake;
@@ -148,6 +150,12 @@ public class AllSystemsTeleBlue extends CommandOpMode {
         turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate));
 
         launcher.setDefaultCommand(new SetRpmDistanceContinuous(launcher));
+
+        feederMotor.setDefaultCommand(new RunFeederMotorContinuous(feederMotor, 0));
+        feederServo.setDefaultCommand(new TurnFeederServoBothContinuous(
+                feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE));
+
+
 
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
                 .whenActive(

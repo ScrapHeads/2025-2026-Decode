@@ -91,7 +91,7 @@ public class Vision implements Subsystem {
     @Override
     public void periodic() {
         TelemetryPacket p = new TelemetryPacket();
-        p.put("LimeLight", limelight.toString());
+//        p.put("LimeLight", limelight.toString());
 
         double robotRot = RobotState.getInstance().getOdometryPose().getRotation().getDegrees();
         double turretAngle = RobotState.getInstance().getTurretAngle();
