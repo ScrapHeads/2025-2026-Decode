@@ -15,6 +15,7 @@ import com.acmerobotics.roadrunner.AngularVelConstraint;
 import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.TurnConstraints;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -25,11 +26,13 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicSplineCommand;
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
 import org.firstinspires.ftc.teamcode.Commands.feeder.TurnFeederServoBoth;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntake;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntakeContinuous;
 import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceRight;
+import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceRightAuto;
 import org.firstinspires.ftc.teamcode.Commands.launcher.LauncherSetDefaultCommand;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetPowerLauncher;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetRpmDistanceContinuous;
@@ -64,6 +67,7 @@ import org.firstinspires.ftc.teamcode.util.BallColor;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Autonomous(name = "RedAutoClose", group = "ScrapHeads")
 public class RedAutoClose extends CommandOpMode {
@@ -148,6 +152,8 @@ public class RedAutoClose extends CommandOpMode {
         Drawing.drawRobot(p.fieldOverlay(), convertPose2D(RobotState.getInstance().getEstimatedPose()));
         dashboard.sendTelemetryPacket(p);
 
+        Vector2d path11 = new Vector2d(path.get(11).getX(), path.get(11).getY());
+
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
 //                new InstantCommand(() -> launcher.setDefaultCommand(new SetRpmDistanceContinuous(launcher))),
@@ -171,7 +177,7 @@ public class RedAutoClose extends CommandOpMode {
                 new SetFlywheelRpm(launcher, 4500),
 
 //                new WaitUntilCommand(() -> launcher.isReadyToLaunch()),
-                new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight, turretRotate),
+                new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
                 new ParallelDeadlineGroup (
                         new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
@@ -183,37 +189,40 @@ public class RedAutoClose extends CommandOpMode {
                         new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
+                new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
 
-                new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(4))
-//                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER)
-                ),
-
-//                new WaitCommand(200),
+                new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
                 new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
 
-//                new WaitCommand(2000),
-                new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight, turretRotate),
-
                 new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(6))
-//                        new IntakeSorterNoEnd(intakeLeft, sorter, ballStoppers, IntakeLeft.INTAKE_POWER + intakePowerOffset)
-                ),
-                new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
                         new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
-                new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
-                new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight, turretRotate),
+//                new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
 
-                new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
-                new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
+                new SetFlywheelRpm(launcher, 4700),
+
+                new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
+
+                new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
+
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
+                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
+                ),
+
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
+                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
+                ),
+
+                new SetFlywheelRpm(launcher, 4500),
 
                 new DynamicStrafeCommand(drivetrain, () -> path.get(11),
-                         turnConstraintsFast, velConstraintFast, accelConstraintFast),
-                new WaitCommand(2000),
+                        turnConstraintsFast, velConstraintFast, accelConstraintFast),
+                new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(12)),
 

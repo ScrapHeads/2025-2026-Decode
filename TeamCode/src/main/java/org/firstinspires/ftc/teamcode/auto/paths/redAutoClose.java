@@ -15,16 +15,16 @@ public final class redAutoClose {
 
     public static final List<Pose2d> PATH = Arrays.asList(
 		new Pose2d(-1.448, 1.071, new Rotation2d(4.712389)),  // #1  x=-1.448m, y=1.071m, θ=270.0°
-		new Pose2d(-0.622, 0.644, new Rotation2d(4.712389)),  // #2  x=-0.622m, y=0.644m, θ=270.0°
-		new Pose2d(0.226, 0.772, new Rotation2d(4.712389)),  // #3  x=0.226m, y=0.772m, θ=270.0°
-		new Pose2d(0.194, 1.412, new Rotation2d(4.712389)),  // #4  x=0.194m, y=1.412m, θ=270.0°
-		new Pose2d(0.205, 0.612, new Rotation2d(4.712390)),  // #5  x=0.205m, y=0.612m, θ=270.0°
-		new Pose2d(-0.425, 0.452, new Rotation2d(4.712389)),  // #6  x=-0.425m, y=0.452m, θ=270.0°
-		new Pose2d(-0.281, 0.719, new Rotation2d(4.712389)),  // #7  x=-0.281m, y=0.719m, θ=270.0°
-		new Pose2d(-0.281, 1.327, new Rotation2d(4.712389)),  // #8  x=-0.281m, y=1.327m, θ=270.0°
-		new Pose2d(-0.425, 0.452, new Rotation2d(4.712389)),  // #9  x=-0.425m, y=0.452m, θ=270.0°
-		new Pose2d(0.941, 0.692, new Rotation2d(4.712389)),  // #10  x=0.941m, y=0.692m, θ=270.0°
-		new Pose2d(0.941, 1.274, new Rotation2d(4.712389)),  // #11  x=0.941m, y=1.274m, θ=270.0°
-		new Pose2d(-0.942, 0.351, new Rotation2d(4.712389))  // #12  x=-0.942m, y=0.351m, θ=270.0°
+		new Pose2d(-0.361, 0.612, new Rotation2d(4.712389)),  // #2  x=-0.361m, y=0.612m, θ=270.0°
+		new Pose2d(-0.190, 0.794, new Rotation2d(4.712389)),  // #3  x=-0.190m, y=0.794m, θ=270.0°
+		new Pose2d(-0.190, 1.401, new Rotation2d(4.712389)),  // #4  x=-0.190m, y=1.401m, θ=270.0°
+		new Pose2d(-0.286, 0.655, new Rotation2d(4.712389)),  // #5  x=-0.286m, y=0.655m, θ=270.0°
+		new Pose2d(0.365, 0.804, new Rotation2d(4.712389)),  // #6  x=0.365m, y=0.804m, θ=270.0°
+		new Pose2d(0.365, 1.407, new Rotation2d(4.712389)),  // #7  x=0.365m, y=1.407m, θ=270.0°
+		new Pose2d(0.007, 0.740, new Rotation2d(4.712390)),  // #8  x=0.007m, y=0.740m, θ=270.0°
+		new Pose2d(-0.057, 0.351, new Rotation2d(4.712389)),  // #9  x=-0.057m, y=0.351m, θ=270.0°
+		new Pose2d(0.898, 0.783, new Rotation2d(4.712389)),  // #10  x=0.898m, y=0.783m, θ=270.0°
+		new Pose2d(0.898, 1.370, new Rotation2d(4.712389)),  // #11  x=0.898m, y=1.370m, θ=270.0°
+		new Pose2d(-0.744, 0.378, new Rotation2d(4.712389))  // #12  x=-0.744m, y=0.378m, θ=270.0°
 	);
 }

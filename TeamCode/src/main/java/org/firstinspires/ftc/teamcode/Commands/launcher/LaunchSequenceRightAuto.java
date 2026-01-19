@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Commands.launcher;
 
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
@@ -19,10 +20,8 @@ import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeRight;
 public class LaunchSequenceRightAuto extends SequentialCommandGroup {
 
     public LaunchSequenceRightAuto(FeederServo feederServo, FeederMotor feederMotor, BallStoppers ballStoppers,
-                                   IntakeRight intakeRight, TurretRotate turretRotate, Launcher launcher) {
+                                   IntakeRight intakeRight) {
         addCommands(
-                new WaitUntilCommand(() -> turretRotate.isInRange()),
-//                new WaitUntilCommand(() -> launcher.isReadyToLaunch()),
                 new RunFeederMotor(feederMotor, FeederMotor.UP_POWER),
                 new WaitCommand(100),
                 new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT),
@@ -44,9 +43,11 @@ public class LaunchSequenceRightAuto extends SequentialCommandGroup {
                 new WaitCommand(25),
                 new TurnStopperRight(ballStoppers, BallStoppers.UP_ANGLE_RIGHT),
                 new TurnFeederServoBoth(feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE),
-                new WaitCommand(300),
-                new RunRightIntake(intakeRight, 0),
-                new RunFeederMotor(feederMotor, 0)
+//                new WaitCommand(300),
+                new ParallelCommandGroup(
+                        new RunRightIntake(intakeRight, 0),
+                        new RunFeederMotor(feederMotor, 0)
+                )
         );
     }
 
