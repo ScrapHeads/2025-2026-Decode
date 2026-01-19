@@ -75,7 +75,6 @@ public class RedAutoClose extends CommandOpMode {
     // Subsystem
     private Drivetrain drivetrain;
     private Launcher launcher;
-    private IntakeLeft intakeLeft;
     private IntakeRight intakeRight;
     private TurretHood turretHood;
     private Vision vision;
@@ -106,9 +105,6 @@ public class RedAutoClose extends CommandOpMode {
 
         launcher = new Launcher(hm);
         launcher.register();
-
-        intakeLeft = new IntakeLeft(hm);
-        intakeLeft.register();
 
         intakeRight = new IntakeRight(hm);
         intakeRight.register();
@@ -156,11 +152,9 @@ public class RedAutoClose extends CommandOpMode {
 
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
-//                new InstantCommand(() -> launcher.setDefaultCommand(new SetRpmDistanceContinuous(launcher))),
                 new LauncherSetDefaultCommand(launcher),
                 new SetPowerLauncher(launcher, 1),
                 new InstantCommand(() -> turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate))),
-//                new InstantCommand(() -> intakeRight.setDefaultCommand(new RunRightIntakeContinuous(intakeRight, .2))),
 
                 new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT),
                 new TurnFeederServoBoth(feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE),
