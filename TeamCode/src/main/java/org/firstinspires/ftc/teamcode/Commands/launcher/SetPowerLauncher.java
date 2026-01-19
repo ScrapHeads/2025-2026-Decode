@@ -29,7 +29,8 @@ public class SetPowerLauncher extends CommandBase {
      */
     @Override
     public void initialize() {
-        launcher.setPower(power);
+        launcher.disable();
+        Launcher.PARAMS.targetPower = power;
 //        launcher.enable();
     }
 

@@ -117,7 +117,8 @@ public final class Launcher implements Subsystem {
         PARAMS.enabledPid = true;
         PARAMS.inTolStartNanos = 0L;
         PARAMS.isReadyToLaunch = false;
-//        shooterPid.reset();
+        PARAMS.targetPower = 0;
+        shooterPid.reset();
         PARAMS.currentTargetRpm = getShooterRPM(); // ramp from current speed
     }
 
@@ -149,6 +150,7 @@ public final class Launcher implements Subsystem {
         PARAMS.inTolStartNanos = 0L;
         PARAMS.isReadyToLaunch = false;
         PARAMS.currentTargetRpm = 0;
+        PARAMS.targetPower = 0;
     }
 
     // ----------------- Target & tuning -----------------
@@ -213,6 +215,8 @@ public final class Launcher implements Subsystem {
             // Set to pidOut needs to be tested what output but motor could never go negative
 //            setPower(output);
             launcher.set(pidOut);
+        } else {
+            launcher.set(PARAMS.targetPower);
         }
 
 
@@ -229,7 +233,6 @@ public final class Launcher implements Subsystem {
             PARAMS.isReadyToLaunch = false;
         }
 
-//        launcher.set(PARAMS.targetPower);
 
         // Telemetry
         sendTelemetry(packet);

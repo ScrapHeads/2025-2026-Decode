@@ -16,10 +16,10 @@ import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.TurretRotate;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeRight;
 
-public class LaunchSequenceRight extends SequentialCommandGroup {
+public class LaunchSequenceRightAuto extends SequentialCommandGroup {
 
-    public LaunchSequenceRight(FeederServo feederServo, FeederMotor feederMotor, BallStoppers ballStoppers,
-                               IntakeRight intakeRight, TurretRotate turretRotate) {
+    public LaunchSequenceRightAuto(FeederServo feederServo, FeederMotor feederMotor, BallStoppers ballStoppers,
+                                   IntakeRight intakeRight, TurretRotate turretRotate, Launcher launcher) {
         addCommands(
                 new WaitUntilCommand(() -> turretRotate.isInRange()),
 //                new WaitUntilCommand(() -> launcher.isReadyToLaunch()),

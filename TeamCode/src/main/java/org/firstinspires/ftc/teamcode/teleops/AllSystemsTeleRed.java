@@ -188,7 +188,7 @@ public class AllSystemsTeleRed extends CommandOpMode {
                 .whenPressed(new LaunchSequenceLeft(feederServo, feederMotor, ballStoppers, intakeLeft, turretRotate, launcher));
 
         driver.getGamepadButton(B)
-                .whenPressed(new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight, turretRotate, launcher));
+                .whenPressed(new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight, turretRotate));
 
         driver.getGamepadButton(START)
                 .whenPressed(

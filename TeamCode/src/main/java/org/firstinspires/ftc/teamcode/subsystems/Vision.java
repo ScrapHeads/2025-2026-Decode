@@ -94,31 +94,29 @@ public class Vision implements Subsystem {
 //        p.put("LimeLight", limelight.toString());
 
         double robotRot = RobotState.getInstance().getOdometryPose().getRotation().getDegrees();
-        double turretAngle = RobotState.getInstance().getTurretAngle();
-        double camRotDegrees = Math.round((robotRot - 90 + turretAngle) * 100) / 100.0;
-        limelight.updateRobotOrientation(ConversionUtil.wrapAngleDeg(camRotDegrees));
+//        double turretAngle = RobotState.getInstance().getTurretAngle();
+//        double camRotDegrees = Math.round((robotRot - 90 + turretAngle) * 100) / 100.0;
+        limelight.updateRobotOrientation(robotRot);
 
         LLResult limeLightResult = limelight.getLatestResult();
         Pose3D camPose3D = limeLightResult.getBotpose_MT2();
 
 
 //        p.put("LimeLightResult", limeLightResult.getFiducialResults());
-//        p.put("LimeLight robot pose", camPose3D.toString());
+        p.put("LimeLight robot pose", camPose3D.toString());
 //        p.put("Limelight pipeline", limelight.getStatus().getPipelineIndex());
-        p.put("Camera rotation", ConversionUtil.wrapAngleDeg(camRotDegrees));
+//        p.put("Camera rotation", ConversionUtil.wrapAngleDeg());
         dashboard.sendTelemetryPacket(p);
 
-        Rotation2d camRot = new Rotation2d(camPose3D.getOrientation().getYaw(AngleUnit.RADIANS));
-
         Pose2d poseRobot = new Pose2d(
-                camPose3D.getPosition().x + ((105*Math.cos(turretAngle + 90)) / 1000),
-                camPose3D.getPosition().y + ((105*Math.sin(turretAngle + 90)) / 1000),
-                camRot
+                camPose3D.getPosition().x,
+                camPose3D.getPosition().y,
+                new Rotation2d(camPose3D.getOrientation().getYaw(AngleUnit.RADIANS))
         );
 
         double limelightTime = TimeTracker.convertTime(limeLightResult.getControlHubTimeStamp() / 1000.0);
 
-        if (camPose3D.getPosition().x == 0 && camPose3D.getPosition().y == 0) return;
+        if (poseRobot.getX() == 0 && poseRobot.getY() == 0) return;
 //        ChassisSpeeds robotVel = RobotState.getInstance().getChassisSpeeds();
 
         RobotState.getInstance().addVisionObservation(poseRobot, limelightTime,
