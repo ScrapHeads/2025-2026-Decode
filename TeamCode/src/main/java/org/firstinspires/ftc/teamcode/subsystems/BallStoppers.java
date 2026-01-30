@@ -20,11 +20,11 @@ public class BallStoppers implements Subsystem {
     private final ServoEx ballStopperRight;
 
     // === Servo configuration ===
-    public static final double UP_ANGLE_LEFT = 0;
-    public static final double DOWN_ANGLE_LEFT = .6;
+    public static final double UP_ANGLE_LEFT = .5;
+    public static final double DOWN_ANGLE_LEFT = .75;
 
-    public static final double UP_ANGLE_RIGHT = 1;
-    public static final double DOWN_ANGLE_RIGHT = .5;
+    public static final double UP_ANGLE_RIGHT = .48;
+    public static final double DOWN_ANGLE_RIGHT = .25;
 
     /**
      * Constructs the HoldControl subsystem.

@@ -155,8 +155,6 @@ public class AllSystemsTeleBlue extends CommandOpMode {
         feederServo.setDefaultCommand(new TurnFeederServoBothContinuous(
                 feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE));
 
-
-
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
                 .whenActive(
                         new ParallelCommandGroup(

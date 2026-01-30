@@ -145,18 +145,10 @@ public class AllSystemsTeleRed extends CommandOpMode {
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
                 .whenActive(
                         new ParallelCommandGroup(
-                            new RunRightIntakeContinuous(intakeRight, IntakeLeft.INTAKE_POWER),
-                            new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.UP_ANGLE_RIGHT)
+                                new RunRightIntakeContinuous(intakeRight, IntakeLeft.INTAKE_POWER),
+                                new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.UP_ANGLE_RIGHT)
                         ))
                 .whenInactive(new RunRightIntake(intakeRight, 0));
-//
-//        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
-//                .whenActive(
-//                        new ParallelCommandGroup(
-//                            new RunRightIntakeContinuous(intakeRight, .8),
-//                            new TurnStopperBoth(ballStoppers, BallStoppers.UP_ANGLE_LEFT, BallStoppers.UP_ANGLE_RIGHT)
-//                        ))
-//                .whenInactive(new RunRightIntake(intakeRight, 0));
 
         driver.getGamepadButton(RIGHT_BUMPER)
                 .whenPressed(new RunRightIntakeContinuous(intakeRight, IntakeLeft.OUTTAKE_POWER))
@@ -165,20 +157,11 @@ public class AllSystemsTeleRed extends CommandOpMode {
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
                 .whenActive(
                         new ParallelCommandGroup (
-                            new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER),
-                            new TurnStopperBoth(ballStoppers, BallStoppers.UP_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT)
+                                new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER),
+                                new TurnStopperBoth(ballStoppers, BallStoppers.UP_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT)
                         )
                 )
                 .whenInactive(new RunLeftIntake(intakeLeft, 0));
-
-//        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
-//                .whenActive(
-//                        new ParallelCommandGroup (
-//                            new RunLeftIntakeContinuous(intakeLeft, .4)
-////                            new TurnStopperBoth(ballStoppers, BallStoppers.UP_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT)
-//                        )
-//                )
-//                .whenInactive(new RunLeftIntake(intakeLeft, 0));
 
         driver.getGamepadButton(LEFT_BUMPER)
                 .whenPressed(new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.OUTTAKE_POWER))
@@ -221,27 +204,16 @@ public class AllSystemsTeleRed extends CommandOpMode {
 //                .whenPressed(new HoldControlCommand(holdControl, HoldControl.HoldPosition.TRANSPORT));
 
         driver.getGamepadButton(DPAD_UP)
-                .whenPressed(
-                        new ParallelCommandGroup(
-                                new InstantCommand(() -> launcher.enable()),
-                                new InstantCommand(() -> turretRotate.enablePID()),
-                                new InstantCommand(() -> turretHood.enableAutoAdjust())
-                )
-                        );
+                .whenPressed(new InstantCommand(() -> launcher.enable()));
 
         driver.getGamepadButton(DPAD_DOWN)
-                .whenPressed(
-                        new ParallelCommandGroup(
-                            new StopFlywheel(launcher),
-                            new InstantCommand(() -> turretRotate.disablePID()),
-                            new InstantCommand(() -> turretHood.disableAutoAdjust())
-                ));
-
+                .whenPressed(new StopFlywheel(launcher));
+//
         driver.getGamepadButton(DPAD_LEFT)
-                        .whenPressed(
-                                new RunFeederMotor(feederMotor, FeederMotor.DOWN_POWER)
-                        ).whenReleased(
-                                new RunFeederMotor(feederMotor, 0)
+                .whenPressed(
+                        new RunFeederMotor(feederMotor, FeederMotor.DOWN_POWER)
+                ).whenReleased(
+                        new RunFeederMotor(feederMotor, 0)
                 );
 
 //        driver.getGamepadButton(DPAD_RIGHT)
