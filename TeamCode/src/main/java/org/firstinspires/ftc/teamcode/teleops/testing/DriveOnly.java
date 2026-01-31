@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.Constants.tele;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.util.TimeTracker;
 
+@Disabled
 @TeleOp(name = "DriveOnly", group = "ScrapHeads")
 public class DriveOnly extends CommandOpMode {
     // Create all subsystems references

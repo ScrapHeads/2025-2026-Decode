@@ -63,6 +63,13 @@ public class AllSystemsTeleRed extends CommandOpMode {
     private TurretRotate turretRotate;
     private BallStoppers ballStoppers;
 
+    private enum DriveStates {
+        DEFAULT,
+        SLOW
+    }
+
+    private DriveStates driveStates = DriveStates.DEFAULT;
+
     @Override
     public void initialize() {
         // Initialize shared constants
@@ -102,7 +109,7 @@ public class AllSystemsTeleRed extends CommandOpMode {
         turretRotate.register();
 
         // Uncomment when testing auto first
-        turretRotate.resetEncoder();
+//        turretRotate.resetEncoder();
 
         ballStoppers = new BallStoppers(hm);
         ballStoppers.register();
@@ -173,35 +180,10 @@ public class AllSystemsTeleRed extends CommandOpMode {
         driver.getGamepadButton(B)
                 .whenPressed(new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight, turretRotate));
 
-        driver.getGamepadButton(START)
-                .whenPressed(
-                        new ParallelCommandGroup(
-                                new InstantCommand(() -> turretRotate.resetEncoder())));
-
-//        driver.getGamepadButton(B)
-//                .whenPressed(
-//                        new ParallelCommandGroup(
-//                                new LuanchSetPattern(launcher, sorter, holdControl, patters.get(22))));
-//
-//        driver.getGamepadButton(Y)
-//                .whenPressed(
-//                        new ParallelCommandGroup(
-//                                new LuanchSetPattern(launcher, sorter, holdControl, patters.get(23))));
-//
-//        driver.getGamepadButton(X)
-//                        .whenPressed(new DynamicStrafeCommand(drivetrain, () -> setLaunchPoint));
-//
 //        driver.getGamepadButton(START)
-//                        .whenPressed(new SetLocalizerHeading(drivetrain, 0));
-//
-//        driver.getGamepadButton(BACK)
-//                        .whenPressed(new GetTagPattern(vision));
-
-//        driver.getGamepadButton(A)
-//                        .whenPressed(new HoldControlCommand(holdControl, HoldControl.HoldPosition.LAUNCHING));
-//
-//        driver.getGamepadButton(B)
-//                .whenPressed(new HoldControlCommand(holdControl, HoldControl.HoldPosition.TRANSPORT));
+//                .whenPressed(
+//                        new ParallelCommandGroup(
+//                                new InstantCommand(() -> turretRotate.resetEncoder())));
 
         driver.getGamepadButton(DPAD_UP)
                 .whenPressed(new InstantCommand(() -> launcher.enable()));
@@ -216,13 +198,21 @@ public class AllSystemsTeleRed extends CommandOpMode {
                         new RunFeederMotor(feederMotor, 0)
                 );
 
-//        driver.getGamepadButton(DPAD_RIGHT)
-//                        .whenPressed(new ParallelCommandGroup(
-//                                new InstantCommand(() -> drivetrain.setDefaultCommand(new DriveContinous(drivetrain, driver, 1)))
-//                        ));
+        driver.getGamepadButton(BACK)
+                .whenPressed(new InstantCommand(this::advanceDriveStates));
 
-
-
+        new Trigger(() -> driveStates == DriveStates.SLOW)
+                .whenActive(new DriveContinous(drivetrain, driver, .3).interruptOn(() -> driveStates == DriveStates.DEFAULT));
+    }
+    private void advanceDriveStates () {
+        switch (driveStates) {
+            case DEFAULT:
+                driveStates = DriveStates.SLOW;
+                break;
+            case SLOW:
+                driveStates = DriveStates.DEFAULT;
+                break;
+        }
     }
 }
 

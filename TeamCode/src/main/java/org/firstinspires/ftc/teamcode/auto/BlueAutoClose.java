@@ -31,6 +31,7 @@ import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceLeftAuto;
 import org.firstinspires.ftc.teamcode.Commands.launcher.LauncherSetDefaultCommand;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetPowerLauncher;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperBoth;
+import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperLeft;
 import org.firstinspires.ftc.teamcode.Commands.turret.SetHoodAngleCommand;
 import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
@@ -151,7 +152,7 @@ public class BlueAutoClose extends CommandOpMode {
                 new TurnFeederServoBoth(feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE),
 
                 new ParallelCommandGroup(
-                        new GetTagPattern(vision).withTimeout(5000),
+//                        new GetTagPattern(vision).withTimeout(5000),
 //                        new SetFlywheelRpm(launcher, 3490),
 //                        new SetHoodAngleCommand(turretHood, 1430),
                         new DynamicStrafeCommand(drivetrain, () -> path.get(1))
@@ -174,7 +175,12 @@ public class BlueAutoClose extends CommandOpMode {
                         new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
                 ),
 
-                new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
+                new TurnStopperLeft(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT),
+
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
+                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                ),
 
                 new LaunchSequenceLeftAuto(feederServo, feederMotor, ballStoppers, intakeLeft),
 
@@ -189,7 +195,12 @@ public class BlueAutoClose extends CommandOpMode {
 
                 new SetFlywheelRpm(launcher, 4700),
 
-                new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
+                new TurnStopperLeft(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT),
+
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
+                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                ),
 
                 new LaunchSequenceLeftAuto(feederServo, feederMotor, ballStoppers, intakeLeft),
 
@@ -203,10 +214,16 @@ public class BlueAutoClose extends CommandOpMode {
                         new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
                 ),
 
-                new SetFlywheelRpm(launcher, 4500),
+                new SetFlywheelRpm(launcher, 4400),
 
-                new DynamicStrafeCommand(drivetrain, () -> path.get(11),
-                        turnConstraintsFast, velConstraintFast, accelConstraintFast),
+                new TurnStopperLeft(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT),
+
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(11),
+                                turnConstraintsFast, velConstraintFast, accelConstraintFast),
+                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                ),
+
                 new LaunchSequenceLeftAuto(feederServo, feederMotor, ballStoppers, intakeLeft),
 
 //                new DynamicStrafeCommand(drivetrain, () -> path.get(12)),

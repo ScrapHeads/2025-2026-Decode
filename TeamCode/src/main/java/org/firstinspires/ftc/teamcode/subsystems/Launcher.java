@@ -78,7 +78,6 @@ public final class Launcher implements Subsystem {
     /** Motor driving the shooter flywheel. */
     private final MotorEx launcher;
 
-    private InterpolatingDoubleTreeMap treeMap = new InterpolatingDoubleTreeMap();
 
     // Encoder resolution calculations
     public static final double MOTOR_TPR   = 28;   // ticks per motor rev
@@ -106,8 +105,6 @@ public final class Launcher implements Subsystem {
 
 //        disable();
         enable();
-
-        createLaunchTable();
     }
 
     // ------------- Public API -------------
@@ -128,12 +125,6 @@ public final class Launcher implements Subsystem {
         stop();
     }
 
-    public void createLaunchTable () {
-        for (double[] pair : LauncherRPMTable) {
-            treeMap.put(pair[0], pair[1]);
-        }
-    }
-
     /** @return true if PID control is enabled. */
     public boolean isEnabled() {
         return PARAMS.enabledPid;
@@ -146,7 +137,7 @@ public final class Launcher implements Subsystem {
 
     /** Immediately stop the motor and reset ready state. */
     public void stop() {
-        launcher.stopMotor();
+        launcher.set(0);
         PARAMS.inTolStartNanos = 0L;
         PARAMS.isReadyToLaunch = false;
         PARAMS.currentTargetRpm = 0;

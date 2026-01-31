@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode.auto.testing;
 
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
@@ -14,10 +14,11 @@ import com.acmerobotics.roadrunner.VelConstraint;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.auto.paths.MoveForwardPath;
+import org.firstinspires.ftc.teamcode.auto.paths.MoveSidewaysPath;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.util.TimeTracker;
@@ -25,12 +26,13 @@ import org.firstinspires.ftc.teamcode.util.TimeTracker;
 import java.util.Arrays;
 import java.util.List;
 
-@Autonomous(name = "MoveForward", group = "ScrapHeads")
-public class MoveForward extends CommandOpMode {
+@Disabled
+@Autonomous(name = "MoveSideways", group = "ScrapHeads")
+public class MoveSideways extends CommandOpMode {
 
     Drivetrain drivetrain;
 
-    public static final List<Pose2d> testPath = MoveForwardPath.PATH;
+    public static final List<Pose2d> testPath = MoveSidewaysPath.PATH;
 
     @Override
     public void initialize() {

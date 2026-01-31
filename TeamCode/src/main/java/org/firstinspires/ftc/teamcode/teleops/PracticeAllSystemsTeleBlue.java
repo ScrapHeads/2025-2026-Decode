@@ -1,13 +1,20 @@
 package org.firstinspires.ftc.teamcode.teleops;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.*;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.BACK;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.START;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 import static org.firstinspires.ftc.teamcode.Constants.turretLookupTable;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -17,6 +24,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
 import org.firstinspires.ftc.teamcode.Commands.feeder.RunFeederMotor;
 import org.firstinspires.ftc.teamcode.Commands.feeder.RunFeederMotorContinuous;
 import org.firstinspires.ftc.teamcode.Commands.feeder.TurnFeederServoBothContinuous;
@@ -28,25 +36,23 @@ import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceLeft;
 import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceRight;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetRpmDistanceContinuous;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperBoth;
-import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
-import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.turret.TurretRotateContinuous;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.state.TurretLookupTable;
-import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.FeederMotor;
 import org.firstinspires.ftc.teamcode.subsystems.FeederServo;
-import org.firstinspires.ftc.teamcode.subsystems.TurretRotate;
-import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.TurretHood;
+import org.firstinspires.ftc.teamcode.subsystems.TurretRotate;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
+import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeRight;
 
-@TeleOp(name = "AllSystemsTeleBlue", group = "ScrapHeads")
-public class AllSystemsTeleBlue extends CommandOpMode {
+@TeleOp(name = "PracticeAllSystemsTeleBlue", group = "ScrapHeads")
+public class PracticeAllSystemsTeleBlue extends CommandOpMode {
     // Controller
     private GamepadEx driver;
 
@@ -108,7 +114,7 @@ public class AllSystemsTeleBlue extends CommandOpMode {
         turretRotate.register();
 
         // Uncomment when testing auto first
-//        turretRotate.resetEncoder();
+        turretRotate.resetEncoder();
 
         ballStoppers = new BallStoppers(hm);
         ballStoppers.register();
