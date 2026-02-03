@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
@@ -25,46 +26,42 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
 import org.firstinspires.ftc.teamcode.Commands.feeder.TurnFeederServoBoth;
-import org.firstinspires.ftc.teamcode.Commands.intake.IntakeSorterNoEnd;
-import org.firstinspires.ftc.teamcode.Commands.intake.RunLeftIntakeContinuous;
-import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceLeftAuto;
+import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntakeContinuous;
+import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceRightAuto;
 import org.firstinspires.ftc.teamcode.Commands.launcher.LauncherSetDefaultCommand;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetPowerLauncher;
-import org.firstinspires.ftc.teamcode.Commands.launcher.SortedLuanch;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperBoth;
-import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperLeft;
+import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperRight;
 import org.firstinspires.ftc.teamcode.Commands.turret.TurretRotateContinuous;
-import org.firstinspires.ftc.teamcode.Commands.vision.GetTagPattern;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.auto.paths.blueAutoFar;
+import org.firstinspires.ftc.teamcode.auto.paths.redAutoFar;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.state.TurretLookupTable;
-import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.FeederMotor;
 import org.firstinspires.ftc.teamcode.subsystems.FeederServo;
-import org.firstinspires.ftc.teamcode.subsystems.TurretRotate;
-import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
 import org.firstinspires.ftc.teamcode.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.TurretHood;
-import org.firstinspires.ftc.teamcode.subsystems.Sorter;
+import org.firstinspires.ftc.teamcode.subsystems.TurretRotate;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
+import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeRight;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 
 import java.util.Arrays;
 import java.util.List;
 
-@Autonomous(name = "BlueAutoFar", group = "ScrapHeads")
-public class BlueAutoFar extends CommandOpMode {
+@Autonomous(name = "RedAutoFar", group = "ScrapHeads")
+public class RedAutoFar extends CommandOpMode {
 
     // Subsystem
     private Drivetrain drivetrain;
     private Launcher launcher;
-    private IntakeLeft intakeLeft;
+    private IntakeRight intakeRight;
     private TurretHood turretHood;
     private Vision vision;
     private FeederServo feederServo;
@@ -72,9 +69,9 @@ public class BlueAutoFar extends CommandOpMode {
     private TurretRotate turretRotate;
     private BallStoppers ballStoppers;
 
-    public boolean isBlue = true;
+    public Boolean isBlue = false;
 
-    public static final List<Pose2d> path = blueAutoFar.PATH;
+    public static final List<Pose2d> path = redAutoFar.PATH;
 
     public BallColor[] ballColors = new BallColor[] {BallColor.PURPLE, BallColor.PURPLE, BallColor.GREEN};
 
@@ -95,8 +92,8 @@ public class BlueAutoFar extends CommandOpMode {
         launcher = new Launcher(hm);
         launcher.register();
 
-        intakeLeft = new IntakeLeft(hm);
-        intakeLeft.register();
+        intakeRight = new IntakeRight(hm);
+        intakeRight.register();
 
         feederMotor = new FeederMotor(hm);
         feederMotor.register();
@@ -157,71 +154,68 @@ public class BlueAutoFar extends CommandOpMode {
 
                 new SetFlywheelRpm(launcher, turretLookupTable.get(turretLookupTable.getDistance()).rpm),
 
-                new LaunchSequenceLeftAuto(feederServo, feederMotor, ballStoppers, intakeLeft),
+                new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
-                new ParallelDeadlineGroup (
+                new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
-                new TurnStopperLeft(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT),
+                new TurnStopperRight(ballStoppers, BallStoppers.DOWN_ANGLE_RIGHT),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(4)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
                 new SetFlywheelRpm(launcher, turretLookupTable.get(turretLookupTable.getDistance()).rpm),
 
-                new LaunchSequenceLeftAuto(feederServo, feederMotor, ballStoppers, intakeLeft),
+                new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
-                new ParallelDeadlineGroup(
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
-                ),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
-                new TurnStopperLeft(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT),
+                new TurnStopperRight(ballStoppers, BallStoppers.DOWN_ANGLE_RIGHT),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
                 new SetFlywheelRpm(launcher, turretLookupTable.get(turretLookupTable.getDistance()).rpm),
 
-                new LaunchSequenceLeftAuto(feederServo, feederMotor, ballStoppers, intakeLeft),
+                new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
                 new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
-                new TurnStopperLeft(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT),
+                new TurnStopperRight(ballStoppers, BallStoppers.DOWN_ANGLE_RIGHT),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
                 new SetFlywheelRpm(launcher, turretLookupTable.get(turretLookupTable.getDistance()).rpm),
 
-                new LaunchSequenceLeftAuto(feederServo, feederMotor, ballStoppers, intakeLeft),
+                new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(11)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
                 new InstantCommand(StateIO::save)
@@ -255,6 +249,7 @@ public class BlueAutoFar extends CommandOpMode {
     public void setUpRobotState() {
         RobotState.getInstance().setAll(
                 path.get(0),
+//                new Pose2d(-2, -2, new Rotation2d(0.942478)),
                 isBlue,
                 ballColors,
                 new ChassisSpeeds(0,0, 0)
@@ -262,5 +257,6 @@ public class BlueAutoFar extends CommandOpMode {
 
         RobotState.getInstance().setPattern(new BallColor[] {EMPTY, EMPTY, EMPTY});
     }
+
 
 }
