@@ -28,18 +28,17 @@ public class TurretRotateContinuous extends CommandBase {
         // Get the robot pose on the x axes
 //        double x = RobotState.getInstance().getEstimatedPose().getX();
         double y = RobotState.getInstance().getEstimatedPose().getY();
-        double targetX = -1.82;
+        double targetX = -1.64;
 
         double angle;
         // If on blue team do the first equation else assume the red team
         if (RobotState.getInstance().getTeam()) {
-            targetX = -1.64;
             double targetY = -1.64;
 //            double targetY = -1.82;
 
             angle = getAsin(targetX, targetY, y);
         } else {
-            double targetY = 1.82;
+            double targetY = 1.64;
 
             angle = getAsin(targetX, targetY, y);
         }
