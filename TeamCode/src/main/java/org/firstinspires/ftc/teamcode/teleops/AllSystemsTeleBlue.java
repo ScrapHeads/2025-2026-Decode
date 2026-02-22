@@ -7,7 +7,6 @@ import static org.firstinspires.ftc.teamcode.Constants.tele;
 import static org.firstinspires.ftc.teamcode.Constants.turretLookupTable;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -29,19 +28,19 @@ import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceRight;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetRpmDistanceContinuous;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperBoth;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
-import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.turret.TurretRotateContinuous;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.state.TurretLookupTable;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
+import org.firstinspires.ftc.teamcode.subsystems.intake.BallStoppers;
 import org.firstinspires.ftc.teamcode.subsystems.FeederMotor;
 import org.firstinspires.ftc.teamcode.subsystems.FeederServo;
-import org.firstinspires.ftc.teamcode.subsystems.TurretRotate;
+import org.firstinspires.ftc.teamcode.subsystems.turret.TurretRotate;
+import org.firstinspires.ftc.teamcode.subsystems.intake.BallTracker;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
-import org.firstinspires.ftc.teamcode.subsystems.Launcher;
-import org.firstinspires.ftc.teamcode.subsystems.TurretHood;
+import org.firstinspires.ftc.teamcode.subsystems.turret.Launcher;
+import org.firstinspires.ftc.teamcode.subsystems.turret.TurretHood;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeRight;
 
@@ -61,6 +60,7 @@ public class AllSystemsTeleBlue extends CommandOpMode {
     private FeederMotor feederMotor;
     private TurretRotate turretRotate;
     private BallStoppers ballStoppers;
+    private BallTracker ballTracker;
 
     private enum DriveStates {
         DEFAULT,
@@ -81,6 +81,8 @@ public class AllSystemsTeleBlue extends CommandOpMode {
 
         RobotState.getInstance().setTeam(true);
 
+        ballTracker = new BallTracker(hm);
+
         // Initialize the subsystems declared at the top of the code
         drivetrain = new Drivetrain(hm, RobotState.getInstance().getOdometryPose());
         drivetrain.register();
@@ -92,13 +94,13 @@ public class AllSystemsTeleBlue extends CommandOpMode {
         launcher = new Launcher(hm);
         launcher.register();
 
-        intakeLeft = new IntakeLeft(hm);
+        intakeLeft = new IntakeLeft(hm, ballTracker);
         intakeLeft.register();
 
         intakeRight = new IntakeRight(hm);
         intakeRight.register();
 
-        feederMotor = new FeederMotor(hm);
+        feederMotor = new FeederMotor(hm, ballTracker);
         feederMotor.register();
 
         feederServo = new FeederServo(hm);
@@ -110,7 +112,7 @@ public class AllSystemsTeleBlue extends CommandOpMode {
         // Uncomment when testing auto first
 //        turretRotate.resetEncoder();
 
-        ballStoppers = new BallStoppers(hm);
+        ballStoppers = new BallStoppers(hm, ballTracker);
         ballStoppers.register();
 
         hood = new TurretHood(hm);

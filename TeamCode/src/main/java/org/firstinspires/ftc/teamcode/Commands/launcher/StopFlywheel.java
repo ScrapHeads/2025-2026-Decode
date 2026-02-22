@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.Commands.launcher;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import org.firstinspires.ftc.teamcode.subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.subsystems.turret.Launcher;
 
 /**
  * One-shot command that disables the launcher PID and stops the motor.

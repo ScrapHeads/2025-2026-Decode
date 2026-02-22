@@ -23,7 +23,7 @@ public class IntakeLeft implements Subsystem  {
 
     private final MotorEx intakeMotorLeft;
 
-    private final RevColorSensorV3 colorSensorLeft;
+    private BallTracker ballTracker = null;
 
     // Default power constants (adjust as needed)
     public static final double INTAKE_POWER = 1.0;
@@ -46,11 +46,23 @@ public class IntakeLeft implements Subsystem  {
 
         intakeMotorLeft.setZeroPowerBehavior(BRAKE);
 
-        colorSensorLeft = hm.get(RevColorSensorV3.class, "colorLeft");
+        // ensure stopped at init
+        stopIntake();
+    }
 
-        colorSensorLeft.setGain(10);
+    /**
+     * Constructs the IntakeSubsystem.
+     *
+     * @param hm The HardwareMap used to retrieve the motor device.
+     */
+    public IntakeLeft(HardwareMap hm, BallTracker ballTracker) {
+        intakeMotorLeft = new MotorEx(hm, "intakeLeft"); // name must match configuration
 
-        colorSensorLeft.enableLed(true);
+        intakeMotorLeft.setInverted(false);
+
+        intakeMotorLeft.setZeroPowerBehavior(BRAKE);
+
+        this.ballTracker = ballTracker;
 
         // ensure stopped at init
         stopIntake();
@@ -76,47 +88,19 @@ public class IntakeLeft implements Subsystem  {
         return intakeMotorLeft.get();
     }
 
-    public BallColor detectBallColor (RevColorSensorV3 colorSensor) {
-        int r = colorSensor.red();
-        int g = colorSensor.green();
-        int b = colorSensor.blue();
-
-        // --- Normalize readings to minimize lighting variance ---
-        double total = r + g + b;
-        if (total == 0) return BallColor.EMPTY;
-
-        double rNorm = r / total;
-        double gNorm = g / total;
-        double bNorm = b / total;
-
-        TelemetryPacket packet = new TelemetryPacket();
-        packet.put("Color Sensor Right", String.format("%.2f, %.2f, %.2f",
-                rNorm, gNorm, bNorm));
-        dashboard.sendTelemetryPacket(packet);
-
-        // --- GREEN detection: strong green dominance ---
-        if (gNorm > rNorm * 2.8 && gNorm > bNorm * 1.2) {
-            return GREEN;
-        }
-
-        // --- PURPLE detection: red + blue high, green low ---
-        double avgRB = (rNorm + bNorm) / 1.87;
-        if (avgRB > gNorm) {
-            return BallColor.PURPLE;
-        }
-
-        // --- None detected ---
-        return BallColor.EMPTY;
-    }
 
     @Override
     public void periodic() {
         tele.addData("Intake Power", toString());
 
+        if (ballTracker != null) {
+            ballTracker.setLeftIntakePower(intakeMotorLeft.get());
+        } else {
+            tele.addLine("Ball Tracker null intake left");
+        }
+
         TelemetryPacket packet = new TelemetryPacket();
-//        packet.put("Color Left", detectBallColor(colorSensorLeft));
-        packet.put("Color Sensor Left", String.format("%d, %d, %d",
-                colorSensorLeft.red(), colorSensorLeft.green(), colorSensorLeft.blue()));
+
         dashboard.sendTelemetryPacket(packet);
     }
 }

@@ -1,14 +1,11 @@
 package org.firstinspires.ftc.teamcode.Commands.turret;
 
-import static org.firstinspires.ftc.teamcode.Constants.dashboard;
-
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Translation2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Units;
 import org.firstinspires.ftc.teamcode.state.RobotState;
-import org.firstinspires.ftc.teamcode.subsystems.TurretRotate;
+import org.firstinspires.ftc.teamcode.subsystems.turret.TurretRotate;
 import org.firstinspires.ftc.teamcode.util.ConversionUtil;
 
 public class TurretRotateContinuous extends CommandBase {
