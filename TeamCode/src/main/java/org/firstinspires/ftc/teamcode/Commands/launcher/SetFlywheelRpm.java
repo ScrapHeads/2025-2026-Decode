@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.Commands.launcher;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import org.firstinspires.ftc.teamcode.subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.subsystems.turret.Launcher;
 
 /**
  * Command that spins the flywheel to a target RPM and keeps it there

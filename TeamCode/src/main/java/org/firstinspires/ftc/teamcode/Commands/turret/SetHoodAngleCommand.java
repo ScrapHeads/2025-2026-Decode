@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.Commands.turret;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import org.firstinspires.ftc.teamcode.subsystems.TurretHood;
+import org.firstinspires.ftc.teamcode.subsystems.turret.TurretHood;
 
 /**
  * Command to set the LauncherHood to a specific target angle.

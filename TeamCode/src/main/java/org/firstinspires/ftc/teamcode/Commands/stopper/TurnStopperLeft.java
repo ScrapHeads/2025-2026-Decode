@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.Commands.stopper;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
+import org.firstinspires.ftc.teamcode.subsystems.intake.BallStoppers;
 
 public class TurnStopperLeft extends CommandBase {
     private final BallStoppers ballStoppers;

@@ -5,8 +5,8 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
 
 import org.firstinspires.ftc.teamcode.Commands.sorter.TurnOneSlot;
-import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
-import org.firstinspires.ftc.teamcode.subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.subsystems.intake.BallStoppers;
+import org.firstinspires.ftc.teamcode.subsystems.turret.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 
 public class ShootAllLoaded extends SequentialCommandGroup {

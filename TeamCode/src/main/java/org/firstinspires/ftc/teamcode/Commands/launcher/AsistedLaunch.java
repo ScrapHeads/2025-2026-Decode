@@ -4,8 +4,8 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.BallStoppers;
-import org.firstinspires.ftc.teamcode.subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.subsystems.intake.BallStoppers;
+import org.firstinspires.ftc.teamcode.subsystems.turret.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.Sorter;
 
 public class AsistedLaunch extends SequentialCommandGroup {

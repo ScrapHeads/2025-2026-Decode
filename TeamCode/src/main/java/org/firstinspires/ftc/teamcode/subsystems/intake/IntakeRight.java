@@ -23,7 +23,7 @@ public class IntakeRight implements Subsystem  {
 
     private final MotorEx intakeMotorRight;
 
-    private final RevColorSensorV3 colorSensorRight;
+//    private final RevColorSensorV3 colorSensorRight;
 
     // Default power constants (adjust as needed)
     public static final double INTAKE_POWER = 1.0;
@@ -46,11 +46,11 @@ public class IntakeRight implements Subsystem  {
 
         intakeMotorRight.setZeroPowerBehavior(BRAKE);
 
-        colorSensorRight = hm.get(RevColorSensorV3.class, "colorRight");
+//        colorSensorRight = hm.get(RevColorSensorV3.class, "colorRight");
 
-        colorSensorRight.setGain(10);
+//        colorSensorRight.setGain(10);
 
-        colorSensorRight.enableLed(true);
+//        colorSensorRight.enableLed(true);
 
         // ensure stopped at init
         stopIntake();
@@ -111,9 +111,9 @@ public class IntakeRight implements Subsystem  {
 
         TelemetryPacket packet = new TelemetryPacket();
 //        packet.put("Color Left", detectBallColor(colorSensorLeft));
-        packet.put("Color right", detectBallColor(colorSensorRight));
-        packet.put("Color Sensor Right", String.format("%d, %d, %d",
-                colorSensorRight.red(), colorSensorRight.green(), colorSensorRight.blue()));
+//        packet.put("Color right", detectBallColor(colorSensorRight));
+//        packet.put("Color Sensor Right", String.format("%d, %d, %d",
+//                colorSensorRight.red(), colorSensorRight.green(), colorSensorRight.blue()));
         dashboard.sendTelemetryPacket(packet);
     }
 }

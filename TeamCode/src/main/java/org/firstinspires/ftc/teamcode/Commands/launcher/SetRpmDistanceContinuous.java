@@ -5,7 +5,7 @@ import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.subsystems.turret.Launcher;
 
 public class SetRpmDistanceContinuous extends CommandBase {
 
