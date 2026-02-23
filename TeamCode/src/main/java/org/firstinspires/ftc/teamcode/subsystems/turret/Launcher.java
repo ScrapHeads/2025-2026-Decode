@@ -1,9 +1,6 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.turret;
 
-import static org.firstinspires.ftc.teamcode.Constants.blueTagPose;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
-import static org.firstinspires.ftc.teamcode.Constants.LauncherRPMTable;
-import static org.firstinspires.ftc.teamcode.Constants.redTagPose;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -14,11 +11,7 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Interpolation.InterpolatingDoubleTreeMap;
-import org.firstinspires.ftc.teamcode.state.RobotState;
 
 /**
  * Subsystem representing a single-motor flywheel launcher.
@@ -64,10 +57,10 @@ public final class Launcher implements Subsystem {
 
         // --- Control ---
         /** Single PID controller for the shooter motor. */
-        public double PIDKp = 0.002;
+        public double PIDKp = 0.00065;
         public double PIDKi = 0.0;
         public double PIDKd = 0.0;
-        public double PIDKf = 0.0001;
+        public double PIDKf = 0.00011;
     }
 
     /** Instance of params for this launcher. */
@@ -81,7 +74,7 @@ public final class Launcher implements Subsystem {
 
     // Encoder resolution calculations
     public static final double MOTOR_TPR   = 28;   // ticks per motor rev
-    public static final double GEAR_RATIO  = 3;  // motor:wheel upgear
+    public static final double GEAR_RATIO  = 2;  // motor:wheel upgear
     public static final double TICKS_PER_REV = MOTOR_TPR / GEAR_RATIO;
 
     /**

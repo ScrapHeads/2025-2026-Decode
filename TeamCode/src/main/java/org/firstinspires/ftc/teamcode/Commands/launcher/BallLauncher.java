@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.Commands.launcher;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.subsystems.Launcher;
+import org.firstinspires.ftc.teamcode.subsystems.turret.Launcher;
 
 public class BallLauncher extends CommandBase {
     public final Launcher launcherBall;

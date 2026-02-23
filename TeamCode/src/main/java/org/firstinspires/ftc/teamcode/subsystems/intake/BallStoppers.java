@@ -1,12 +1,9 @@
-package org.firstinspires.ftc.teamcode.subsystems;
-
-import static org.firstinspires.ftc.teamcode.Constants.tele;
+package org.firstinspires.ftc.teamcode.subsystems.intake;
 
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 /**
  * The HoldControl subsystem controls a positional servo responsible
