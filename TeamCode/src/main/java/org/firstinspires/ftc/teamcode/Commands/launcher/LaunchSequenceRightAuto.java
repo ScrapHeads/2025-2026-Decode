@@ -24,7 +24,6 @@ public class LaunchSequenceRightAuto extends SequentialCommandGroup {
                 new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT),
                 new TurnFeederServoBoth(feederServo, FeederServo.OUT_FRONT_ANGLE, FeederServo.OUT_BACK_ANGLE),
                 new RunRightIntake(intakeRight, .8),
-//                new WaitCommand(800),
                 new WaitCommand(25),
                 new TurnStopperRight(ballStoppers, BallStoppers.UP_ANGLE_RIGHT),
                 new TurnFeederServoBoth(feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE),
@@ -40,7 +39,6 @@ public class LaunchSequenceRightAuto extends SequentialCommandGroup {
                 new WaitCommand(25),
                 new TurnStopperRight(ballStoppers, BallStoppers.UP_ANGLE_RIGHT),
                 new TurnFeederServoBoth(feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE),
-//                new WaitCommand(300),
                 new ParallelCommandGroup(
                         new RunRightIntake(intakeRight, 0),
                         new RunFeederMotor(feederMotor, 0)

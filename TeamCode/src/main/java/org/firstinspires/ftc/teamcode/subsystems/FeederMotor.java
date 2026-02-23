@@ -10,12 +10,13 @@ import org.firstinspires.ftc.teamcode.subsystems.intake.BallTracker;
 
 public class FeederMotor implements Subsystem {
 
-    private BallTracker ballTracker;
 
     public static final double UP_POWER = -1;
     public static final double DOWN_POWER = 1;
 
     private final MotorEx feeder;
+    private BallTracker ballTracker = null;
+
 
     public FeederMotor(HardwareMap hm) {
         feeder = new MotorEx(hm, "feeder");
@@ -27,8 +28,13 @@ public class FeederMotor implements Subsystem {
     }
 
     public void setPower (double power) {
-        ballTracker.setFeederPower(power);
         feeder.set(power);
+
+        if (ballTracker != null){
+            ballTracker.setFeederPower(-power);
+        } else {
+            tele.addLine("Ball Tracker null feeder");
+        }
     }
 
     public void stopMotor () {

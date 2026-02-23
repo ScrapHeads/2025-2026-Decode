@@ -136,7 +136,6 @@ public class BlueAutoClose extends CommandOpMode {
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
                 new LauncherSetDefaultCommand(launcher),
-                new SetPowerLauncher(launcher, 1),
                 new InstantCommand(() -> turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate))),
 
                 new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT),
@@ -148,8 +147,6 @@ public class BlueAutoClose extends CommandOpMode {
 //                        new SetHoodAngleCommand(turretHood, 1430),
                         new DynamicStrafeCommand(drivetrain, () -> path.get(1))
                 ),
-
-                new WaitCommand(1000),
 
                 new SetFlywheelRpm(launcher, 4500),
 

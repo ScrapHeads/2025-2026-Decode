@@ -14,7 +14,7 @@ public final class redAutoClose {
     private redAutoClose() {}
 
     public static final List<Pose2d> PATH = Arrays.asList(
-		new Pose2d(-1.448, 1.071, new Rotation2d(4.712389)),  // #1  x=-1.448m, y=1.071m, θ=270.0°
+		new Pose2d(-1.443, 1.092, new Rotation2d(4.712389)),  // #1  x=-1.443m, y=1.092m, θ=270.0°
 		new Pose2d(-0.361, 0.612, new Rotation2d(4.712389)),  // #2  x=-0.361m, y=0.612m, θ=270.0°
 		new Pose2d(-0.190, 0.794, new Rotation2d(4.712389)),  // #3  x=-0.190m, y=0.794m, θ=270.0°
 		new Pose2d(-0.190, 1.401, new Rotation2d(4.712389)),  // #4  x=-0.190m, y=1.401m, θ=270.0°
@@ -25,6 +25,6 @@ public final class redAutoClose {
 		new Pose2d(-0.057, 0.351, new Rotation2d(4.712389)),  // #9  x=-0.057m, y=0.351m, θ=270.0°
 		new Pose2d(0.898, 0.783, new Rotation2d(4.712389)),  // #10  x=0.898m, y=0.783m, θ=270.0°
 		new Pose2d(0.898, 1.370, new Rotation2d(4.712389)),  // #11  x=0.898m, y=1.370m, θ=270.0°
-		new Pose2d(-0.744, 0.378, new Rotation2d(4.712389))  // #12  x=-0.744m, y=0.378m, θ=270.0°
+		new Pose2d(-0.840, 0.346, new Rotation2d(4.712389))  // #12  x=-0.840m, y=0.346m, θ=270.0°
 	);
 }

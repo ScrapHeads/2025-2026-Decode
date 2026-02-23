@@ -3,11 +3,12 @@ package org.firstinspires.ftc.teamcode.subsystems.intake;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -29,25 +30,26 @@ import org.firstinspires.ftc.teamcode.util.TimeTracker;
  * Center / feeder pickup (no sensor):
  *   [3]
  *
- * Sensor naming:
- *   RevColorSensorV3: colorLeft, colorRight, colorCenterLeft, colorCenterRight
- *   DistanceSensor:   distanceLeft, distanceRight
+ * Sensor naming (RevColorSensorV3):
+ *   Left pocket:  colorLeftFront,  colorLeftBack
+ *   Right pocket: colorRightFront, colorRightBack
+ *   Center path:  colorCenterLeft, colorCenterRight
  */
 @Config
-public class BallTracker implements Subsystem {
+public final class BallTracker implements Subsystem {
 
     // -------------------- Tunable Parameters --------------------
 
     public static class Params {
         // Presence thresholds (mm)
-        public double presentPocketMm = 90.0; // distanceLeft/distanceRight thresholds
-        public double presentCenterMm = 75.0; // center Rev V3 distance thresholds
+        public double presentPocketMm = 50.0; // pocket Rev V3 distance thresholds
+        public double presentCenterMm = 30; // center Rev V3 distance thresholds
 
         // Color classification
         public double minTotalRgb = 40.0;
-        public double greenDominance = 2.8;
+        public double greenDominance = 2.5;
         public double greenOverBlue = 1.2;
-        public double purpleMargin = 0.04;
+        public double purpleMargin = 0.025;
 
         // Motion thresholds
         public double powerDeadband = 0.05;
@@ -77,6 +79,7 @@ public class BallTracker implements Subsystem {
 
         private Ball(int id) { this.id = id; }
 
+        @NonNull
         @Override
         public String toString() {
             return id + ":" + color;
@@ -85,13 +88,14 @@ public class BallTracker implements Subsystem {
 
     // -------------------- Hardware --------------------
 
-    private final RevColorSensorV3 colorLeft;
-    private final RevColorSensorV3 colorRight;
+    private final RevColorSensorV3 colorLeftFront;
+    private final RevColorSensorV3 colorLeftBack;
+
+    private final RevColorSensorV3 colorRightFront;
+    private final RevColorSensorV3 colorRightBack;
+
     private final RevColorSensorV3 colorCenterLeft;
     private final RevColorSensorV3 colorCenterRight;
-
-    private final DistanceSensor distanceLeft;
-    private final DistanceSensor distanceRight;
 
     // -------------------- Inputs from other systems --------------------
 
@@ -151,13 +155,14 @@ public class BallTracker implements Subsystem {
     private double rightTransitStartSec = -1.0;
 
     public BallTracker(HardwareMap hm) {
-        colorLeft = hm.get(RevColorSensorV3.class, "colorLeft");
-        colorRight = hm.get(RevColorSensorV3.class, "colorRight");
+        colorLeftFront = hm.get(RevColorSensorV3.class, "colorLeftFront");
+        colorLeftBack = hm.get(RevColorSensorV3.class, "colorLeftBack");
+
+        colorRightFront = hm.get(RevColorSensorV3.class, "colorRightFront");
+        colorRightBack = hm.get(RevColorSensorV3.class, "colorRightBack");
+
         colorCenterLeft = hm.get(RevColorSensorV3.class, "colorCenterLeft");
         colorCenterRight = hm.get(RevColorSensorV3.class, "colorCenterRight");
-
-        distanceLeft = hm.get(DistanceSensor.class, "distanceLeft");
-        distanceRight = hm.get(DistanceSensor.class, "distanceRight");
     }
 
     // -------------------- Slot Indices --------------------
@@ -178,30 +183,44 @@ public class BallTracker implements Subsystem {
     public void periodic() {
         double nowSec = TimeTracker.getTime();
 
-        // Read pocket distance sensors (presence only)
-        double dLeft = distanceLeft.getDistance(DistanceUnit.MM);
-        double dRight = distanceRight.getDistance(DistanceUnit.MM);
+        // Read pocket sensors (COLOR ONLY)
+        BallColor lFrontColor = detectBallColor(colorLeftFront, true);
+        BallColor lBackColor  = detectBallColor(colorLeftBack,  true);
 
-        boolean leftPocketPresent = !Double.isNaN(dLeft) && dLeft <= PARAMS.presentPocketMm;
-        boolean rightPocketPresent = !Double.isNaN(dRight) && dRight <= PARAMS.presentPocketMm;
+        BallColor rFrontColor = detectBallColor(colorRightFront, true);
+        BallColor rBackColor  = detectBallColor(colorRightBack,  true);
 
-        // Read center sensors (presence + color)
-        Station cLeft = readRevStation(colorCenterLeft, PARAMS.presentCenterMm);
-        Station cRight = readRevStation(colorCenterRight, PARAMS.presentCenterMm);
+        // Presence based on color classification (not EMPTY)
+        boolean leftPocketPresent =
+                (lFrontColor != BallColor.EMPTY) || (lBackColor != BallColor.EMPTY);
+        boolean rightPocketPresent =
+                (rFrontColor != BallColor.EMPTY) || (rBackColor != BallColor.EMPTY);
 
-        // Update edges
-        pocketLeftEdge.update(leftPocketPresent, dLeft);
-        pocketRightEdge.update(rightPocketPresent, dRight);
-        centerLeftEdge.update(cLeft.present, cLeft.distanceMm);
-        centerRightEdge.update(cRight.present, cRight.distanceMm);
+        // Read center sensors (COLOR ONLY)
+        BallColor cLeftColor  = detectBallColor(colorCenterLeft,  true);
+        BallColor cRightColor = detectBallColor(colorCenterRight, true);
+
+        boolean centerLeftPresent  = (cLeftColor  != BallColor.EMPTY);
+        boolean centerRightPresent = (cRightColor != BallColor.EMPTY);
+
+        // Update edges (distance unused)
+        pocketLeftEdge.update(leftPocketPresent, Double.NaN);
+        pocketRightEdge.update(rightPocketPresent, Double.NaN);
+        centerLeftEdge.update(centerLeftPresent, Double.NaN);
+        centerRightEdge.update(centerRightPresent, Double.NaN);
 
         // 1) Pocket arrivals
         if (pocketLeftEdge.rising) addIntoLeftPocket(nowSec);
         if (pocketRightEdge.rising) addIntoRightPocket(nowSec);
 
         // 2) Update pocket colors (best-effort; one sensor cannot fully disambiguate two balls)
-        updatePocketColorLeft(nowSec);
-        updatePocketColorRight(nowSec);
+        updatePocketColorLeft(nowSec,
+                new Station(leftPocketPresent, Double.NaN, (lFrontColor != BallColor.EMPTY) ? lFrontColor : lBackColor),
+                new Station(leftPocketPresent, Double.NaN, (lBackColor  != BallColor.EMPTY) ? lBackColor  : lFrontColor));
+
+        updatePocketColorRight(nowSec,
+                new Station(rightPocketPresent, Double.NaN, (rFrontColor != BallColor.EMPTY) ? rFrontColor : rBackColor),
+                new Station(rightPocketPresent, Double.NaN, (rBackColor  != BallColor.EMPTY) ? rBackColor  : rFrontColor));
 
         // 3) Push inward from each side (pocket -> path)
         if (canPushLeftInward()) {
@@ -212,7 +231,9 @@ public class BallTracker implements Subsystem {
         }
 
         // 4) Move into center based on intake power AND gate state AND center-side sensor presence
-        tryMoveIntoCenter(nowSec, cLeft, cRight);
+        Station cLeftStation = new Station(centerLeftPresent, Double.NaN, cLeftColor);
+        Station cRightStation = new Station(centerRightPresent, Double.NaN, cRightColor);
+        tryMoveIntoCenter(nowSec, cLeftStation, cRightStation);
 
         // 5) Feeder consumes center (no sensor in center)
         if (isForward(feederPower) && line[CENTER] != null) {
@@ -234,18 +255,19 @@ public class BallTracker implements Subsystem {
         tele.addData("intakeR", "%.2f", intakeRightPower);
         tele.addData("feeder", "%.2f", feederPower);
 
-        tele.addData("pocketL", "d=%.1fmm present=%s", dLeft, leftPocketPresent);
-        tele.addData("pocketR", "d=%.1fmm present=%s", dRight, rightPocketPresent);
-        tele.addData("centerL", "present=%s color=%s", cLeft.present, cLeft.color);
-        tele.addData("centerR", "present=%s color=%s", cRight.present, cRight.color);
+        tele.addData("LF", "color=%s", lFrontColor);
+        tele.addData("LB", "color=%s", lBackColor);
+        tele.addData("RF", "color=%s", rFrontColor);
+        tele.addData("RB", "color=%s", rBackColor);
+        tele.addData("cL", "present=%s color=%s", centerLeftPresent, cLeftColor);
+        tele.addData("cR", "present=%s color=%s", centerRightPresent, cRightColor);
 
         if (PARAMS.debugDashboard) {
             TelemetryPacket p = new TelemetryPacket();
             for (int i = 0; i < line.length; i++) p.put("slot" + i, slotString(i));
-//            p.put("leftGateDown", leftGateDown);
-//            p.put("rightGateDown", rightGateDown);
             dashboard.sendTelemetryPacket(p);
         }
+
     }
 
     // -------------------- Movement Permissions --------------------
@@ -375,20 +397,26 @@ public class BallTracker implements Subsystem {
 
     // -------------------- Pocket Color Updates --------------------
 
-    private void updatePocketColorLeft(double nowSec) {
-        Station s = readRevStation(colorLeft, PARAMS.presentPocketMm);
-        if (!s.present) return;
+    private void updatePocketColorLeft(double nowSec, Station front, Station back) {
+        Ball target = null;
+        if (line[L_INNER] != null) target = line[L_INNER];
+        else if (line[L_OUTER] != null) target = line[L_OUTER];
 
-        if (line[L_INNER] != null) applyColorIfKnown(line[L_INNER], s.color, nowSec);
-        else if (line[L_OUTER] != null) applyColorIfKnown(line[L_OUTER], s.color, nowSec);
+        if (target == null) return;
+
+        if (front.present) applyColorIfKnown(target, front.color, nowSec);
+        else if (back.present) applyColorIfKnown(target, back.color, nowSec);
     }
 
-    private void updatePocketColorRight(double nowSec) {
-        Station s = readRevStation(colorRight, PARAMS.presentPocketMm);
-        if (!s.present) return;
+    private void updatePocketColorRight(double nowSec, Station front, Station back) {
+        Ball target = null;
+        if (line[R_INNER] != null) target = line[R_INNER];
+        else if (line[R_OUTER] != null) target = line[R_OUTER];
 
-        if (line[R_INNER] != null) applyColorIfKnown(line[R_INNER], s.color, nowSec);
-        else if (line[R_OUTER] != null) applyColorIfKnown(line[R_OUTER], s.color, nowSec);
+        if (target == null) return;
+
+        if (front.present) applyColorIfKnown(target, front.color, nowSec);
+        else if (back.present) applyColorIfKnown(target, back.color, nowSec);
     }
 
     // -------------------- Sensors + Color Detection --------------------
@@ -418,11 +446,17 @@ public class BallTracker implements Subsystem {
      * - If present but cannot classify => UNKNOWN
      */
     private BallColor detectBallColor(RevColorSensorV3 sensor, boolean present) {
-        if (!present) return BallColor.EMPTY;
+//        if (!present) return BallColor.EMPTY;
+
+        TelemetryPacket p = new TelemetryPacket();
 
         int r = sensor.red();
         int g = sensor.green();
         int b = sensor.blue();
+
+        p.put("r", r);
+        p.put("g", g);
+        p.put("b", b);
 
         double total = (double) r + g + b;
         if (total < PARAMS.minTotalRgb) return BallColor.UNKNOWN;
@@ -431,16 +465,21 @@ public class BallTracker implements Subsystem {
         double gNorm = g / total;
         double bNorm = b / total;
 
+        p.put("rNorm", rNorm);
+        p.put("gNorm", gNorm);
+        p.put("bNorm", bNorm);
+        dashboard.sendTelemetryPacket(p);
+
         if (gNorm > rNorm * PARAMS.greenDominance && gNorm > bNorm * PARAMS.greenOverBlue) {
             return BallColor.GREEN;
         }
 
-        double avgRB = (rNorm + bNorm) / 1.87;
+        double avgRB = (rNorm + bNorm) / 1.5;
         if ((avgRB - gNorm) > PARAMS.purpleMargin) {
             return BallColor.PURPLE;
         }
 
-        return BallColor.UNKNOWN;
+        return BallColor.EMPTY;
     }
 
     // -------------------- Utilities --------------------
@@ -468,6 +507,15 @@ public class BallTracker implements Subsystem {
 
     private boolean isForward(double p) {
         return p > PARAMS.powerDeadband;
+    }
+
+    private static double minValid(double a, double b) {
+        boolean aOk = !Double.isNaN(a);
+        boolean bOk = !Double.isNaN(b);
+        if (aOk && bOk) return Math.min(a, b);
+        if (aOk) return a;
+        if (bOk) return b;
+        return Double.NaN;
     }
 
     private String formatLine() {

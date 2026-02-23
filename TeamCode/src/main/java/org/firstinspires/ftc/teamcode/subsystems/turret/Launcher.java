@@ -57,10 +57,10 @@ public final class Launcher implements Subsystem {
 
         // --- Control ---
         /** Single PID controller for the shooter motor. */
-        public double PIDKp = 0.002;
+        public double PIDKp = 0.00065;
         public double PIDKi = 0.0;
         public double PIDKd = 0.0;
-        public double PIDKf = 0.0001;
+        public double PIDKf = 0.00011;
     }
 
     /** Instance of params for this launcher. */

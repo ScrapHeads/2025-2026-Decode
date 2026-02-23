@@ -43,6 +43,7 @@ import org.firstinspires.ftc.teamcode.subsystems.intake.BallStoppers;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.FeederMotor;
 import org.firstinspires.ftc.teamcode.subsystems.FeederServo;
+import org.firstinspires.ftc.teamcode.subsystems.intake.BallTracker;
 import org.firstinspires.ftc.teamcode.subsystems.turret.Launcher;
 import org.firstinspires.ftc.teamcode.subsystems.turret.TurretHood;
 import org.firstinspires.ftc.teamcode.subsystems.turret.TurretRotate;
@@ -60,12 +61,14 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
     private Launcher launcher;
     private IntakeLeft intakeLeft;
     private IntakeRight intakeRight;
-    private TurretHood hood;
+    private TurretHood turretHood;
     private Vision vision;
     private FeederServo feederServo;
     private FeederMotor feederMotor;
     private TurretRotate turretRotate;
     private BallStoppers ballStoppers;
+    private BallTracker ballTracker;
+//    private BallLedDisplay ledDisplay;
 
     private enum DriveStates {
         DEFAULT,
@@ -86,6 +89,11 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
 
         RobotState.getInstance().setTeam(true);
 
+        ballTracker = new BallTracker(hm);
+        ballTracker.register();
+
+//        ledDisplay = new BallLedDisplay(hm, ballTracker);
+
         // Initialize the subsystems declared at the top of the code
         drivetrain = new Drivetrain(hm, RobotState.getInstance().getOdometryPose());
         drivetrain.register();
@@ -97,13 +105,13 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
         launcher = new Launcher(hm);
         launcher.register();
 
-        intakeLeft = new IntakeLeft(hm);
+        intakeLeft = new IntakeLeft(hm, ballTracker);
         intakeLeft.register();
 
-        intakeRight = new IntakeRight(hm);
+        intakeRight = new IntakeRight(hm, ballTracker);
         intakeRight.register();
 
-        feederMotor = new FeederMotor(hm);
+        feederMotor = new FeederMotor(hm, ballTracker);
         feederMotor.register();
 
         feederServo = new FeederServo(hm);
@@ -115,11 +123,11 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
         // Uncomment when testing auto first
         turretRotate.resetEncoder();
 
-        ballStoppers = new BallStoppers(hm);
+        ballStoppers = new BallStoppers(hm, ballTracker);
         ballStoppers.register();
 
-        hood = new TurretHood(hm);
-        hood.register();
+        turretHood = new TurretHood(hm);
+        turretHood.register();
 
         vision = new Vision(hm);
         vision.register();

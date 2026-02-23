@@ -54,13 +54,14 @@ public class AllSystemsTeleBlue extends CommandOpMode {
     private Launcher launcher;
     private IntakeLeft intakeLeft;
     private IntakeRight intakeRight;
-    private TurretHood hood;
+    private TurretHood turretHood;
     private Vision vision;
     private FeederServo feederServo;
     private FeederMotor feederMotor;
     private TurretRotate turretRotate;
     private BallStoppers ballStoppers;
     private BallTracker ballTracker;
+//    private BallLedDisplay ledDisplay;
 
     private enum DriveStates {
         DEFAULT,
@@ -82,6 +83,9 @@ public class AllSystemsTeleBlue extends CommandOpMode {
         RobotState.getInstance().setTeam(true);
 
         ballTracker = new BallTracker(hm);
+        ballTracker.register();
+
+//        ledDisplay = new BallLedDisplay(hm, ballTracker);
 
         // Initialize the subsystems declared at the top of the code
         drivetrain = new Drivetrain(hm, RobotState.getInstance().getOdometryPose());
@@ -97,7 +101,7 @@ public class AllSystemsTeleBlue extends CommandOpMode {
         intakeLeft = new IntakeLeft(hm, ballTracker);
         intakeLeft.register();
 
-        intakeRight = new IntakeRight(hm);
+        intakeRight = new IntakeRight(hm, ballTracker);
         intakeRight.register();
 
         feederMotor = new FeederMotor(hm, ballTracker);
@@ -115,8 +119,8 @@ public class AllSystemsTeleBlue extends CommandOpMode {
         ballStoppers = new BallStoppers(hm, ballTracker);
         ballStoppers.register();
 
-        hood = new TurretHood(hm);
-        hood.register();
+        turretHood = new TurretHood(hm);
+        turretHood.register();
 
         vision = new Vision(hm);
         vision.register();

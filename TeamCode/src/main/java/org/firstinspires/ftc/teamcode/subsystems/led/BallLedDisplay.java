@@ -25,7 +25,7 @@ import java.util.Arrays;
  * Hardware:
  *  - goBILDA Prism RGB LED Driver on I2C, named "ledStrip" in the Robot Configuration.
  */
-public class BallLedDisplaySubsystem implements Subsystem {
+public class BallLedDisplay implements Subsystem {
 
     public static class Params {
         // If colors look wrong, switch to GRB.
@@ -69,7 +69,7 @@ public class BallLedDisplaySubsystem implements Subsystem {
             6  // R_OUTER
     };
 
-    public BallLedDisplaySubsystem(HardwareMap hm, BallTracker tracker) {
+    public BallLedDisplay(HardwareMap hm, BallTracker tracker) {
         this.tracker = tracker;
         this.prism = PrismLedDriver.fromHardwareMap(hm, "ledStrip");
 
