@@ -12,6 +12,7 @@ import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 import static org.firstinspires.ftc.teamcode.Constants.turretLookupTable;
+import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandOpMode;
@@ -36,6 +37,7 @@ import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceRight;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetRpmDistanceContinuous;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperBoth;
 import org.firstinspires.ftc.teamcode.Commands.turret.TurretRotateContinuous;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.state.TurretLookupTable;
@@ -49,6 +51,8 @@ import org.firstinspires.ftc.teamcode.subsystems.turret.TurretRotate;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeRight;
+import org.firstinspires.ftc.teamcode.util.BallColor;
+import org.firstinspires.ftc.teamcode.util.TimeTracker;
 
 @TeleOp(name = "PracticeAllSystemsTeleBlue", group = "ScrapHeads")
 public class PracticeAllSystemsTeleBlue extends CommandOpMode {
@@ -82,7 +86,9 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
         dashboard = FtcDashboard.getInstance();
         turretLookupTable = new TurretLookupTable();
 
-        StateIO.load();
+//        StateIO.load();
+
+        setUpRobotState();
 
         RobotState.getInstance().setTeam(true);
 
@@ -217,6 +223,14 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
                 driveStates = DriveStates.DEFAULT;
                 break;
         }
+    }
+
+    public void setUpRobotState() {
+        RobotState.getInstance().addOdometryObservation(new Pose2d(), TimeTracker.getTime());
+
+        RobotState.getInstance().setTeam(false);
+
+        RobotState.getInstance().setPattern(new BallColor[] {EMPTY, EMPTY, EMPTY});
     }
 }
 

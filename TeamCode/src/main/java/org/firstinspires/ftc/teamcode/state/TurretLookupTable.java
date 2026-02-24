@@ -22,15 +22,15 @@ public class TurretLookupTable {
         // Put your tuned points here.
         // Make sure distance units are consistent (inches OR meters, etc.)
         table.put(70.0, new TurretState(4200.0, 744.0));
-        table.put(80.0, new TurretState(4350.0, 1000.0));
+        table.put(80.0, new TurretState(4375.0, 1000.0));
         table.put(90.0, new TurretState(4450.0, 1100.0));
         table.put(100.0, new TurretState(4550.0, 1250));
         table.put(110.0, new TurretState(4600.0, 1300));
-        table.put(120.0, new TurretState(4600.0, 1500.0));
+        table.put(120.0, new TurretState(4650.0, 1500.0));
         table.put(130.0, new TurretState(4850.0, 1600.0));
-        table.put(140.0, new TurretState(4900.0, 1650.0));
-        table.put(150.0, new TurretState(5000.0, 1700.0));
-        table.put(160.0, new TurretState(5100, 1750));
+        table.put(140.0, new TurretState(4925.0, 1650.0));
+        table.put(150.0, new TurretState(5050.0, 1700.0));
+        table.put(160.0, new TurretState(5100.0, 1750));
         table.put(170.0, new TurretState(5200.0, 1850));
         table.put(180.0, new TurretState(5300.0, 1850.0));
         table.put(190.0, new TurretState(5350.0, 1950.0));
@@ -40,12 +40,12 @@ public class TurretLookupTable {
         table.put(230.0, new TurretState(5900.0, 2100.0));
         table.put(240.0, new TurretState(6000.0, 2150.0));
         table.put(250.0, new TurretState(6050.0, 2200.0));
-        table.put(260.0, new TurretState(6150.0, 2200.0));
-        table.put(270.0, new TurretState(6200.0, 2200.0));
-        table.put(280.0, new TurretState(6300.0, 2200.0));
-        table.put(290.0, new TurretState(6400.0, 2290));
-        table.put(300.0, new TurretState(6400.0, 2300.0));
-        table.put(310.0, new TurretState(6475.0, 2300.0));
+        table.put(260.0, new TurretState(6175.0, 2200.0));
+        table.put(270.0, new TurretState(6225.0, 2200.0));
+        table.put(280.0, new TurretState(6325.0, 2200.0));
+        table.put(290.0, new TurretState(6400.0, 2250.0));
+        table.put(300.0, new TurretState(6475.0, 2300.0));
+        table.put(310.0, new TurretState(6525.0, 2300.0));
     }
 
     public TurretState get(double distance) {

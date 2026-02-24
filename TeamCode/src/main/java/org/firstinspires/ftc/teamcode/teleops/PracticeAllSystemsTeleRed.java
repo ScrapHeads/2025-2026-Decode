@@ -12,6 +12,7 @@ import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
 import static org.firstinspires.ftc.teamcode.Constants.turretLookupTable;
+import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandOpMode;
@@ -37,6 +38,8 @@ import org.firstinspires.ftc.teamcode.Commands.launcher.SetRpmDistanceContinuous
 import org.firstinspires.ftc.teamcode.Commands.launcher.StopFlywheel;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperBoth;
 import org.firstinspires.ftc.teamcode.Commands.turret.TurretRotateContinuous;
+import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
+import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.state.TurretLookupTable;
@@ -50,6 +53,8 @@ import org.firstinspires.ftc.teamcode.subsystems.turret.TurretRotate;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeLeft;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeRight;
+import org.firstinspires.ftc.teamcode.util.BallColor;
+import org.firstinspires.ftc.teamcode.util.TimeTracker;
 
 @TeleOp(name = "PracticeAllSystemsTeleRed", group = "ScrapHeads")
 public class PracticeAllSystemsTeleRed extends CommandOpMode {
@@ -83,9 +88,9 @@ public class PracticeAllSystemsTeleRed extends CommandOpMode {
         dashboard = FtcDashboard.getInstance();
         turretLookupTable = new TurretLookupTable();
 
-        StateIO.load();
+//        StateIO.load();
 
-        RobotState.getInstance().setTeam(false);
+        setUpRobotState();
 
         // Initialize the subsystems declared at the top of the code
         drivetrain = new Drivetrain(hm, RobotState.getInstance().getOdometryPose());
@@ -146,9 +151,9 @@ public class PracticeAllSystemsTeleRed extends CommandOpMode {
         intakeLeft.setDefaultCommand(new RunLeftIntakeContinuous(intakeLeft, .2));
         intakeRight.setDefaultCommand(new RunRightIntakeContinuous(intakeRight, .2));
 
-        turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate));
-
-        launcher.setDefaultCommand(new SetRpmDistanceContinuous(launcher));
+//        turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate));
+//
+//        launcher.setDefaultCommand(new SetRpmDistanceContinuous(launcher));
 
         feederMotor.setDefaultCommand(new RunFeederMotorContinuous(feederMotor, 0));
         feederServo.setDefaultCommand(new TurnFeederServoBothContinuous(
@@ -218,6 +223,14 @@ public class PracticeAllSystemsTeleRed extends CommandOpMode {
                 driveStates = DriveStates.DEFAULT;
                 break;
         }
+    }
+
+    public void setUpRobotState() {
+        RobotState.getInstance().addOdometryObservation(new Pose2d(), TimeTracker.getTime());
+
+        RobotState.getInstance().setTeam(false);
+
+        RobotState.getInstance().setPattern(new BallColor[] {EMPTY, EMPTY, EMPTY});
     }
 }
 
