@@ -27,6 +27,7 @@ import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCom
 import org.firstinspires.ftc.teamcode.Commands.feeder.TurnFeederServoBoth;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntakeContinuous;
 import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceRightAuto;
+import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetRpmDistanceContinuous;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperBoth;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperRight;
@@ -131,8 +132,6 @@ public class RedAutoClose extends CommandOpMode {
         Drawing.drawRobot(p.fieldOverlay(), convertPose2D(RobotState.getInstance().getEstimatedPose()));
         dashboard.sendTelemetryPacket(p);
 
-        launcher.setDefaultCommand(new SetRpmDistanceContinuous(launcher));
-
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
                 new InstantCommand(() -> turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate))),
@@ -174,8 +173,10 @@ public class RedAutoClose extends CommandOpMode {
 
                 new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
-                new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
-
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
+                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
+                ),
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
                         new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
@@ -215,6 +216,8 @@ public class RedAutoClose extends CommandOpMode {
                         new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
+                new InstantCommand(() -> new SetFlywheelRpm(launcher, 4625)),
+
                 new WaitCommand(300),
 
                 new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
@@ -239,6 +242,8 @@ public class RedAutoClose extends CommandOpMode {
                 tele.update();
             }
         };
+
+        launcher.setDefaultCommand(new SetRpmDistanceContinuous(launcher));
 
         // Wait to start the auto path till the play button is pressed
         waitForStart();
