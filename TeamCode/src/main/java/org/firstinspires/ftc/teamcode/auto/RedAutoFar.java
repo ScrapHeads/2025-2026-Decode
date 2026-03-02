@@ -31,6 +31,7 @@ import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceRightAuto;
 import org.firstinspires.ftc.teamcode.Commands.launcher.LauncherSetDefaultCommand;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetPowerLauncher;
+import org.firstinspires.ftc.teamcode.Commands.launcher.SetRpmDistanceContinuous;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperBoth;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperRight;
 import org.firstinspires.ftc.teamcode.Commands.turret.TurretRotateContinuous;
@@ -134,10 +135,10 @@ public class RedAutoFar extends CommandOpMode {
         Drawing.drawRobot(p.fieldOverlay(), convertPose2D(RobotState.getInstance().getEstimatedPose()));
         dashboard.sendTelemetryPacket(p);
 
+        launcher.setDefaultCommand(new SetRpmDistanceContinuous(launcher));
+
         // Create the dive path the the robot follows in order
         SequentialCommandGroup followPath = new SequentialCommandGroup(
-                new LauncherSetDefaultCommand(launcher),
-                new SetPowerLauncher(launcher, 1),
                 new InstantCommand(() -> turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate))),
 
                 new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT),
@@ -150,9 +151,7 @@ public class RedAutoFar extends CommandOpMode {
                         new DynamicStrafeCommand(drivetrain, () -> path.get(1))
                 ),
 
-                new WaitCommand(3500),
-
-                new SetFlywheelRpm(launcher, turretLookupTable.get(turretLookupTable.getDistance()).rpm),
+                new WaitCommand(1000),
 
                 new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
@@ -173,7 +172,7 @@ public class RedAutoFar extends CommandOpMode {
                         new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
-                new SetFlywheelRpm(launcher, turretLookupTable.get(turretLookupTable.getDistance()).rpm),
+                new WaitCommand(300),
 
                 new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
@@ -191,7 +190,7 @@ public class RedAutoFar extends CommandOpMode {
                         new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
-                new SetFlywheelRpm(launcher, turretLookupTable.get(turretLookupTable.getDistance()).rpm),
+                new WaitCommand(300),
 
                 new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
@@ -209,7 +208,7 @@ public class RedAutoFar extends CommandOpMode {
                         new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
-                new SetFlywheelRpm(launcher, turretLookupTable.get(turretLookupTable.getDistance()).rpm),
+                new WaitCommand(300),
 
                 new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 

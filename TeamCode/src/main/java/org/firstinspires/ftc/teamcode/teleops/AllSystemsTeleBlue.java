@@ -194,6 +194,9 @@ public class AllSystemsTeleBlue extends CommandOpMode {
                         new RunFeederMotor(feederMotor, 0)
                 );
 
+        driver.getGamepadButton(DPAD_RIGHT)
+                .whenPressed(new InstantCommand(() -> turretRotate.disablePID()));
+
         driver.getGamepadButton(BACK)
                 .whenPressed(new InstantCommand(this::advanceDriveStates));
 

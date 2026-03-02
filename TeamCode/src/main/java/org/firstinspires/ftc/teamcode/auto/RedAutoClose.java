@@ -171,6 +171,7 @@ public class RedAutoClose extends CommandOpMode {
                 ),
 
                 new WaitCommand(300),
+
                 new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
                 new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
@@ -180,10 +181,6 @@ public class RedAutoClose extends CommandOpMode {
                         new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
 
-//                new DynamicStrafeCommand(drivetrain, () -> path.get(7)),
-
-//                new SetFlywheelRpm(launcher, 4700),
-
                 new TurnStopperRight(ballStoppers, BallStoppers.DOWN_ANGLE_RIGHT),
 
                 new ParallelDeadlineGroup(
@@ -192,6 +189,7 @@ public class RedAutoClose extends CommandOpMode {
                 ),
 
                 new WaitCommand(300),
+
                 new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
                 new ParallelDeadlineGroup(
@@ -203,8 +201,6 @@ public class RedAutoClose extends CommandOpMode {
                         new DynamicStrafeCommand(drivetrain, () -> path.get(10)),
                         new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
                 ),
-
-//                new SetFlywheelRpm(launcher, 4500),
 
                 new TurnStopperRight(ballStoppers, BallStoppers.DOWN_ANGLE_RIGHT),
 
@@ -220,9 +216,8 @@ public class RedAutoClose extends CommandOpMode {
                 ),
 
                 new WaitCommand(300),
-                new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
-//                new DynamicStrafeCommand(drivetrain, () -> path.get(12)),
+                new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
                 new InstantCommand(StateIO::save)
         ) {

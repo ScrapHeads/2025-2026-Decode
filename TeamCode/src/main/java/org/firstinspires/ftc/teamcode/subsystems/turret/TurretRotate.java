@@ -27,7 +27,7 @@ public class TurretRotate implements Subsystem {
         public boolean enabledPid = true;
 
         public double kp = 0.0002;
-        public double ki = 0.0;
+        public double ki = 0.00007;
         public double kd = 0.0;
     }
 

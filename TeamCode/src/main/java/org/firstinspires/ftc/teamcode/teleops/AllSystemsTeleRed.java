@@ -189,6 +189,9 @@ public class AllSystemsTeleRed extends CommandOpMode {
 
         driver.getGamepadButton(DPAD_DOWN)
                 .whenPressed(new StopFlywheel(launcher));
+
+        driver.getGamepadButton(DPAD_RIGHT)
+                .whenPressed(new InstantCommand(() -> turretRotate.disablePID()));
 //
         driver.getGamepadButton(DPAD_LEFT)
                 .whenPressed(

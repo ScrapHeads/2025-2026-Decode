@@ -5,6 +5,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.BACK;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_LEFT;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_RIGHT;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
@@ -151,9 +152,9 @@ public class PracticeAllSystemsTeleRed extends CommandOpMode {
         intakeLeft.setDefaultCommand(new RunLeftIntakeContinuous(intakeLeft, .2));
         intakeRight.setDefaultCommand(new RunRightIntakeContinuous(intakeRight, .2));
 
-//        turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate));
-//
-//        launcher.setDefaultCommand(new SetRpmDistanceContinuous(launcher));
+        turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate));
+
+        launcher.setDefaultCommand(new SetRpmDistanceContinuous(launcher));
 
         feederMotor.setDefaultCommand(new RunFeederMotorContinuous(feederMotor, 0));
         feederServo.setDefaultCommand(new TurnFeederServoBothContinuous(
@@ -207,6 +208,9 @@ public class PracticeAllSystemsTeleRed extends CommandOpMode {
                 ).whenReleased(
                         new RunFeederMotor(feederMotor, 0)
                 );
+
+        driver.getGamepadButton(DPAD_RIGHT)
+                .whenPressed(new InstantCommand(() -> turretRotate.disablePID()));
 
         driver.getGamepadButton(BACK)
                 .whenPressed(new InstantCommand(this::advanceDriveStates));
