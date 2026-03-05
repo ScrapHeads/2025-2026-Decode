@@ -21,14 +21,14 @@ public class TurretLookupTable {
     public TurretLookupTable() {
         // Put your tuned points here.
         // Make sure distance units are consistent (inches OR meters, etc.)
-        table.put(70.0, new TurretState(4200.0, 744.0));
+        table.put(70.0, new TurretState(4250.0, 744.0));
         table.put(80.0, new TurretState(4375.0, 1000.0));
         table.put(90.0, new TurretState(4450.0, 1100.0));
-        table.put(100.0, new TurretState(4550.0, 1250));
-        table.put(110.0, new TurretState(4600.0, 1300));
-        table.put(120.0, new TurretState(4650.0, 1500.0));
-        table.put(130.0, new TurretState(4850.0, 1600.0));
-        table.put(140.0, new TurretState(4925.0, 1650.0));
+        table.put(100.0, new TurretState(4575.0, 1250));
+        table.put(110.0, new TurretState(4650.0, 1300));
+        table.put(120.0, new TurretState(4725.0, 1500.0));
+        table.put(130.0, new TurretState(4900.0, 1575.0));
+        table.put(140.0, new TurretState(4975.0, 1650.0));
         table.put(150.0, new TurretState(5050.0, 1700.0));
         table.put(160.0, new TurretState(5100.0, 1750));
         table.put(170.0, new TurretState(5200.0, 1850));
