@@ -117,6 +117,8 @@ public class AllSystemsTeleBlue extends CommandOpMode {
         vision = new Vision(hm);
         vision.register();
 
+        turretRotate.enablePID();
+
         // Bind controls
         assignControls();
 
