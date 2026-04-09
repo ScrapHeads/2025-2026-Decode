@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Commands.launcher;
+package org.firstinspires.ftc.teamcode.Commands.launcher.launchsequence;
 
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;

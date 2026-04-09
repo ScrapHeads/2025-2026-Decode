@@ -26,7 +26,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.Commands.AutoPathCommands.DynamicStrafeCommand;
 import org.firstinspires.ftc.teamcode.Commands.feeder.TurnFeederServoBoth;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntakeContinuous;
-import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceRightAuto;
+import org.firstinspires.ftc.teamcode.Commands.launcher.launchsequence.LaunchSequenceRightAuto;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetFlywheelRpm;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetRpmDistanceContinuous;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperBoth;

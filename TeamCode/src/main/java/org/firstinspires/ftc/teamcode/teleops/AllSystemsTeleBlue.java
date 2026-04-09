@@ -23,8 +23,8 @@ import org.firstinspires.ftc.teamcode.Commands.intake.RunLeftIntake;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunLeftIntakeContinuous;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntake;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunRightIntakeContinuous;
-import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceLeft;
-import org.firstinspires.ftc.teamcode.Commands.launcher.LaunchSequenceRight;
+import org.firstinspires.ftc.teamcode.Commands.launcher.launchsequence.LaunchSequenceLeft;
+import org.firstinspires.ftc.teamcode.Commands.launcher.launchsequence.LaunchSequenceRight;
 import org.firstinspires.ftc.teamcode.Commands.launcher.SetRpmDistanceContinuous;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperBoth;
 import org.firstinspires.ftc.teamcode.Commands.drivetrain.DriveContinous;
@@ -172,7 +172,7 @@ public class AllSystemsTeleBlue extends CommandOpMode {
                 .whenPressed(new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.OUTTAKE_POWER))
                 .whenReleased(new RunLeftIntake(intakeLeft, 0));
 
-        driver.getGamepadButton(A)
+        driver.getGamepadButton(X)
                 .whenPressed(new LaunchSequenceLeft(feederServo, feederMotor, ballStoppers, intakeLeft, turretRotate, launcher));
 
         driver.getGamepadButton(B)

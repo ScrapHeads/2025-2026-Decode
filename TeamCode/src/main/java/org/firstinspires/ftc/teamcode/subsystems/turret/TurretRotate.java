@@ -40,8 +40,11 @@ public class TurretRotate implements Subsystem {
 
     // Left Turning
     public final double MAX_ENCODER_VALUE = 15600;
+    public final double MAX_ENCODER_POWER_LIMIT = MAX_ENCODER_VALUE - 821;
     // Right Turning
     public final double MIN_ENCODER_VALUE = -15600;
+    public final double MIN_ENCODER_POWER_LIMIT = MIN_ENCODER_VALUE + 821;
+
 
     public static final double TICKS_PER_DEGREE = 143.36;
 
@@ -101,6 +104,13 @@ public class TurretRotate implements Subsystem {
 
         if (PARAMS.enabledPid) {
             output = -pid.calculate(encoder.getCurrentPosition(), PARAMS.targetPos);
+            if (MAX_ENCODER_POWER_LIMIT >= getTurretAngle() && output > .3) {
+                pid.reset();
+                output = .3;
+            } else if (MIN_ENCODER_POWER_LIMIT >= getTurretAngle() && output > -.3) {
+                output = -.3;
+                pid.reset();
+            }
             turnPower(clampIfOutOfRange(-1, 1, output));
         }
 
