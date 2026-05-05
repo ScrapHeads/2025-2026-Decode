@@ -74,6 +74,12 @@ public class DriveContinous extends CommandBase {
         double ySpeed = yLimiter.calculate(-driver.getLeftX(), TimeTracker.getTime()) * speed;
         double rotSpeed = rotLimiter.calculate(-driver.getRightX(), TimeTracker.getTime()) * speed;
 
+        if (xSpeed <= 0.1 && ySpeed <= 0.1 && rotSpeed <= 0.1) {
+            RobotState.getInstance().setMoving(false);
+        } else {
+            RobotState.getInstance().setMoving(true);
+        }
+
         // Get raw gyro heading (rotation from odometry or IMU)
         Rotation2d rawHeading = RobotState.getInstance().getOdometryPose().getRotation();
 
@@ -84,11 +90,11 @@ public class DriveContinous extends CommandBase {
         ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 xSpeed, ySpeed, rotSpeed, correctedHeading);
 
-        TelemetryPacket p = new TelemetryPacket();
-        p.put("Driver rot speed", -driver.getRightX());
-        p.put("Rot speed", robotSpeeds);
-        p.put("Robot Speeds rot", robotSpeeds.omegaRadiansPerSecond);
-        dashboard.sendTelemetryPacket(p);
+//        TelemetryPacket p = new TelemetryPacket();
+//        p.put("Driver rot speed", -driver.getRightX());
+//        p.put("Rot speed", robotSpeeds);
+//        p.put("Robot Speeds rot", robotSpeeds.omegaRadiansPerSecond);
+//        dashboard.sendTelemetryPacket(p);
 
 //        double xSpeed = xLimiter.calculate(driver.getLeftY(), TimeTracker.getTime()) * speed;
 //        double ySpeed = yLimiter.calculate(-driver.getLeftX(), TimeTracker.getTime()) * speed;

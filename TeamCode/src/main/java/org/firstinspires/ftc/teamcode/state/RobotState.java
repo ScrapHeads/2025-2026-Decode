@@ -11,7 +11,6 @@ import org.firstinspires.ftc.teamcode.RilLib.Math.PoseEstimator;
 import org.firstinspires.ftc.teamcode.util.BallColor;
 import org.firstinspires.ftc.teamcode.util.TimeTracker;
 
-import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -32,6 +31,9 @@ public class RobotState {
     private transient Lock poseLock = new ReentrantLock();
 
     private transient double turretAngle = 0;
+
+    private  boolean isTurretRotating;
+    private boolean isMoving;
 
     // Pose on the field
     private Pose2d odometryPose;
@@ -180,6 +182,22 @@ public class RobotState {
 
     public void setTurretAngle (double turretAngle) {
         this.turretAngle = turretAngle;
+    }
+
+    public void setIsTurretRotating (Boolean isTurretRotating) {
+        this.isTurretRotating = isTurretRotating;
+    }
+
+    public boolean isTurretRotating() {
+        return isTurretRotating;
+    }
+
+    public void setMoving(Boolean moving) {
+        this.isMoving = moving;
+    }
+
+    public boolean isMoving() {
+        return isMoving;
     }
 
     public double getTurretAngle () {return turretAngle;}

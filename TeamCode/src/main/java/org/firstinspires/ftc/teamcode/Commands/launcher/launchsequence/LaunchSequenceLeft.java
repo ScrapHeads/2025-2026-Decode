@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.Commands.feeder.TurnFeederServoBoth;
 import org.firstinspires.ftc.teamcode.Commands.intake.RunLeftIntake;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperBoth;
 import org.firstinspires.ftc.teamcode.Commands.stopper.TurnStopperLeft;
+import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.subsystems.intake.BallStoppers;
 import org.firstinspires.ftc.teamcode.subsystems.FeederMotor;
 import org.firstinspires.ftc.teamcode.subsystems.FeederServo;
@@ -21,7 +22,8 @@ public class LaunchSequenceLeft extends SequentialCommandGroup {
     public LaunchSequenceLeft(FeederServo feederServo, FeederMotor feederMotor, BallStoppers ballStoppers,
                               IntakeLeft intakeLeft, TurretRotate turretRotate, Launcher launcher) {
         addCommands(
-                new WaitUntilCommand(() -> turretRotate.isInRange()),
+                new WaitUntilCommand(() -> RobotState.getInstance().isTurretRotating()),
+                new WaitUntilCommand(() -> RobotState.getInstance().isMoving()),
 //                new WaitUntilCommand(() -> launcher.isReadyToLaunch()),
                 new RunFeederMotor(feederMotor, FeederMotor.UP_POWER),
                 new WaitCommand(100),

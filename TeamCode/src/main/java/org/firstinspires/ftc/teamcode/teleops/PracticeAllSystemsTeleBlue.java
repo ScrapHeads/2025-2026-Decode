@@ -42,6 +42,7 @@ import org.firstinspires.ftc.teamcode.Commands.turret.TurretRotateContinuous;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.TurretLookupTable;
+import org.firstinspires.ftc.teamcode.subsystems.PrismLights;
 import org.firstinspires.ftc.teamcode.subsystems.intake.BallStoppers;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.FeederMotor;
@@ -71,6 +72,7 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
     private FeederMotor feederMotor;
     private TurretRotate turretRotate;
     private BallStoppers ballStoppers;
+    private PrismLights prism;
 
     private enum DriveStates {
         DEFAULT,
@@ -133,6 +135,9 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
 
         turretRotate.enablePID();
 
+        prism = new PrismLights(hm);
+        prism.register();
+
         // Bind controls
         assignControls();
 
@@ -187,10 +192,17 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
                 .whenReleased(new RunLeftIntake(intakeLeft, 0));
 
         driver.getGamepadButton(X)
-                .whenPressed(new LaunchSequenceLeft(feederServo, feederMotor, ballStoppers, intakeLeft, turretRotate, launcher));
+                .whenPressed(new ParallelCommandGroup(
+                        new InstantCommand(() -> prism.setIsLaunching(true)),
+                        new LaunchSequenceLeft(feederServo, feederMotor, ballStoppers, intakeLeft, turretRotate, launcher))
+                                .andThen(new InstantCommand(() -> prism.setIsLaunching(false))));
+
 
         driver.getGamepadButton(B)
-                .whenPressed(new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight, turretRotate));
+                .whenPressed(new ParallelCommandGroup(
+                        new InstantCommand(() -> prism.setIsLaunching(true)),
+                        new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight, turretRotate))
+                                .andThen(new InstantCommand(() -> prism.setIsLaunching(false))));
 
 //        driver.getGamepadButton(START)
 //                .whenPressed(
