@@ -100,7 +100,6 @@ public class TurretRotate implements Subsystem {
 //        pid.setPID(PARAMS.kp, PARAMS.ki, PARAMS.kd);
 
         RobotState.getInstance().setTurretAngle(getTurretAngle());
-        RobotState.getInstance().setIsTurretRotating(isInRange());
 
         double output = 0;
 
@@ -116,12 +115,16 @@ public class TurretRotate implements Subsystem {
             turnPower(clampIfOutOfRange(-1, 1, output));
         }
 
+        RobotState.getInstance().setIsTurretRotating(Math.abs(getPower()) >= .08);
+
+
         tele.addData("Rotator power", "%.1f°", getPower());
 
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("Turret rot Encoder", encoder.getCurrentPosition());
         packet.put("Turret location", getTurretAngle());
-        packet.put("PID output", output);
+        packet.put("Turret in range", isInRange());
+        packet.put("PID output turret", getPower());
         dashboard.sendTelemetryPacket(packet);
     }
 }

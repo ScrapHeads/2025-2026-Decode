@@ -74,10 +74,16 @@ public class DriveContinous extends CommandBase {
         double ySpeed = yLimiter.calculate(-driver.getLeftX(), TimeTracker.getTime()) * speed;
         double rotSpeed = rotLimiter.calculate(-driver.getRightX(), TimeTracker.getTime()) * speed;
 
-        if (xSpeed <= 0.1 && ySpeed <= 0.1 && rotSpeed <= 0.1) {
-            RobotState.getInstance().setMoving(false);
-        } else {
+        TelemetryPacket p = new TelemetryPacket();
+        p.put("xSpeed", xSpeed);
+        p.put("ySpeed", ySpeed);
+        p.put("rotSpeed", rotSpeed);
+        dashboard.sendTelemetryPacket(p);
+
+        if (Math.abs(xSpeed) >= 0.05 || Math.abs(ySpeed) >= 0.05 || Math.abs(rotSpeed) >= 0.05) {
             RobotState.getInstance().setMoving(true);
+        } else {
+            RobotState.getInstance().setMoving(false);
         }
 
         // Get raw gyro heading (rotation from odometry or IMU)
