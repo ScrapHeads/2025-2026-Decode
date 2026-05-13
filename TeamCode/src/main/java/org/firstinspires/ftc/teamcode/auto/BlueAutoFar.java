@@ -39,6 +39,8 @@ import org.firstinspires.ftc.teamcode.state.RobotState;
 import org.firstinspires.ftc.teamcode.state.StateIO;
 import org.firstinspires.ftc.teamcode.state.TurretLookupTable;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.PrismLights;
+import org.firstinspires.ftc.teamcode.subsystems.PrismLightsAuto;
 import org.firstinspires.ftc.teamcode.subsystems.intake.BallStoppers;
 import org.firstinspires.ftc.teamcode.subsystems.FeederMotor;
 import org.firstinspires.ftc.teamcode.subsystems.FeederServo;
@@ -65,6 +67,8 @@ public class BlueAutoFar extends CommandOpMode {
     private FeederMotor feederMotor;
     private TurretRotate turretRotate;
     private BallStoppers ballStoppers;
+    private PrismLightsAuto prism;
+
 
     public boolean isBlue = true;
 
@@ -111,6 +115,9 @@ public class BlueAutoFar extends CommandOpMode {
 
         vision = new Vision(hm);
         vision.register();
+
+        prism = new PrismLightsAuto(hm);
+        prism.register();
 
         // Custom constraints for some moves
         TurnConstraints turnConstraintsFast = new TurnConstraints(4, -4, 4);

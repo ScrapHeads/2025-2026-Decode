@@ -195,14 +195,15 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
                 .whenPressed(new ParallelCommandGroup(
                         new InstantCommand(() -> prism.setIsLaunching(true)),
                         new LaunchSequenceLeft(feederServo, feederMotor, ballStoppers, intakeLeft, turretRotate, launcher))
-                                .andThen(new InstantCommand(() -> prism.setIsLaunching(false))));
-
+                            .andThen(new InstantCommand(() -> prism.setIsLaunching(false)))
+                            .whenFinished(() -> prism.setIsLaunching(false)));
 
         driver.getGamepadButton(B)
                 .whenPressed(new ParallelCommandGroup(
                         new InstantCommand(() -> prism.setIsLaunching(true)),
                         new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight, turretRotate))
-                                .andThen(new InstantCommand(() -> prism.setIsLaunching(false))));
+                            .andThen(new InstantCommand(() -> prism.setIsLaunching(false)))
+                            .whenFinished(() -> prism.setIsLaunching(false)));
 
 //        driver.getGamepadButton(START)
 //                .whenPressed(
