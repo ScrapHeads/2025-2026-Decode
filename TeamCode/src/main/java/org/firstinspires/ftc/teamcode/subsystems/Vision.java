@@ -14,19 +14,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Transform2d;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Translation2d;
-import org.firstinspires.ftc.teamcode.RilLib.Math.MathUtil;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Units;
 import org.firstinspires.ftc.teamcode.RilLib.Math.VecBuilder;
 import org.firstinspires.ftc.teamcode.state.RobotState;
-import org.firstinspires.ftc.teamcode.util.ConversionUtil;
 import org.firstinspires.ftc.teamcode.util.TimeTracker;
-
-import java.text.DecimalFormat;
 
 /**
  * Vision subsystem for HuskyLens integration.
@@ -125,7 +117,7 @@ public class Vision implements Subsystem {
                         Math.pow(0.8, limeLightResult.getFiducialResults().size()) * (limeLightResult.getBotposeAvgDist()) * 2,
                         9999999));
 
-        Pose2d tagLocation = RobotState.getInstance().getTeam() ? blueTagPose : redTagPose;
+        Pose2d tagLocation = RobotState.getInstance().isBlueTeam() ? blueTagPose : redTagPose;
         double distance = 100 * RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(tagLocation.getTranslation());
 
         TelemetryPacket packet = new TelemetryPacket();

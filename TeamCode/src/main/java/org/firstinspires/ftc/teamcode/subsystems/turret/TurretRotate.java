@@ -100,6 +100,7 @@ public class TurretRotate implements Subsystem {
 //        pid.setPID(PARAMS.kp, PARAMS.ki, PARAMS.kd);
 
         RobotState.getInstance().setTurretAngle(getTurretAngle());
+        RobotState.getInstance().setIsTurretInRange(isInRange());
 
         double output = 0;
 

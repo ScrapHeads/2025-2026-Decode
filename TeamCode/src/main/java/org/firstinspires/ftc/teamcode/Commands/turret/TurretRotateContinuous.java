@@ -29,7 +29,7 @@ public class TurretRotateContinuous extends CommandBase {
 
         double angle;
         // If on blue team do the first equation else assume the red team
-        if (RobotState.getInstance().getTeam()) {
+        if (RobotState.getInstance().isBlueTeam()) {
             double targetY = -1.64;
 //            double targetY = -1.82;
 

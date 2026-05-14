@@ -36,7 +36,7 @@ public class DriveWithAutoWrite extends CommandOpMode {
 
         StateIO.load();
 
-        if (RobotState.getInstance().getTeam() == null) {
+        if (RobotState.getInstance().isBlueTeam() == null) {
             RobotState.getInstance().setTeam(true);
         }
 

@@ -32,7 +32,8 @@ public class RobotState {
 
     private transient double turretAngle = 0;
 
-    private  boolean isTurretRotating;
+    private boolean isTurretRotating;
+    private boolean isTurretInRange;
     private boolean isMoving;
 
     // Pose on the field
@@ -103,7 +104,7 @@ public class RobotState {
 
         addOdometryObservation(other.getOdometryPose(), TimeTracker.getTime());
         this.estimatedPose = other.getEstimatedPose();
-        this.isBlue = other.getTeam();
+        this.isBlue = other.isBlueTeam();
         this.chassisSpeeds = other.getChassisSpeeds();
         this.ballColors = other.getBallColors();
         this.pattern = other.getPattern();
@@ -113,7 +114,7 @@ public class RobotState {
     public BallColor[] getPattern () { return pattern; }
 
     /** returns true if on the blue team */
-    public Boolean getTeam() {return isBlue;}
+    public Boolean isBlueTeam() {return isBlue;}
 
     public void setTeam(Boolean isBlue) {this.isBlue = isBlue;}
 
@@ -190,6 +191,13 @@ public class RobotState {
 
     public boolean isTurretRotating() {
         return isTurretRotating;
+    }
+
+    public void setIsTurretInRange (Boolean isTurretInRange) {
+        this.isTurretInRange = isTurretInRange;
+    }
+    public boolean isTurretInRange() {
+        return isTurretInRange;
     }
 
     public void setMoving(Boolean moving) {

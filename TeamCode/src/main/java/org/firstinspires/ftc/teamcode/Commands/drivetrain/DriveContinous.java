@@ -52,10 +52,10 @@ public class DriveContinous extends CommandBase {
         yLimiter = new SlewRateLimiter(10, TimeTracker.getTime());
         rotLimiter = new SlewRateLimiter(10, TimeTracker.getTime());
 
-        if (RobotState.getInstance().getTeam() != null && RobotState.getInstance().getTeam()) {
+        if (RobotState.getInstance().isBlueTeam() != null && RobotState.getInstance().isBlueTeam()) {
             // Blue team: field forward at -90 degrees
             RobotState.getInstance().setHeadingOffset(Rotation2d.fromDegrees(-90));
-        } else if (RobotState.getInstance().getTeam() != null && !RobotState.getInstance().getTeam()){
+        } else if (RobotState.getInstance().isBlueTeam() != null && !RobotState.getInstance().isBlueTeam()){
             // Red team: field forward at +90 degrees
             RobotState.getInstance().setHeadingOffset(Rotation2d.fromDegrees(90));
         } else {

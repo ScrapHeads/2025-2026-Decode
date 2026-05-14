@@ -116,7 +116,7 @@ public class BlueAutoClose extends CommandOpMode {
         vision = new Vision(hm);
         vision.register();
 
-        prism = new PrismLightsAuto(hm);
+        prism = new PrismLightsAuto(hm, false);
         prism.register();
 
         // Custom constraints for some moves

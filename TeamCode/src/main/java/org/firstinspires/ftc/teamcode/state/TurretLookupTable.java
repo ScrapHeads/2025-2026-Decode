@@ -58,7 +58,7 @@ public class TurretLookupTable {
     }
 
     public double getDistance () {
-        Pose2d tagLocation = RobotState.getInstance().getTeam() ? blueTagPose : redTagPose;
+        Pose2d tagLocation = RobotState.getInstance().isBlueTeam() ? blueTagPose : redTagPose;
         double distance = 100 * RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(tagLocation.getTranslation());
         return distance - CENTER_TO_FRONT_OFFSET_CM;
     }

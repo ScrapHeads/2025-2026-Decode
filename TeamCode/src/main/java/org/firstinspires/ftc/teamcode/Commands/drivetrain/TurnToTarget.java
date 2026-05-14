@@ -5,14 +5,11 @@ import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.CommandBase;
-import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.RilLib.Control.PID.PIDController;
 import org.firstinspires.ftc.teamcode.RilLib.Math.ChassisSpeeds;
-import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Rotation2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.Geometry.Translation2d;
 import org.firstinspires.ftc.teamcode.RilLib.Math.SlewRateLimiter;
@@ -80,7 +77,7 @@ public class TurnToTarget extends CommandBase {
 
         double angle;
         // If on red team do the first equation set else assume the blue team
-        if (!RobotState.getInstance().getTeam()) {
+        if (!RobotState.getInstance().isBlueTeam()) {
             double targetX = -1.7788;
             double targetY = 1.8288;
 

@@ -47,7 +47,8 @@ public class PrismLights implements Subsystem {
         if (isLaunching) {
             desiredColor = Color.YELLOW;
         } else if (!RobotState.getInstance().isMoving()
-                && !RobotState.getInstance().isTurretRotating()) {
+                && !RobotState.getInstance().isTurretRotating()
+                && RobotState.getInstance().isTurretInRange()) {
             desiredColor = Color.GREEN;
         } else {
             desiredColor = Color.WHITE;
