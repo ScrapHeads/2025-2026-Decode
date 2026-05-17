@@ -19,6 +19,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.ParallelDeadlineGroup;
+import com.arcrobotics.ftclib.command.PrintCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -116,7 +117,7 @@ public class BlueAutoClose extends CommandOpMode {
         vision = new Vision(hm);
         vision.register();
 
-        prism = new PrismLightsAuto(hm, false);
+        prism = new PrismLightsAuto(hm, true);
         prism.register();
 
         // Custom constraints for some moves
@@ -144,24 +145,21 @@ public class BlueAutoClose extends CommandOpMode {
         SequentialCommandGroup followPath = new SequentialCommandGroup(
                 new InstantCommand(() -> turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate))),
 
-                new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT),
-                new TurnFeederServoBoth(feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE),
-
-                new ParallelCommandGroup(
-//                        new GetTagPattern(vision).withTimeout(5000),
-//                        new SetFlywheelRpm(launcher, 3490),
-//                        new SetHoodAngleCommand(turretHood, 1430),
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(1))
+                new ParallelDeadlineGroup(
+                        new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT),
+                        new TurnFeederServoBoth(feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE)
                 ),
 
-                new WaitCommand(300),
+                new DynamicStrafeCommand(drivetrain, () -> path.get(1)),
+
+                new WaitCommand(150),
 
                 new LaunchSequenceLeftAuto(feederServo, feederMotor, ballStoppers, intakeLeft),
 
-                new ParallelDeadlineGroup (
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
-                ),
+//                new ParallelDeadlineGroup(
+//                        new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
+//                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+//                ),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(3),
@@ -178,7 +176,10 @@ public class BlueAutoClose extends CommandOpMode {
 
                 new LaunchSequenceLeftAuto(feederServo, feederMotor, ballStoppers, intakeLeft),
 
-                new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
+                        new RunLeftIntakeContinuous(intakeLeft, -1).withTimeout(500)
+                ),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(6),
@@ -197,7 +198,10 @@ public class BlueAutoClose extends CommandOpMode {
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        new SequentialCommandGroup(
+                                new RunLeftIntakeContinuous(intakeLeft, -1).withTimeout(500),
+                                new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        )
                 ),
 
                 new ParallelDeadlineGroup(
