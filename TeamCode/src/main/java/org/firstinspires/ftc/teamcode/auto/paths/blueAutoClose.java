@@ -15,7 +15,6 @@ public final class blueAutoClose {
 
     public static final List<Pose2d> PATH = Arrays.asList(
 		new Pose2d(-1.443, -1.105, new Rotation2d(4.712389)),  // #1  x=-1.443m, y=-1.105m, θ=270.0°
-		new Pose2d(-0.430, -0.550, new Rotation2d(4.712389)),  // #2  x=-0.430m, y=-0.550m, θ=270.0°
 		new Pose2d(-0.202, -0.469, new Rotation2d(4.712389)),  // #2  x=-0.202m, y=-0.469m, θ=270.0°
 		new Pose2d(-0.201, -0.785, new Rotation2d(4.712389)),  // #3  x=-0.201m, y=-0.785m, θ=270.0°
 		new Pose2d(-0.172, -1.417, new Rotation2d(4.712389)),  // #4  x=-0.172m, y=-1.417m, θ=270.0°
