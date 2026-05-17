@@ -10,6 +10,7 @@ import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.LEFT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.RIGHT_BUMPER;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
+import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
 import static org.firstinspires.ftc.teamcode.Constants.dashboard;
 import static org.firstinspires.ftc.teamcode.Constants.hm;
 import static org.firstinspires.ftc.teamcode.Constants.tele;
@@ -19,6 +20,7 @@ import static org.firstinspires.ftc.teamcode.util.BallColor.EMPTY;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -73,6 +75,8 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
     private TurretRotate turretRotate;
     private BallStoppers ballStoppers;
     private PrismLights prism;
+
+    private Boolean overideIntakes = false;
 
     private enum DriveStates {
         DEFAULT,
@@ -155,8 +159,8 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
         // Set up continuous drive
         drivetrain.setDefaultCommand(new DriveContinous(drivetrain, driver, 1));
 
-        intakeLeft.setDefaultCommand(new RunLeftIntakeContinuous(intakeLeft, .2));
-        intakeRight.setDefaultCommand(new RunRightIntakeContinuous(intakeRight, .2));
+//        intakeLeft.setDefaultCommand(new RunLeftIntakeContinuous(intakeLeft, .2));
+//        intakeRight.setDefaultCommand(new RunRightIntakeContinuous(intakeRight, .2));
 
         turretRotate.setDefaultCommand(new TurretRotateContinuous(turretRotate));
 
@@ -166,34 +170,45 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
         feederServo.setDefaultCommand(new TurnFeederServoBothContinuous(
                 feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE));
 
-        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
-                .whenActive(
-                        new ParallelCommandGroup(
-                                new RunRightIntakeContinuous(intakeRight, IntakeLeft.INTAKE_POWER),
-                                new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.UP_ANGLE_RIGHT)
-                        ))
-                .whenInactive(new RunRightIntake(intakeRight, 0));
-
         driver.getGamepadButton(RIGHT_BUMPER)
-                .whenPressed(new RunRightIntakeContinuous(intakeRight, IntakeLeft.OUTTAKE_POWER))
+                .whenPressed(new RunRightIntakeContinuous(intakeRight, IntakeRight.OUTTAKE_POWER))
                 .whenReleased(new RunRightIntake(intakeRight, 0));
-
-        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
-                .whenActive(
-                        new ParallelCommandGroup (
-                                new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER),
-                                new TurnStopperBoth(ballStoppers, BallStoppers.UP_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT)
-                        )
-                )
-                .whenInactive(new RunLeftIntake(intakeLeft, 0));
 
         driver.getGamepadButton(LEFT_BUMPER)
                 .whenPressed(new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.OUTTAKE_POWER))
                 .whenReleased(new RunLeftIntake(intakeLeft, 0));
 
+        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
+                .whenActive(
+                        new ParallelCommandGroup(
+                                new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER),
+                                new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.UP_ANGLE_RIGHT),
+                                new ConditionalCommand(
+                                        new RunLeftIntake(intakeLeft, IntakeLeft.OUTTAKE_POWER_SLOW),
+                                        new InstantCommand(),
+                                        () -> !overideIntakes
+                                )
+                        ))
+                .whenInactive(new RunRightIntake(intakeRight, 0));
+
+        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
+                .whenActive(
+                        new ParallelCommandGroup (
+                                new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER),
+                                new TurnStopperBoth(ballStoppers, BallStoppers.UP_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT),
+                                new ConditionalCommand(
+                                        new RunRightIntake(intakeRight, IntakeRight.OUTTAKE_POWER_SLOW),
+                                        new InstantCommand(),
+                                        () -> !overideIntakes
+                                )
+                        )
+                )
+                .whenInactive(new RunLeftIntake(intakeLeft, 0));
+
         driver.getGamepadButton(X)
                 .whenPressed(new ParallelCommandGroup(
                         new InstantCommand(() -> prism.setIsLaunching(true)),
+                        new InstantCommand(() -> overideIntakes = false),
                         new LaunchSequenceLeft(feederServo, feederMotor, ballStoppers, intakeLeft, turretRotate, launcher))
                             .andThen(new InstantCommand(() -> prism.setIsLaunching(false)))
                             .whenFinished(() -> prism.setIsLaunching(false)));
@@ -201,9 +216,15 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
         driver.getGamepadButton(B)
                 .whenPressed(new ParallelCommandGroup(
                         new InstantCommand(() -> prism.setIsLaunching(true)),
+                        new InstantCommand(() -> overideIntakes = false),
                         new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight, turretRotate))
                             .andThen(new InstantCommand(() -> prism.setIsLaunching(false)))
                             .whenFinished(() -> prism.setIsLaunching(false)));
+
+        driver.getGamepadButton(Y)
+                        .whileActiveOnce(
+                                new InstantCommand(() -> overideIntakes = !overideIntakes)
+                        );
 
 //        driver.getGamepadButton(START)
 //                .whenPressed(
