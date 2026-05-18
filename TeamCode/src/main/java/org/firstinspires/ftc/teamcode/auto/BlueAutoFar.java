@@ -158,9 +158,12 @@ public class BlueAutoFar extends CommandOpMode {
 
                 new LaunchSequenceLeftAuto(feederServo, feederMotor, ballStoppers, intakeLeft),
 
-                new ParallelDeadlineGroup (
+                new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        new SequentialCommandGroup(
+                                new RunLeftIntakeContinuous(intakeLeft, -1).withTimeout(500),
+                                new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        )
                 ),
 
                 new ParallelDeadlineGroup(
@@ -181,7 +184,10 @@ public class BlueAutoFar extends CommandOpMode {
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        new SequentialCommandGroup(
+                                new RunLeftIntakeContinuous(intakeLeft, -1).withTimeout(500),
+                                new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        )
                 ),
 
                 new ParallelDeadlineGroup(
@@ -200,7 +206,10 @@ public class BlueAutoFar extends CommandOpMode {
 
                 new LaunchSequenceLeftAuto(feederServo, feederMotor, ballStoppers, intakeLeft),
 
-                new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
+                        new RunLeftIntakeContinuous(intakeLeft, -1).withTimeout(500)
+                ),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
@@ -220,7 +229,10 @@ public class BlueAutoFar extends CommandOpMode {
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(11)),
-                        new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        new SequentialCommandGroup(
+                                new RunLeftIntakeContinuous(intakeLeft, -1).withTimeout(500),
+                                new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER)
+                        )
                 ),
 
                 new InstantCommand(StateIO::save)

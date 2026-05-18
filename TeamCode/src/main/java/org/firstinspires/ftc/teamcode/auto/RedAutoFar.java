@@ -161,7 +161,10 @@ public class RedAutoFar extends CommandOpMode {
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
-                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
+                        new SequentialCommandGroup(
+                                new RunRightIntakeContinuous(intakeRight, -1).withTimeout(500),
+                                new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
+                        )
                 ),
 
                 new ParallelDeadlineGroup(
@@ -180,7 +183,10 @@ public class RedAutoFar extends CommandOpMode {
 
                 new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
-                new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
+                        new RunRightIntakeContinuous(intakeRight, -1).withTimeout(500)
+                ),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
@@ -198,7 +204,10 @@ public class RedAutoFar extends CommandOpMode {
 
                 new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
-                new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
+                new ParallelDeadlineGroup(
+                        new DynamicStrafeCommand(drivetrain, () -> path.get(8)),
+                        new RunRightIntakeContinuous(intakeRight, -1).withTimeout(500)
+                ),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
@@ -218,7 +227,10 @@ public class RedAutoFar extends CommandOpMode {
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(11)),
-                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
+                        new SequentialCommandGroup(
+                                new RunRightIntakeContinuous(intakeRight, -1).withTimeout(500),
+                                new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
+                        )
                 ),
 
                 new InstantCommand(StateIO::save)

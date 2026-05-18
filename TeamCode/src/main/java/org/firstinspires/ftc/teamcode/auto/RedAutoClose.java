@@ -156,13 +156,16 @@ public class RedAutoClose extends CommandOpMode {
 //                new SetFlywheelRpm(launcher, 4500),
 
 //                new WaitUntilCommand(() -> launcher.isReadyToLaunch()),
-                new WaitCommand(300),
+                new WaitCommand(150),
                 new LaunchSequenceRightAuto(feederServo, feederMotor, ballStoppers, intakeRight),
 
-                new ParallelDeadlineGroup (
-                        new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
-                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
-                ),
+//                new ParallelDeadlineGroup(
+//                        new DynamicStrafeCommand(drivetrain, () -> path.get(2)),
+//                        new SequentialCommandGroup(
+//                                new RunRightIntakeContinuous(intakeRight, -1).withTimeout(500),
+//                                new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
+//                        )
+//                ),
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(3)),
@@ -182,7 +185,10 @@ public class RedAutoClose extends CommandOpMode {
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(5)),
-                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
+                        new SequentialCommandGroup(
+                                new RunRightIntakeContinuous(intakeRight, -1).withTimeout(500),
+                                new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
+                        )
                 ),
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(6)),
@@ -202,7 +208,10 @@ public class RedAutoClose extends CommandOpMode {
 
                 new ParallelDeadlineGroup(
                         new DynamicStrafeCommand(drivetrain, () -> path.get(9)),
-                        new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
+                        new SequentialCommandGroup(
+                                new RunRightIntakeContinuous(intakeRight, -1).withTimeout(500),
+                                new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER)
+                        )
                 ),
 
                 new ParallelDeadlineGroup(

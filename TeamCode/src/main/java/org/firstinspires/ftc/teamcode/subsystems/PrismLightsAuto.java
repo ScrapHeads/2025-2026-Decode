@@ -23,7 +23,7 @@ public class PrismLightsAuto implements Subsystem {
         color.setBrightness(50);
         color2.setBrightness(50);
 
-        if (isFar) {
+        if (!isFar) {
             color.setStartIndex(0);
             color.setStopIndex(6);
 
