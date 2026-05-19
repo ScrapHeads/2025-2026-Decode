@@ -20,6 +20,8 @@ public class PrismLights implements Subsystem {
     public PrismLights(HardwareMap hm) {
         prism = hm.get(GoBildaPrismDriver.class,"prism");
 
+        prism.clearAllAnimations();
+
 //        color.setPrimaryColor(Color.RED);
         color.setStartIndex(0);
         color.setStopIndex(24);

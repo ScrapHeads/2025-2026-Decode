@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.teleops;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.BACK;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
@@ -76,7 +75,7 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
     private BallStoppers ballStoppers;
     private PrismLights prism;
 
-    private Boolean overideIntakes = false;
+    private Boolean overrideIntakes = false;
 
     private enum DriveStates {
         DEFAULT,
@@ -92,8 +91,6 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
         tele = telemetry;
         dashboard = FtcDashboard.getInstance();
         turretLookupTable = new TurretLookupTable();
-
-//        StateIO.load();
 
         setUpRobotState();
 
@@ -186,7 +183,7 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
                                 new ConditionalCommand(
                                         new RunLeftIntake(intakeLeft, IntakeLeft.OUTTAKE_POWER_SLOW),
                                         new InstantCommand(),
-                                        () -> !overideIntakes
+                                        () -> !overrideIntakes
                                 )
                         ))
                 .whenInactive(new RunRightIntake(intakeRight, 0));
@@ -199,7 +196,7 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
                                 new ConditionalCommand(
                                         new RunRightIntake(intakeRight, IntakeRight.OUTTAKE_POWER_SLOW),
                                         new InstantCommand(),
-                                        () -> !overideIntakes
+                                        () -> !overrideIntakes
                                 )
                         )
                 )
@@ -208,7 +205,7 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
         driver.getGamepadButton(X)
                 .whenPressed(new ParallelCommandGroup(
                         new InstantCommand(() -> prism.setIsLaunching(true)),
-                        new InstantCommand(() -> overideIntakes = false),
+                        new InstantCommand(() -> overrideIntakes = false),
                         new LaunchSequenceLeft(feederServo, feederMotor, ballStoppers, intakeLeft, turretRotate, launcher))
                             .andThen(new InstantCommand(() -> prism.setIsLaunching(false)))
                             .whenFinished(() -> prism.setIsLaunching(false)));
@@ -216,14 +213,14 @@ public class PracticeAllSystemsTeleBlue extends CommandOpMode {
         driver.getGamepadButton(B)
                 .whenPressed(new ParallelCommandGroup(
                         new InstantCommand(() -> prism.setIsLaunching(true)),
-                        new InstantCommand(() -> overideIntakes = false),
+                        new InstantCommand(() -> overrideIntakes = false),
                         new LaunchSequenceRight(feederServo, feederMotor, ballStoppers, intakeRight, turretRotate))
                             .andThen(new InstantCommand(() -> prism.setIsLaunching(false)))
                             .whenFinished(() -> prism.setIsLaunching(false)));
 
         driver.getGamepadButton(Y)
                         .whileActiveOnce(
-                                new InstantCommand(() -> overideIntakes = !overideIntakes)
+                                new InstantCommand(() -> overrideIntakes = !overrideIntakes)
                         );
 
 //        driver.getGamepadButton(START)

@@ -20,6 +20,8 @@ public class PrismLightsAuto implements Subsystem {
     public PrismLightsAuto(HardwareMap hm, Boolean isFar) {
         prism = hm.get(GoBildaPrismDriver.class,"prism");
 
+        prism.clearAllAnimations();
+
         color.setBrightness(50);
         color2.setBrightness(50);
 

@@ -9,6 +9,7 @@ import static org.firstinspires.ftc.teamcode.Constants.turretLookupTable;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -61,6 +62,8 @@ public class AllSystemsTeleBlue extends CommandOpMode {
     private TurretRotate turretRotate;
     private BallStoppers ballStoppers;
     private PrismLights prism;
+
+    public Boolean overrideIntakes = false;
 
 
     private enum DriveStates {
@@ -153,30 +156,48 @@ public class AllSystemsTeleBlue extends CommandOpMode {
         feederServo.setDefaultCommand(new TurnFeederServoBothContinuous(
                 feederServo, FeederServo.IN_FRONT_ANGLE, FeederServo.IN_BACK_ANGLE));
 
-        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
-                .whenActive(
-                        new ParallelCommandGroup(
-                                new RunRightIntakeContinuous(intakeRight, IntakeLeft.INTAKE_POWER),
-                                new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.UP_ANGLE_RIGHT)
-                        ))
-                .whenInactive(new RunRightIntake(intakeRight, 0));
-
         driver.getGamepadButton(RIGHT_BUMPER)
                 .whenPressed(new RunRightIntakeContinuous(intakeRight, IntakeLeft.OUTTAKE_POWER))
                 .whenReleased(new RunRightIntake(intakeRight, 0));
+
+        driver.getGamepadButton(LEFT_BUMPER)
+                .whenPressed(new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.OUTTAKE_POWER))
+                .whenReleased(new RunLeftIntake(intakeLeft, 0));
+
+        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1)
+                .whenActive(
+                        new ParallelCommandGroup(
+                                new RunRightIntakeContinuous(intakeRight, IntakeRight.INTAKE_POWER),
+                                new TurnStopperBoth(ballStoppers, BallStoppers.DOWN_ANGLE_LEFT, BallStoppers.UP_ANGLE_RIGHT),
+                                new ConditionalCommand(
+                                        new RunLeftIntake(intakeLeft, IntakeLeft.OUTTAKE_POWER_SLOW),
+                                        new InstantCommand(),
+                                        () -> !overrideIntakes
+                                )
+                        ))
+                .whenInactive(new RunRightIntake(intakeRight, 0));
 
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1)
                 .whenActive(
                         new ParallelCommandGroup (
                                 new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.INTAKE_POWER),
-                                new TurnStopperBoth(ballStoppers, BallStoppers.UP_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT)
+                                new TurnStopperBoth(ballStoppers, BallStoppers.UP_ANGLE_LEFT, BallStoppers.DOWN_ANGLE_RIGHT),
+                                new ConditionalCommand(
+                                        new RunRightIntake(intakeRight, IntakeRight.OUTTAKE_POWER_SLOW),
+                                        new InstantCommand(),
+                                        () -> !overrideIntakes
+                                )
                         )
                 )
                 .whenInactive(new RunLeftIntake(intakeLeft, 0));
 
-        driver.getGamepadButton(LEFT_BUMPER)
-                .whenPressed(new RunLeftIntakeContinuous(intakeLeft, IntakeLeft.OUTTAKE_POWER))
-                .whenReleased(new RunLeftIntake(intakeLeft, 0));
+        driver.getGamepadButton(X)
+                .whenPressed(new ParallelCommandGroup(
+                        new InstantCommand(() -> prism.setIsLaunching(true)),
+                        new InstantCommand(() -> overrideIntakes = false),
+                        new LaunchSequenceLeft(feederServo, feederMotor, ballStoppers, intakeLeft, turretRotate, launcher))
+                        .andThen(new InstantCommand(() -> prism.setIsLaunching(false)))
+                        .whenFinished(() -> prism.setIsLaunching(false)));
 
         driver.getGamepadButton(X)
                 .whenPressed(new ParallelCommandGroup(
